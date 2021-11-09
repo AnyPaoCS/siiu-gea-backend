@@ -6,13 +6,17 @@ package com.siiu.umss.siiu.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.List;
 
 @Entity
 public class Employee {
     @Id
     private Long id;
 
-    private String name;
+    private String firstName;
+    private String lastName;
+    private Byte[] image;
+    private List<Contract> contracts;
 
     public Long getId() {
         return id;
@@ -22,11 +26,11 @@ public class Employee {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String name) {
+        this.firstName = name;
     }
 }
