@@ -15,7 +15,7 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     public String parseName(String name) {
-        Employee employee = employeeRepository.findByName(name);
+        Employee employee = employeeRepository.findByFirstName(name);
         return employee.getFirstName().toUpperCase();
         // muchas operaciones tal forma que se cumple con los criterios de aceptacion de una tarea de jira
     }
