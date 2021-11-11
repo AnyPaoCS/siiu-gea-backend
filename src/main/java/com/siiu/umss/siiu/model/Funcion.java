@@ -5,14 +5,13 @@
 package com.siiu.umss.siiu.model;
 
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
 
 @Entity
-public class Position extends ModelBase {
+public class Funcion extends ModelBase {
     private String name;
 
-    @OneToOne
-    private Funcion funcion;
+    /*@OneToOne(mappedBy = "funcion")
+    private Position position;*/
 
     public String getName() {
         return name;

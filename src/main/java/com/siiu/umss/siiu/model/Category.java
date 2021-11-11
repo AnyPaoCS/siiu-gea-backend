@@ -8,7 +8,8 @@ import javax.persistence.Entity;
 
 @Entity
 public class Category extends ModelBase {
-    private String name;
+//    @Column(length = 200,name = "nombre", nullable = false, unique = true)
+private String name;
     private String code;
 
     public String getName() {
