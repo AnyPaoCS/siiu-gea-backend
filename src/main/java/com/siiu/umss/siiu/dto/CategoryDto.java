@@ -2,14 +2,11 @@
  * @author: Edson A. Terceros T.
  */
 
-package com.siiu.umss.siiu.model;
+package com.siiu.umss.siiu.dto;
 
-import com.siiu.umss.siiu.dto.CategoryDto;
+import com.siiu.umss.siiu.model.Category;
 
-import javax.persistence.Entity;
-
-@Entity
-public class Category extends ModelBase<CategoryDto> {
+public class CategoryDto extends DtoBase<Category> {
     private String name;
     private String code;
 

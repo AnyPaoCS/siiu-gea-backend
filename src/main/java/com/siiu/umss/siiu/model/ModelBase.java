@@ -4,6 +4,7 @@
 
 package com.siiu.umss.siiu.model;
 
+import com.siiu.umss.siiu.dto.DtoBase;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,7 +15,7 @@ import java.util.Date;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @SuppressWarnings("rawtypes")
-public class ModelBase/*<D extends DtoBase>*/ {
+public class ModelBase<D extends DtoBase> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)

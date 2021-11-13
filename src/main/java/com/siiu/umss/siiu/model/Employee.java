@@ -4,6 +4,8 @@
 
 package com.siiu.umss.siiu.model;
 
+import com.siiu.umss.siiu.dto.EmployeeDto;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,7 +13,7 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-public class Employee extends ModelBase {
+public class Employee extends ModelBase<EmployeeDto> {
     private String firstName;
     private String lastName;
     private Byte[] image;
