@@ -12,6 +12,7 @@ import java.util.Date;
 @Entity
 public class Contract extends ModelBase {
     @ManyToOne(optional = false)
+//    @JoinColumn(name = "emp_id")
     private Employee employee;
 
     @OneToOne(optional = false)

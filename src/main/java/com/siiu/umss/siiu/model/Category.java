@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 
 @Entity
 public class Category extends ModelBase<CategoryDto> {
+    //    @Column(length = 200,name = "nombre", nullable = false, unique = true)
     private String name;
     private String code;
 

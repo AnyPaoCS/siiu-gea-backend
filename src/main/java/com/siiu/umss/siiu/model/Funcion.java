@@ -4,17 +4,14 @@
 
 package com.siiu.umss.siiu.model;
 
-import com.siiu.umss.siiu.dto.PositionDto;
-
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
 
 @Entity
-public class Position extends ModelBase<PositionDto> {
+public class Funcion extends ModelBase {
     private String name;
 
-    @OneToOne
-    private Funcion funcion;
+    /*@OneToOne(mappedBy = "funcion")
+    private Position position;*/
 
     public String getName() {
         return name;
