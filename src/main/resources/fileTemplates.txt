@@ -11,7 +11,7 @@ File Template para repositorios
 #if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
 #parse("File Header.java")
 
-import com.siiu.umss.siiu.model.${NAME};
+import com.umss.siiu.model.${NAME};
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ${NAME}Repository extends JpaRepository<${NAME}, Long>{
@@ -30,7 +30,7 @@ File Template para repositorios
 #if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
 #parse("File Header.java")
 
-import com.siiu.umss.siiu.model.${NAME};
+import com.umss.siiu.model.${NAME};
 
 public class ${NAME}Dto extends DtoBase<${NAME}>{
 }
