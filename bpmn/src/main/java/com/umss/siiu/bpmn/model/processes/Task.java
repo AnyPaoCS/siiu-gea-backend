@@ -64,13 +64,13 @@ public class Task extends ModelBase<DtoBase<?>> {
         this.taskActions = taskActions;
     }
 
-//    public EntryLogicGatePolicyType getEntryLogicGatePolicyType() {
-//        return entryLogicGatePolicyType;
-//    }
+    public EntryLogicGatePolicyType getEntryLogicGatePolicyType() {
+        return entryLogicGatePolicyType;
+    }
 
-//    public void setEntryLogicGatePolicyType(EntryLogicGatePolicyType entryLogicGatePolicyType) {
-//        this.entryLogicGatePolicyType = entryLogicGatePolicyType;
-//    }
+    public void setEntryLogicGatePolicyType(EntryLogicGatePolicyType entryLogicGatePolicyType) {
+        this.entryLogicGatePolicyType = entryLogicGatePolicyType;
+    }
 
     public String getParallelGroupingCode() {
         return parallelGroupingCode;

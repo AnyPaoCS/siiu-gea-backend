@@ -20,15 +20,16 @@
     <modules>
         <module>core</module>
         <module>bpmn</module>
+        <module>siiu-rest</module>
     </modules>
 
     <build>
-        <plugins>
+        <!--<plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-        </plugins>
+        </plugins>-->
     </build>
 
 </project>

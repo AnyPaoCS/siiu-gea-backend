@@ -1,7 +1,7 @@
 package com.umss.siiu.bpmn.dto;
 
+import com.umss.siiu.bpmn.model.processes.Task;
 import com.umss.siiu.core.dto.DtoBase;
-import org.springframework.scheduling.config.Task;
 
 public class TaskDto extends DtoBase<Task> {
 
