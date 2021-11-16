@@ -5,12 +5,14 @@
 package com.umss.siiu.core.model;
 
 import com.umss.siiu.core.dto.DtoBase;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -22,7 +24,6 @@ public class ModelBase<D extends DtoBase> {
     private Long id;
 
     @CreatedDate
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, updatable = false)
     private Date createdAt;
 
@@ -74,7 +75,7 @@ public class ModelBase<D extends DtoBase> {
         this.version = version;
     }
 
-    /*protected void beforeConversion(D element, ModelMapper mapper) {
+    protected void beforeConversion(D element, ModelMapper mapper) {
         // Do nothing
     }
 
@@ -120,5 +121,5 @@ public class ModelBase<D extends DtoBase> {
                 return new ModelBase<>();
             }
         }).sorted(Comparator.comparing(ModelBase::getIndexedId)).collect(Collectors.toList());
-    }*/
+    }
 }
