@@ -2,7 +2,7 @@
  * @author: Edson A. Terceros T.
  */
 
-package com.umss.siiu.core.controller;
+package com.umss.siiu.siiurest.controller;
 
 import com.umss.siiu.core.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
