@@ -9,4 +9,6 @@ import com.umss.siiu.core.model.Employee;
 
 public interface EmployeeRepository extends GenericRepository<Employee> {
     Employee findByFirstName(String name);// select * from employee;
+
+    Employee findByUserSystemUserTrue();
 }

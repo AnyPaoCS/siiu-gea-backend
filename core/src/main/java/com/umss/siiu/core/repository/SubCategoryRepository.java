@@ -5,7 +5,9 @@
 package com.umss.siiu.core.repository;
 
 import com.umss.siiu.core.model.SubCategory;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> {
+import java.util.List;
+
+public interface SubCategoryRepository extends GenericRepository<SubCategory> {
+    List<SubCategory> findAllByCategoryId(Long categoryId);
 }
