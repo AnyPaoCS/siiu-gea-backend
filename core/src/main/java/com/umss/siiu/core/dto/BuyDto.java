@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 public class BuyDto extends DtoBase<Buy> {
 
     private BigDecimal value;
+    private Integer transactionNumber;
 
     public BigDecimal getValue() {
         return value;
@@ -22,6 +23,13 @@ public class BuyDto extends DtoBase<Buy> {
         this.value = value;
     }
 
+    public Integer getTransactionNumber() {
+        return transactionNumber;
+    }
+
+    public void setTransactionNumber(Integer transactionNumber) {
+        this.transactionNumber = transactionNumber;
+    }
 
     //
     // contro  serv   ->   dto.setF1(model.getF1)
@@ -40,11 +48,17 @@ public class BuyDto extends DtoBase<Buy> {
 
     @Override
     public BuyDto toDto(Buy buy, ModelMapper mapper) {
-        /*BuyDto buyDto = new BuyDto();
-        buyDto.setValue(buy.getValue());*/
+        BuyDto buyDto = new BuyDto();
+        buyDto.setValue(buy.getValue());
         BuyDto dtoBase = super.toDto(buy, mapper);
         // buyDto.setTransacNum(Intger.valueOf(buy.getF1)     en caso que no coincide tipo o nombre de atributo
         return dtoBase;
     }
 
+   /* @Override
+    protected void beforeConversion(Buy buy, ModelMapper mapper) {
+        super.beforeConversion(buy, mapper);
+        // setTransacNum(Intger.valueOf(buy.getF1)     en caso que no coincide tipo o nombre de atributo
+        setTransactionNumber(buy.getValue().intValue());
+    }*/
 }
