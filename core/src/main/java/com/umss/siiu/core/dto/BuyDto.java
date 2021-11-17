@@ -52,6 +52,12 @@ public class BuyDto extends DtoBase<Buy> {
         buyDto.setValue(buy.getValue());
         BuyDto dtoBase = super.toDto(buy, mapper);
         // buyDto.setTransacNum(Intger.valueOf(buy.getF1)     en caso que no coincide tipo o nombre de atributo
+
+        /*
+        M.f1   D.f1  String     si
+        M.f2   D.f2  Boolean    si
+        M.f2   D.F2  Boolean    no   -> sobreeescribir toDto  o beforeConversion afterConversion
+        * */
         return dtoBase;
     }
 
