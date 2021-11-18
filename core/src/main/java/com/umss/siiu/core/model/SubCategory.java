@@ -5,6 +5,7 @@
 package com.umss.siiu.core.model;
 
 import com.umss.siiu.core.dto.SubCategoryDto;
+import org.modelmapper.ModelMapper;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -48,5 +49,14 @@ public class SubCategory extends ModelBase<SubCategoryDto> {
 
     public void setCateId(Long cateId) {
         this.cateId = cateId;
+    }
+
+    @Override
+    public SubCategory toDomain(SubCategoryDto subCategoryDto, ModelMapper mapper) {
+        SubCategory subCategory = super.toDomain(subCategoryDto, mapper);
+        Category category = new Category();
+        category.setId(subCategoryDto.getCategoryId());
+        subCategory.setCategory(category);
+        return subCategory;
     }
 }
