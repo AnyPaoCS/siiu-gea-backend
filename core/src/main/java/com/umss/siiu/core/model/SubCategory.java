@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
 public class SubCategory extends ModelBase<SubCategoryDto> {
@@ -16,6 +17,9 @@ public class SubCategory extends ModelBase<SubCategoryDto> {
     private String code;
     @ManyToOne
     private Category category;
+
+    @Transient
+    private String completeName;
 
     private Long cateId;  /// DTO
 
@@ -49,6 +53,14 @@ public class SubCategory extends ModelBase<SubCategoryDto> {
 
     public void setCateId(Long cateId) {
         this.cateId = cateId;
+    }
+
+    public String getCompleteName() {
+        return completeName;
+    }
+
+    public void setCompleteName(String completeName) {
+        this.completeName = completeName;
     }
 
     @Override

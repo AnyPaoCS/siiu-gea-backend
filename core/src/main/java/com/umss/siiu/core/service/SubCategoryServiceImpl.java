@@ -19,6 +19,16 @@ public class SubCategoryServiceImpl extends GenericServiceImpl<SubCategory> impl
     private final SubCategoryRepository repository;
     private final CategoryService categoryService;
 
+    /*  Multicapa Spring  MVC       PHP-> employee.php   sql(injectado)+ logica negocio(tucodigo)+ http
+    Controlador {1 solo Servicio}
+        y si necesito mas Servicios en este controller?
+            -> Servicio principal injecte todos los otros servicios que requieras
+    Servicio  { 1 solo repositorio y N-Servicios(link repo)}
+        -> Mesclar datos deSubCategory y Category   ... N recursos siguiendo la regla de arriba
+    Repositorio (consultas de BD)  donde esa tabla sea la principal  haber joins    // no injecta otros repositorios
+    */
+
+
     public SubCategoryServiceImpl(SubCategoryRepository repository, CategoryService categoryService) {
         this.repository = repository;
         this.categoryService = categoryService;
@@ -31,6 +41,7 @@ public class SubCategoryServiceImpl extends GenericServiceImpl<SubCategory> impl
         if (category != null && category.getId() != null) {
             subCategory.setCategory(categoryService.findById(category.getId()));
         }
+        subCategory.setCompleteName(subCategory.getCode() + subCategory.getName() + category.getCode());
         return subCategory;
     }
 
