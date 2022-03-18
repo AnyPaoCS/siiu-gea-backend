@@ -13,6 +13,8 @@ import java.util.List;
 public class Employee extends ModelBase<EmployeeDto> {
     private String firstName;
     private String lastName;
+    private Boolean featured;
+    private Byte[] image;
 
     @Column(length = 1, nullable = false)
     private boolean available = true;
@@ -70,5 +72,25 @@ public class Employee extends ModelBase<EmployeeDto> {
 
     public void setContracts(List<Contract> contracts) {
         this.contracts = contracts;
+    }
+
+    public Boolean getFeatured() {
+        return featured;
+    }
+
+    public void setFeatured(Boolean featured) {
+        this.featured = featured;
+    }
+
+    public List<Contract> getContracts() {
+        return contracts;
+    }
+
+    public Byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(Byte[] image) {
+        this.image = image;
     }
 }

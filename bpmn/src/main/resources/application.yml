@@ -1,0 +1,57 @@
+# MariaDB or Mysql Server config
+spring:
+  #  jpa:
+  #    hibernate:
+  #      ddl-auto: validate
+  #    show-sql: false
+  #    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  # Mail configurations
+  mail:
+    test-connection: true
+    host: smtp.gmail.com
+    port: 587
+    username: valuationumsstest@gmail.com
+    password: valuationumsstest123
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+          connectiontimeout: 25000
+          timeout: 25000
+          writetimeout: 25000
+  # Secret keys
+  secret:
+    tokenKey: JszuZl0vV+SwgyI08+zpQ6Hhp3Epr3Zxuy/8UFSLBOSUJWkm1havRtdabryNCrklfCSXom9K9nuMxbCX5TR+8ceoNsArkX6on9dn+4hY+GH3gL11/mROgd42cSoPAxiLEBqJHRhlQZgijRygMR63OffGKAd8OW5V4zCixQEeUI9Ql5Ay+GStqXK7Cp4447a68R8HnhqWTroKNHXaFZC+k4AdjGCjsU1GaWIvie7pmHSOq49nP9Lsv1cGVghXG42ozde/mze0hdODqzBOwPrREcI1SpzOr2jgMNfRx4PuPBaezuUhkaAhXwi+uu3QjXki24Ld4HIBwaBJ6hNFtB1B+A==
+  # HTTP max file requests
+  servlet:
+    multipart:
+      max-file-size: 128MB
+      max-request-size: 128MB
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: error
+
+scheduler:
+  jobFetch:
+    interval: 900000
+  allocation:
+    interval: 120000
+    process: CRMJob
+
+# INFO ENDPOINT CONFIGURATION
+info:
+  app:
+    name: '@project.name@'
+    description: '@project.description@'
+    version: '@project.version@'
+    encoding: '@project.build.sourceEncoding@'
+    java.version: '@java.version@'

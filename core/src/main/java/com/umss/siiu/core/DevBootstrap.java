@@ -11,7 +11,6 @@ import com.umss.siiu.core.service.CategoryService;
 import com.umss.siiu.core.service.ItemInstanceService;
 import com.umss.siiu.core.service.ItemService;
 import com.umss.siiu.core.service.SubCategoryService;
-import com.umss.siiu.core.util.ImageUtils;
 import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -91,11 +90,11 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         item.setCode("B-MALTIN");
         item.setName("MALTIN");
         item.setSubCategory(subCategory);
-        try {
+        /*try {
             item.setImage(ImageUtils.inputStreamToByteArray(getResourceAsStream("/images/maltin.jpg")));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         return itemService.save(item);
     }
 

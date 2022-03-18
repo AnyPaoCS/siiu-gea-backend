@@ -2,6 +2,7 @@ package com.umss.siiu.bpmn.dto;
 
 import com.umss.siiu.bpmn.model.Notification;
 import com.umss.siiu.core.dto.DtoBase;
+import com.umss.siiu.core.dto.UserDto;
 
 public class NotificationDto extends DtoBase<Notification> {
 

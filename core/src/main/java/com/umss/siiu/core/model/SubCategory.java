@@ -66,6 +66,7 @@ public class SubCategory extends ModelBase<SubCategoryDto> {
     @Override
     public SubCategory toDomain(SubCategoryDto subCategoryDto, ModelMapper mapper) {
         SubCategory subCategory = super.toDomain(subCategoryDto, mapper);
+        // establecer la relacion // SQL establecer el FK
         Category category = new Category();
         category.setId(subCategoryDto.getCategoryId());
         subCategory.setCategory(category);

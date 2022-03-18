@@ -8,6 +8,7 @@ import com.umss.siiu.bpmn.model.processes.ResourceInstance;
 import com.umss.siiu.bpmn.model.processes.TaskInstance;
 import com.umss.siiu.bpmn.model.processes.TaskStatus;
 import com.umss.siiu.core.dto.DtoBase;
+import com.umss.siiu.core.dto.EmployeeDto;
 import org.modelmapper.ModelMapper;
 
 import java.util.List;

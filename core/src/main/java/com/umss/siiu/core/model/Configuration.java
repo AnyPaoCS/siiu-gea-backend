@@ -1,13 +1,16 @@
-package com.umss.siiu.bpmn.dto;
+package com.umss.siiu.core.model;
 
-import com.umss.siiu.bpmn.model.Configuration;
-import com.umss.siiu.core.dto.DtoBase;
+import com.umss.siiu.core.dto.ConfigurationDto;
 
-public class ConfigurationDto extends DtoBase<Configuration> {
+import javax.persistence.Entity;
 
+@Entity
+public class Configuration extends ModelBase<ConfigurationDto> {
     private String type;
     private String entryKey;
     private String value;
+
+    private boolean active;
 
     public String getType() {
         return type;
@@ -33,4 +36,11 @@ public class ConfigurationDto extends DtoBase<Configuration> {
         this.value = value;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

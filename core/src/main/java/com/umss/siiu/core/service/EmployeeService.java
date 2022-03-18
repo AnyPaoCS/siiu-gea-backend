@@ -5,29 +5,17 @@
 package com.umss.siiu.core.service;
 
 import com.umss.siiu.core.model.Employee;
-import com.umss.siiu.core.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import java.util.List;
 
-@Service
-public class EmployeeService {
-    @Autowired
-    private EmployeeRepository employeeRepository;
+public interface EmployeeService extends GenericService<Employee> {
+    List<Employee> findAvailableEmployees();
 
-    @Value("${EmployeeService.urlSSU:www.ssu.com}")
-    private String urlSSU;
+//    List<Employee> findByTasksId(long taskId);
 
-    public String parseName(String name) {
-        Employee employee = employeeRepository.findByFirstName(name);
-        return employee.getFirstName().toUpperCase();
-        // muchas operaciones tal forma que se cumple con los criterios de aceptacion de una tarea de jira
-    }
+    Employee findByEmail(String email);
 
-    @PostConstruct
-    void post() {
-        System.out.println("hola");
-    }
+    Employee findSystemEmployee();
+
+    String parseName(String name);
 }
