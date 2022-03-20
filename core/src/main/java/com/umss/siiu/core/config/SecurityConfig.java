@@ -64,16 +64,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and()
                 .csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, ApiPath.LOGIN_URL).permitAll()
+                .antMatchers(HttpMethod.POST, "/users/login").permitAll()
                 .antMatchers(HttpMethod.POST, ApiPath.USER_PATH).permitAll()
                 .antMatchers(HttpMethod.POST, ApiPath.FORGOTTEN_PASSWORD).permitAll()
                 .antMatchers(HttpMethod.POST, ApiPath.RESTORE_PASSWORD).permitAll()
                 .antMatchers(HttpMethod.GET, "/websocket/**").permitAll()
-                // TODO delete this and its implementation once we get the real CRM endpoint
-                // available
-                .antMatchers(HttpMethod.GET, "/service/v4_1/rest.php").permitAll()
-                .antMatchers(HttpMethod.POST, "/service/v4_1/rest.php").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/file/public/download").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/file/public/upload").permitAll()
+                .antMatchers(HttpMethod.GET, "/h2-console/*").permitAll()
+                .antMatchers(HttpMethod.POST, "/h2-console/*").permitAll()
+                .antMatchers(HttpMethod.PUT, "/h2-console/*").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/h2-console/*").permitAll()
+                .antMatchers(HttpMethod.GET, "/actuator/*").permitAll()
 
                 .anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                 .and().addFilterBefore(authorizationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);

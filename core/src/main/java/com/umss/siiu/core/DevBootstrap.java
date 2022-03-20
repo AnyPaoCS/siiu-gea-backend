@@ -7,21 +7,17 @@ package com.umss.siiu.core;
 import com.umss.siiu.core.model.*;
 import com.umss.siiu.core.model.market.ItemInstance;
 import com.umss.siiu.core.repository.*;
-import com.umss.siiu.core.service.CategoryService;
-import com.umss.siiu.core.service.ItemInstanceService;
-import com.umss.siiu.core.service.ItemService;
-import com.umss.siiu.core.service.SubCategoryService;
+import com.umss.siiu.core.service.*;
 import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 
-@Component
+//@Component
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
     private CategoryRepository categoryRepository;
     private SubCategoryRepository subCategoryRepository;
@@ -41,7 +37,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
             ItemRepository itemRepository, EmployeeRepository employeeRepository,
             PositionRepository positionRepository, ContractRepository contractRepository, BuyRepository buyRepository
             , CategoryService categoryService, SubCategoryService subCategoryService, ItemService itemService,
-            ItemInstanceService itemInstanceService) {
+            ItemInstanceService itemInstanceService, UserService userService) {
         this.categoryRepository = categoryRepository;
         this.subCategoryRepository = subCategoryRepository;
         this.itemRepository = itemRepository;

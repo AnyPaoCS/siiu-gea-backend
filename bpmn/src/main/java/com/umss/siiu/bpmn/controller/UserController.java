@@ -31,7 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-@RestController("users")
+@RestController
+@RequestMapping("/users")
 public class UserController extends GenericController<User, UserDto> {
 
     private UserService userService;
