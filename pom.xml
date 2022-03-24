@@ -20,6 +20,7 @@
     <modules>
         <module>core</module>
         <module>bpmn</module>
+        <module>fileStorage</module>
         <module>siiu-rest</module>
     </modules>
 

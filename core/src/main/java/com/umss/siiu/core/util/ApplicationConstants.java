@@ -18,17 +18,12 @@ public class ApplicationConstants {
     public static final String TOKEN = "token";
     public static final String UNDEFINED = "undefined";
 
-    // JWT
-    public static final String ISSUER_INFO = "https://www.avantica.net/";
-    public static final String SUPER_SECRET_KEY = "1234";
-    public static final long TOKEN_EXPIRATION_TIME = 864_000_000; // 10 day
+    // File
+    public static final String FILE_WITHOUT_PREVIEW = "File cannot be displayed";
+    public static final String VIEW_AND_DOWNLOAD_FILE = "filename=\"%s\"";
 
     // Oauth2
     public static final String GRANT_TYPE = "password";
-
-    // Export
-    public static final String EXCEL_APPLICATION = "application/xlsx";
-    public static final String WORD_APPLICATION = "application/msword";
 
     public static final String CONTENT_DISPOSITION = "Content-Disposition";
 
