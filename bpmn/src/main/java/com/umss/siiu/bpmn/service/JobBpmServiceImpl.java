@@ -28,7 +28,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     private static final String NORMAL = "normal";
     private static final String COMPLETE_ACTION_NAME = "DONE";
     private static final String PATH_SEPARATOR = "/";
-    private static final String BOOTSTRAP = "Bootstrap";
+    private static final String REQUEST_PROCESS = "req_pro";
 
     private JobBpmRepository repository;
 
@@ -232,7 +232,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
                         }
                     }
                 }
-                if (getSystem && taskInstance.getTask().getName().compareTo(BOOTSTRAP) == 0) {
+                if (getSystem && taskInstance.getTask().getCode().compareTo(REQUEST_PROCESS) == 0) {
                     taskInstance = taskInstanceService.findById(taskInstance.getId());
                     taskInstanceService.complete(taskInstance, Collections.singletonList(COMPLETE_ACTION_NAME));
                 }
@@ -273,7 +273,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     }
 
     private TaskInstance exceptionFlow(TaskInstance task) {
-        if (task.getTask().getCode().equals(TaskType.VALIDATE_PARCEL.getCode())) {
+        if (task.getTask().getCode().equals(TaskType.VALIDATION_DOCUMENTS.getCode())) {
             restartProcess(task);
             taskInstanceService.createTaskInstance(task.getProcessInstance().getProcess(), task.getProcessInstance());
             return taskInstanceService.findById(task.getId());

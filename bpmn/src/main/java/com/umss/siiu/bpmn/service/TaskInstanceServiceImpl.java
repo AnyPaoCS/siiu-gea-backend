@@ -30,7 +30,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     private static final String COMPLETE_ACTION_NAME = "DONE";
     private static final String STATUS_CHANGE_MSG = "You can't change the task status manually from state %s";
     private static final String SYSTEM_EMPLOYEE_NAME = "System";
-    private static final String BOOTSTRAP = "Bootstrap";
+    private static final String REQUEST_PROCESS = "req_pro";
 
     private TaskInstanceRepository repository;
 
@@ -298,7 +298,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
                             resourceInstance.getTaskInstance().getTask().getName()));
         }
         boolean isSystem = employee.getFirstName().equals(SYSTEM_EMPLOYEE_NAME);
-        if (taskInstance.getTask().getName().compareTo(BOOTSTRAP) == 0) {
+        if (taskInstance.getTask().getCode().compareTo(REQUEST_PROCESS) == 0) {
             taskInstance.setTaskStatus(TaskStatus.ALLOCATED);
         }
 

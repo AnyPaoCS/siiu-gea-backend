@@ -31,7 +31,6 @@ import java.util.Set;
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
     private static final String COMPLETE_ACTION = "DONE";
     private static final String CRM_JOB = "CRMJob";
-    private static final String VALIDATE_PARCEL_ROI_GROUP = "ValidateParcel_ROI";
 
     private EmployeeRepository employeeRepository;
     private EmployeeTaskService employeeTaskService;
@@ -40,22 +39,18 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private RoleService roleService;
     private NotificationTypeRepository notificationTypeRepository;
 
-    private Task bootstrapTask;
-    private Task validateParcelTask;
-    private Task roiTask;
-    private Task qaTask;
-    private Task civasQaTask;
-    private Task uploadFilesTask;
-    private Task narrativeTask;
-    private Task taxingTask;
-    private Task zoningTask;
-    private Task relomaTask;
-    private Task formattingTask;
-    private Task reformattingTask;
+    private Task requestProcessTask;
+    private Task reviewRequirementsTask;
+    private Task enablePaymentTask;
+    private Task validationPaymentTask;
+    private Task validationDocumentsTask;
+    private Task signatureDocumentsTask;
+    private Task concludeProcessTask;
+    private Task cancellProcessTask;
 
-    public DevBootstrap( EmployeeRepository employeeRepository,
-            EmployeeTaskService employeeTaskService,
-            UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository) {
+    public DevBootstrap(EmployeeRepository employeeRepository,
+                        EmployeeTaskService employeeTaskService,
+                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository) {
         this.employeeRepository = employeeRepository;
         this.employeeTaskService = employeeTaskService;
         this.userService = userService;
@@ -99,37 +94,30 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         List<Employee> employees = employeeRepository.findAll();
         if (employees.isEmpty()) {
             Set<Task> edsonTasks = new HashSet<>();
-            edsonTasks.add(uploadFilesTask);
+            edsonTasks.add(validationDocumentsTask);
             createEmployee("Edson", "Terceros", edsonTasks, "edson@maecre.com");
 
             Set<Task> arielTasks = new HashSet<>();
-            arielTasks.add(qaTask);
+            arielTasks.add(enablePaymentTask);
             createEmployee("Ariel", "Terceros", arielTasks, "ariel@maecre.com");
 
             Set<Task> victorTasks = new HashSet<>();
-            victorTasks.add(validateParcelTask);
-            victorTasks.add(relomaTask);
-            victorTasks.add(taxingTask);
-            victorTasks.add(narrativeTask);
-            victorTasks.add(formattingTask);
-            victorTasks.add(zoningTask);
-            victorTasks.add(roiTask);
-            victorTasks.add(qaTask);
-            victorTasks.add(reformattingTask);
-            victorTasks.add(civasQaTask);
-            victorTasks.add(uploadFilesTask);
+            victorTasks.add(validationDocumentsTask);
+            victorTasks.add(validationPaymentTask);
+            victorTasks.add(cancellProcessTask);
+            victorTasks.add(reviewRequirementsTask);
             createEmployee("Victor", "Linero", victorTasks, "victor@maecre.com");
 
             Set<Task> jasonTasks = new HashSet<>();
-            jasonTasks.add(zoningTask);
+            jasonTasks.add(cancellProcessTask);
             createEmployee("Jason", "Gonzalez", jasonTasks, "jason@maecre.com");
 
             Set<Task> marioTasks = new HashSet<>();
-            marioTasks.add(uploadFilesTask);
+            marioTasks.add(validationPaymentTask);
             createEmployee("Mario", "Montero", marioTasks, "mario@maecre.com");
 
             Set<Task> systemTasks = new HashSet<>();
-            systemTasks.add(bootstrapTask);
+            systemTasks.add(requestProcessTask);
             createEmployee("System", "", systemTasks, "maecre.appgestion@gmail.com");
         }
     }
@@ -146,109 +134,62 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         Process process = new Process();
         process.setName(CRM_JOB);
 
-        uploadFilesTask = createProcessTask(TaskType.UPLOAD_FILES.getName(), TaskType.UPLOAD_FILES.getCode(), false,
-                Area.QA.getCode());
-        civasQaTask = createProcessTask(TaskType.RE_REVISE.getName(), TaskType.RE_REVISE.getCode(), true,
-                Area.QA.getCode());
-        reformattingTask = createProcessTask(TaskType.REFORMATTING.getName(), TaskType.REFORMATTING.getCode(), false,
-                Area.FORMATTING.getCode());
-        qaTask = createProcessTask(TaskType.QA.getName(), TaskType.QA.getCode(), true, Area.QA.getCode());
-        formattingTask = createProcessTask(TaskType.FORMATTING.getName(), TaskType.FORMATTING.getCode(), false,
-                Area.FORMATTING.getCode());
-        formattingTask.setEntryLogicGatePolicyType(EntryLogicGatePolicyType.AND);
-        narrativeTask = createProcessTask(TaskType.NARRATIVE.getName(), TaskType.NARRATIVE.getCode(), false,
-                Area.NARRATIVE.getCode());
-        taxingTask = createProcessTask(TaskType.TAXES.getName(), TaskType.TAXES.getCode(), false, Area.TAXES.getCode());
-        zoningTask = createProcessTask(TaskType.ZONING.getName(), TaskType.ZONING.getCode(), false,
-                Area.ZONING.getCode());
-        roiTask = createProcessTask(TaskType.ROI.getName(), TaskType.ROI.getCode(), false, Area.ROI.getCode());
-        roiTask.setParallelGroupingCode(VALIDATE_PARCEL_ROI_GROUP);
-        relomaTask = createProcessTask(TaskType.RELOMA.getName(), TaskType.RELOMA.getCode(), false,
-                Area.RELOMA.getCode());
-        validateParcelTask = createProcessTask(TaskType.VALIDATE_PARCEL.getName(), TaskType.VALIDATE_PARCEL.getCode(),
-                false, Area.ROI.getCode());
-        validateParcelTask.setParallelGroupingCode(VALIDATE_PARCEL_ROI_GROUP);
-        bootstrapTask = createProcessTask(TaskType.BOOTSTRAP.getName(), TaskType.BOOTSTRAP.getCode(), false,
-                Area.NONE.getCode());
+        requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(),false, Area.NONE.getCode());
+        //addResourceDocument(requestProcessTask, false, "Documento Original", "DOC-ORIGINAL");
+        //addResourceDocument(requestProcessTask, false, "Fotocopia del documento original a legalizar", "DOC-COPY");
 
-        addTaskAction(bootstrapTask, COMPLETE_ACTION, validateParcelTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(bootstrapTask, COMPLETE_ACTION, roiTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(bootstrapTask, COMPLETE_ACTION, zoningTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(bootstrapTask, COMPLETE_ACTION, taxingTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(bootstrapTask, COMPLETE_ACTION, relomaTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(bootstrapTask, COMPLETE_ACTION, narrativeTask, ActionFlowType.AUTOMATIC);
+        // La tarea necesita de dos recursos.
+        //uploadFilesTask = createProcessTask(TaskType.UPLOAD_FILES.getName(), TaskType.UPLOAD_FILES.getCode(), Area.FILES_AREA.getCode());
+        reviewRequirementsTask = createProcessTask(TaskType.REVIEW_REQUIREMENTS.getName(), TaskType.REVIEW_REQUIREMENTS.getCode(), false, Area.FILES_AREA.getCode());
 
-        addTaskAction(validateParcelTask, COMPLETE_ACTION, formattingTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(validateParcelTask, TaskType.ROI.getCode(), roiTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(validateParcelTask, TaskType.ZONING.getCode(), zoningTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(validateParcelTask, TaskType.TAXES.getCode(), taxingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(validateParcelTask, TaskType.RELOMA.getCode(), relomaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(validateParcelTask, TaskType.NARRATIVE.getCode(), narrativeTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(validateParcelTask, TaskType.BOOTSTRAP.getCode(), bootstrapTask, ActionFlowType.FORCE_GATE_ENTRY);
 
-        addTaskAction(roiTask, COMPLETE_ACTION, formattingTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(zoningTask, COMPLETE_ACTION, formattingTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(taxingTask, COMPLETE_ACTION, formattingTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(relomaTask, COMPLETE_ACTION, formattingTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(narrativeTask, COMPLETE_ACTION, formattingTask, ActionFlowType.AUTOMATIC);
+        enablePaymentTask = createProcessTask(TaskType.ENABLE_PAYMENT.getName(), TaskType.ENABLE_PAYMENT.getCode(), false,Area.FILES_AREA.getCode());
 
-        addTaskAction(formattingTask, COMPLETE_ACTION, qaTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(formattingTask, TaskType.VALIDATE_PARCEL.getCode(), validateParcelTask,
-                ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(formattingTask, TaskType.ROI.getCode(), roiTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(formattingTask, TaskType.ZONING.getCode(), zoningTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(formattingTask, TaskType.TAXES.getCode(), taxingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(formattingTask, TaskType.RELOMA.getCode(), relomaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(formattingTask, TaskType.NARRATIVE.getCode(), narrativeTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(formattingTask, TaskType.BOOTSTRAP.getCode(), bootstrapTask, ActionFlowType.FORCE_GATE_ENTRY);
 
-        addTaskAction(qaTask, COMPLETE_ACTION, reformattingTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(qaTask, TaskType.FORMATTING.getCode(), formattingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(qaTask, TaskType.VALIDATE_PARCEL.getCode(), validateParcelTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(qaTask, TaskType.ROI.getCode(), roiTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(qaTask, TaskType.ZONING.getCode(), zoningTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(qaTask, TaskType.TAXES.getCode(), taxingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(qaTask, TaskType.RELOMA.getCode(), relomaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(qaTask, TaskType.NARRATIVE.getCode(), narrativeTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(qaTask, TaskType.BOOTSTRAP.getCode(), bootstrapTask, ActionFlowType.FORCE_GATE_ENTRY);
+        validationPaymentTask = createProcessTask(TaskType.VALIDATION_PAYMENT.getName(), TaskType.VALIDATION_PAYMENT.getCode(), false,Area.CASH_AREA.getCode());
+        //addResourceDocument(validationPaymentTask, false, "Valorado de Legalizacion Fotocopia", "VALORADO");
 
-        addTaskAction(reformattingTask, COMPLETE_ACTION, civasQaTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(reformattingTask, TaskType.QA.getCode(), qaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(reformattingTask, TaskType.FORMATTING.getCode(), formattingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(reformattingTask, TaskType.VALIDATE_PARCEL.getCode(), validateParcelTask,
-                ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(reformattingTask, TaskType.ROI.getCode(), roiTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(reformattingTask, TaskType.ZONING.getCode(), zoningTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(reformattingTask, TaskType.TAXES.getCode(), taxingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(reformattingTask, TaskType.RELOMA.getCode(), relomaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(reformattingTask, TaskType.NARRATIVE.getCode(), narrativeTask, ActionFlowType.FORCE_GATE_ENTRY);
+        //validationPaymentTask.setEntryLogicGatePolicyType(EntryLogicGatePolicyType.AND);//revisar
+        validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(),false, Area.DEPARTMENT_AREA.getCode());
 
-        addTaskAction(civasQaTask, COMPLETE_ACTION, uploadFilesTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(civasQaTask, TaskType.REFORMATTING.getCode(), reformattingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(civasQaTask, TaskType.QA.getCode(), qaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(civasQaTask, TaskType.FORMATTING.getCode(), formattingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(civasQaTask, TaskType.VALIDATE_PARCEL.getCode(), validateParcelTask,
-                ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(civasQaTask, TaskType.ROI.getCode(), roiTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(civasQaTask, TaskType.ZONING.getCode(), zoningTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(civasQaTask, TaskType.TAXES.getCode(), taxingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(civasQaTask, TaskType.RELOMA.getCode(), relomaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(civasQaTask, TaskType.NARRATIVE.getCode(), narrativeTask, ActionFlowType.FORCE_GATE_ENTRY);
 
-        addTaskAction(uploadFilesTask, TaskType.RE_REVISE.getCode(), civasQaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.REFORMATTING.getCode(), reformattingTask,
-                ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.QA.getCode(), qaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.FORMATTING.getCode(), formattingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.VALIDATE_PARCEL.getCode(), validateParcelTask,
-                ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.ROI.getCode(), roiTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.ZONING.getCode(), zoningTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.TAXES.getCode(), taxingTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.RELOMA.getCode(), relomaTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(uploadFilesTask, TaskType.NARRATIVE.getCode(), narrativeTask, ActionFlowType.FORCE_GATE_ENTRY);
+        //validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(), Area.FACULTY_AREA.getCode());
+        signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(),false, Area.FACULTY_AREA.getCode());
 
-        process.setTask(bootstrapTask);
+
+        concludeProcessTask= createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), true,Area.FILES_AREA.getCode());
+
+        //addResourceDocument(concludeProcessTask, true, "Documento Legalizado", "DOC-LEGALIZADO");
+
+        cancellProcessTask = createProcessTask(TaskType.CANCELL_PROCESS.getName(), TaskType.CANCELL_PROCESS.getCode(), false, Area.FILES_AREA.getCode());
+
+        //Primer nodo
+        addTaskAction(requestProcessTask, TaskType.REQUEST_PROCESS.getCode(), reviewRequirementsTask, ActionFlowType.AUTOMATIC);
+
+        //Segundo nodo
+        addTaskAction(reviewRequirementsTask, TaskType.REVIEW_REQUIREMENTS.getCode(), enablePaymentTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(reviewRequirementsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(reviewRequirementsTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        //Tercer nodo
+        addTaskAction(enablePaymentTask, TaskType.ENABLE_PAYMENT.getCode(), validationPaymentTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(enablePaymentTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(enablePaymentTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        addTaskAction(validationPaymentTask, TaskType.VALIDATION_PAYMENT.getCode(), validationDocumentsTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationPaymentTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationPaymentTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        addTaskAction(validationDocumentsTask, TaskType.VALIDATION_DOCUMENTS.getCode(), signatureDocumentsTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationDocumentsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationPaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        addTaskAction(signatureDocumentsTask, TaskType.CONCLUDE_PROCESS.getCode(), concludeProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(signatureDocumentsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationDocumentsTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+
+        process.setTask(requestProcessTask);
         return process;
     }
 

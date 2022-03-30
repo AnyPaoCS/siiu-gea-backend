@@ -1,18 +1,16 @@
 package com.umss.siiu.bpmn.model.processes;
 
 public enum TaskType {
-    BOOTSTRAP("Bootstrap", "boot"),
+    REQUEST_PROCESS("Request Process", "req_pro"),
     VALIDATE_PARCEL("Validate Parcel", "vp"),
-    ROI("ROI", "roi"),
-    RELOMA("Reloma", "reloma"),
-    ZONING("Zoning", "zoning"),
-    TAXES("Taxes", "taxes"),
-    NARRATIVE("Narrative", "narrative"),
-    FORMATTING("Formatting", "formatting"),
-    REFORMATTING("Reformatting", "reformatting"),
-    QA("QA", "qa"),
-    RE_REVISE("Re-Revise", "rrevise"),
-    UPLOAD_FILES("Upload Files", "uploadf");
+    REVIEW_REQUIREMENTS("Review Requirements", "rev_doc"),
+    ENABLE_PAYMENT("Enable Payment", "ena_pay"),
+    VALIDATION_PAYMENT("Validation Payment", "val_pay"),
+    VALIDATION_DOCUMENTS("Validation Documents", "val_doc"),
+    SIGNATURE_DOCUMENTS("Signature Documents", "sign_doc"),
+    CONCLUDE_PROCESS("Conclude Process", "con_pro"),
+    CANCELL_PROCESS("Cancell process", "can_proc"),
+    OBSERVATIONS("Observations", "obs");
 
     private final String name;
     private final String code;
