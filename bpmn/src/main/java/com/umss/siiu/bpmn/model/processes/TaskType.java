@@ -9,7 +9,6 @@ public enum TaskType {
     VALIDATION_DOCUMENTS("Validation Documents", "val_doc"),
     SIGNATURE_DOCUMENTS("Signature Documents", "sign_doc"),
     CONCLUDE_PROCESS("Conclude Process", "con_pro"),
-    CANCELL_PROCESS("Cancell process", "can_proc"),
     OBSERVATIONS("Observations", "obs");
 
     private final String name;
