@@ -74,7 +74,7 @@ public class ProcessCycleTest extends AbstractTestNGSpringContextTests {
                     allocatedTaskInstances.stream().filter(taskInstance -> taskInstance.getTaskStatus().equals(TaskStatus.ALLOCATED)).collect(Collectors.toList());
         }
 
-        //cleanup
+        /*//cleanup
         List<TaskInstance> taskInstanceList =
                 taskInstanceService.findByProcessInstance(job.getJobBpm().getProcessInstance());
         taskInstanceList.forEach(taskInstance -> {
@@ -84,7 +84,7 @@ public class ProcessCycleTest extends AbstractTestNGSpringContextTests {
         });
         processInstanceService.deleteById(jobBpm.getProcessInstance().getId());
         jobService.deleteById(job.getId());
-        jobBpmService.deleteById(job.getJobBpm().getId());
+        jobBpmService.deleteById(job.getJobBpm().getId());*/
 
     }
 

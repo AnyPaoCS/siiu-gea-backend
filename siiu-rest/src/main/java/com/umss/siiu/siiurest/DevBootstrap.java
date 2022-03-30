@@ -106,6 +106,8 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
             victorTasks.add(validationPaymentTask);
             victorTasks.add(cancellProcessTask);
             victorTasks.add(reviewRequirementsTask);
+            victorTasks.add(concludeProcessTask);
+            victorTasks.add(signatureDocumentsTask);
             createEmployee("Victor", "Linero", victorTasks, "victor@maecre.com");
 
             Set<Task> jasonTasks = new HashSet<>();
@@ -168,24 +170,24 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
         //Segundo nodo
         addTaskAction(reviewRequirementsTask, TaskType.REVIEW_REQUIREMENTS.getCode(), enablePaymentTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(reviewRequirementsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(reviewRequirementsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(reviewRequirementsTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
 
         //Tercer nodo
         addTaskAction(enablePaymentTask, TaskType.ENABLE_PAYMENT.getCode(), validationPaymentTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(enablePaymentTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(enablePaymentTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(enablePaymentTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
 
         addTaskAction(validationPaymentTask, TaskType.VALIDATION_PAYMENT.getCode(), validationDocumentsTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(validationPaymentTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationPaymentTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(validationPaymentTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
 
         addTaskAction(validationDocumentsTask, TaskType.VALIDATION_DOCUMENTS.getCode(), signatureDocumentsTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(validationDocumentsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationDocumentsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationPaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
 
         addTaskAction(signatureDocumentsTask, TaskType.CONCLUDE_PROCESS.getCode(), concludeProcessTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(signatureDocumentsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(signatureDocumentsTask, TaskType.CANCELL_PROCESS.getCode(), cancellProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationDocumentsTask, ActionFlowType.FORCE_GATE_ENTRY);
 
 
