@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name="siiuuser", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User extends ModelBase<UserDto> {
 
     @Column(unique = true, nullable = false, length = 50)
@@ -18,8 +18,8 @@ public class User extends ModelBase<UserDto> {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private Boolean systemUser = false;
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_role", joinColumns = {
-            @JoinColumn(name = "user_id", nullable = false, updatable = false)}, inverseJoinColumns = {
+    @JoinTable(name = "siiuuser_role", joinColumns = {
+            @JoinColumn(name = "siiuuser_id", nullable = false, updatable = false)}, inverseJoinColumns = {
             @JoinColumn(name = "role_id", nullable = false, updatable = false)})
     private Set<Role> roles;
 

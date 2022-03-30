@@ -12,9 +12,12 @@ import com.umss.siiu.bpmn.repository.NotificationTypeRepository;
 import com.umss.siiu.bpmn.repository.ProcessRepository;
 import com.umss.siiu.bpmn.service.EmployeeTaskService;
 import com.umss.siiu.bpmn.service.RoleService;
-import com.umss.siiu.core.model.*;
-import com.umss.siiu.core.repository.*;
-import com.umss.siiu.core.service.*;
+import com.umss.siiu.core.model.Employee;
+import com.umss.siiu.core.model.Role;
+import com.umss.siiu.core.model.RoleType;
+import com.umss.siiu.core.model.User;
+import com.umss.siiu.core.repository.EmployeeRepository;
+import com.umss.siiu.core.service.UserService;
 import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -53,9 +56,9 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private Task formattingTask;
     private Task reformattingTask;
 
-    public DevBootstrap( EmployeeRepository employeeRepository,
-            EmployeeTaskService employeeTaskService,
-            UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository) {
+    public DevBootstrap(EmployeeRepository employeeRepository,
+                        EmployeeTaskService employeeTaskService,
+                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository) {
         this.employeeRepository = employeeRepository;
         this.employeeTaskService = employeeTaskService;
         this.userService = userService;
