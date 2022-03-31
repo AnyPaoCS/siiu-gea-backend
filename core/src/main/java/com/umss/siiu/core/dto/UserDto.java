@@ -17,6 +17,7 @@ public class UserDto extends DtoBase<User> {
     private String password;
     private List<RoleDto> roles;
     private EmployeeDto employee;
+    private String type;
 
     public UserDto() {
         super();
@@ -68,6 +69,14 @@ public class UserDto extends DtoBase<User> {
 
     public void setEmployee(EmployeeDto employee) {
         this.employee = employee;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @SuppressWarnings("unchecked")

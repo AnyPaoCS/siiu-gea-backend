@@ -34,7 +34,7 @@ public class ApplicationConstants {
 
     // CORS
     public static final List<String> ALLOWED_DOMAIN = Collections
-            .unmodifiableList(Arrays.asList("http://localhost:4200", "http://dashboardmetrics", "http://192.168.65.54",
+            .unmodifiableList(Arrays.asList("http://localhost:3000", "http://dashboardmetrics", "http://192.168.65.54",
                     "http://192.168.0.1"));
 
     // Generic exception messages

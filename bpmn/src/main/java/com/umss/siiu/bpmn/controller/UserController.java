@@ -88,7 +88,7 @@ public class UserController extends GenericController<User, UserDto> {
 
             if (!userService.isUserRegistered(tokenInformation.getEmail())) {
                 userService.save(userDto.getFirstName(), userDto.getLastName(), tokenInformation.getEmail(),
-                        userDto.getPassword());
+                        userDto.getPassword(), tokenInformation.getType());
                 responseEntity = new ResponseEntity<>(new TokenDto(tokenService.generateTokenByDay(10,
                         userService.findUserDetails(tokenInformation.getEmail()), true)), HttpStatus.OK);
             } else {
