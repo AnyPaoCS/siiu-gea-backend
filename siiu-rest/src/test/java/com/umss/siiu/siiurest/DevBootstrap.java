@@ -164,7 +164,7 @@ public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent
         signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(), false, Area.FACULTY_AREA.getCode());
 
 
-        concludeProcessTask = createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), true, Area.FILES_AREA.getCode());
+        concludeProcessTask = createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), false, Area.FILES_AREA.getCode());
         addResourceDocument(concludeProcessTask, true, ResourceDocumentType.LEGALIZED_DOCUMENT.getCode(), ResourceDocumentType.LEGALIZED_DOCUMENT.getName());
 
         //Primer nodo

@@ -208,10 +208,10 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
             TaskInstance taskInstance, List<Employee> employeesForTask,
             Map<Long, Map<String, List<TaskInstance>>> groupingByProcessId) {
         Task task = taskInstance.getTask();
+        ProcessInstance processInstance = taskInstance.getProcessInstance();
         for (Resource resource : task.getResourceList()) {
             if (resource.getResourceType().equals(ResourceType.EMPLOYEE)) {
                 Employee employee = employeesForTask.get(0);
-                ProcessInstance processInstance = taskInstance.getProcessInstance();
                 boolean getSystem = employee.getUser().getSystemUser();
                 if (!getSystem) {
                     employeesForTask.remove(0);
@@ -233,6 +233,23 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
                     }
                 }
                 if (getSystem && taskInstance.getTask().getCode().compareTo(REQUEST_PROCESS) == 0) {
+                    taskInstance = taskInstanceService.findById(taskInstance.getId());
+                    taskInstanceService.complete(taskInstance, Collections.singletonList(COMPLETE_ACTION_NAME));
+                }
+            } else {
+                Employee employee = processInstance.getUser().getEmployee();
+                ResourceInstance resourceInstance = taskInstanceService.allocateResource(taskInstance, resource, null,
+                        employee);
+                String parallelGroupingCode = taskInstance.getTask().getParallelGroupingCode();
+                if (parallelGroupingCode != null) {
+                    for (TaskInstance groupedTaskInstance : groupingByProcessId.get(processInstance.getId())
+                            .get(parallelGroupingCode)) {
+                        if (groupedTaskInstance.getId().equals(taskInstance.getId())) {
+                            groupedTaskInstance.getResourceInstances().add(resourceInstance);
+                        }
+                    }
+                }
+                if (taskInstance.getTask().getCode().compareTo(REQUEST_PROCESS) == 0) {
                     taskInstance = taskInstanceService.findById(taskInstance.getId());
                     taskInstanceService.complete(taskInstance, Collections.singletonList(COMPLETE_ACTION_NAME));
                 }

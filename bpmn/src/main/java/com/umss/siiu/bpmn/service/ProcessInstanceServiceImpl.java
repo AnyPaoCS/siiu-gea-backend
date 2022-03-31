@@ -68,7 +68,7 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
     }
 
     private User getDefaultUserSolicitante() {
-        return userService.findByEmail("csorialopez11@gmail.com");
+        return userService.findByEmail("csorialopez11+1@gmail.com");
     }
 
     @Override

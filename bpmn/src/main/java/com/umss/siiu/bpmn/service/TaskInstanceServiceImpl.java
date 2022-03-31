@@ -282,6 +282,10 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     @Override
     public ResourceInstance allocateResource(TaskInstance taskInstance, Resource resource,
             ResourceInstance resourceInstance, Employee employee) {
+        if (taskInstance.getTask().getCode().equals(TaskType.REQUEST_PROCESS.getCode()) ||
+            taskInstance.getTask().getCode().equals(TaskType.VALIDATION_PAYMENT.getCode())) {
+            employee = taskInstance.getProcessInstance().getUser().getEmployee();
+        }
         if (resourceInstance == null) {
             JobBpm jobBpm = taskInstance.getProcessInstance().getJobBpm();
             resourceInstance = createNewResourceInstance(taskInstance, resource, employee);
