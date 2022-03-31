@@ -78,6 +78,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         createRole(RoleType.ADMIN.getId(), RoleType.ADMIN.getType());
         createRole(RoleType.GENERAL.getId(), RoleType.GENERAL.getType());
         createRole(RoleType.SUPERVISOR.getId(), RoleType.SUPERVISOR.getType());
+        createRole(RoleType.APPLICANT.getId(), RoleType.APPLICANT.getType());
     }
 
     private Role createRole(long id, String roleName) {
@@ -94,31 +95,37 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         if (employees.isEmpty()) {
             Set<Task> edsonTasks = new HashSet<>();
             edsonTasks.add(validationDocumentsTask);
-            createEmployee("Edson", "Terceros", edsonTasks, "edson@maecre.com");
+            createEmployee("Edson", "Terceros", edsonTasks, "edson@maecre.com", RoleType.GENERAL.getId());
 
             Set<Task> arielTasks = new HashSet<>();
             arielTasks.add(enablePaymentTask);
-            createEmployee("Ariel", "Terceros", arielTasks, "ariel@maecre.com");
+            createEmployee("Ariel", "Terceros", arielTasks, "ariel@maecre.com", RoleType.GENERAL.getId());
 
             Set<Task> victorTasks = new HashSet<>();
             victorTasks.add(validationDocumentsTask);
-            victorTasks.add(validationPaymentTask);
             victorTasks.add(reviewRequirementsTask);
             victorTasks.add(concludeProcessTask);
             victorTasks.add(signatureDocumentsTask);
-            createEmployee("Victor", "Linero", victorTasks, "victor@maecre.com");
+            createEmployee("Victor", "Linero", victorTasks, "victor@maecre.com", RoleType.GENERAL.getId());
 
             Set<Task> jasonTasks = new HashSet<>();
             jasonTasks.add(signatureDocumentsTask);
-            createEmployee("Jason", "Gonzalez", jasonTasks, "jason@maecre.com");
-
-            Set<Task> marioTasks = new HashSet<>();
-            marioTasks.add(validationPaymentTask);
-            createEmployee("Mario", "Montero", marioTasks, "mario@maecre.com");
+            createEmployee("Jason", "Gonzalez", jasonTasks, "jason@maecre.com", RoleType.GENERAL.getId());
 
             Set<Task> systemTasks = new HashSet<>();
-            systemTasks.add(requestProcessTask);
-            createEmployee("System", "", systemTasks, "maecre.appgestion@gmail.com");
+            systemTasks.add(signatureDocumentsTask);
+            createEmployee("System", "", systemTasks, "maecre.appgestion@gmail.com", RoleType.GENERAL.getId());
+
+            //Usuario solicitante puede hacer esos recursos porque necesita subir documentos
+            Set<Task> user1Tasks = new HashSet<>();
+            user1Tasks.add(requestProcessTask);
+            user1Tasks.add(validationPaymentTask);
+            createEmployee("Solicitante", "1", user1Tasks, "csorialopez11@gmail.com", RoleType.APPLICANT.getId());
+
+            Set<Task> user2Tasks = new HashSet<>();
+            user2Tasks.add(requestProcessTask);
+            user2Tasks.add(validationPaymentTask);
+            createEmployee("Solicitante2", "2", user2Tasks, "csorialopez11+1@gmail.com", RoleType.APPLICANT.getId());
         }
     }
 
@@ -135,8 +142,8 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         process.setName(CRM_JOB);
 
         requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(),false, Area.NONE.getCode());
-        //addResourceDocument(requestProcessTask, false, "Documento Original", "DOC-ORIGINAL");
-        //addResourceDocument(requestProcessTask, false, "Fotocopia del documento original a legalizar", "DOC-COPY");
+        addResourceDocument(requestProcessTask, false, ResourceDocumentType.ORIGINAL_DOCUMENT.getCode(), ResourceDocumentType.ORIGINAL_DOCUMENT.getName());
+        addResourceDocument(requestProcessTask, false, ResourceDocumentType.COPY_ORIGINAL_DOCUMENT.getCode(), ResourceDocumentType.COPY_ORIGINAL_DOCUMENT.getName());
 
         // La tarea necesita de dos recursos.
         //uploadFilesTask = createProcessTask(TaskType.UPLOAD_FILES.getName(), TaskType.UPLOAD_FILES.getCode(), Area.FILES_AREA.getCode());
@@ -146,19 +153,15 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         enablePaymentTask = createProcessTask(TaskType.ENABLE_PAYMENT.getName(), TaskType.ENABLE_PAYMENT.getCode(), false,Area.FILES_AREA.getCode());
 
         validationPaymentTask = createProcessTask(TaskType.VALIDATION_PAYMENT.getName(), TaskType.VALIDATION_PAYMENT.getCode(), false,Area.CASH_AREA.getCode());
-        //addResourceDocument(validationPaymentTask, false, "Valorado de Legalizacion Fotocopia", "VALORADO");
+        addResourceDocument(validationPaymentTask, false, ResourceDocumentType.VALUED.getCode(), ResourceDocumentType.VALUED.getName());
 
-        //validationPaymentTask.setEntryLogicGatePolicyType(EntryLogicGatePolicyType.AND);//revisar
         validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(),false, Area.DEPARTMENT_AREA.getCode());
 
-
-        //validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(), Area.FACULTY_AREA.getCode());
         signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(),false, Area.FACULTY_AREA.getCode());
 
 
         concludeProcessTask= createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), true,Area.FILES_AREA.getCode());
-
-        //addResourceDocument(concludeProcessTask, true, "Documento Legalizado", "DOC-LEGALIZADO");
+        addResourceDocument(concludeProcessTask, true, ResourceDocumentType.LEGALIZED_DOCUMENT.getCode(), ResourceDocumentType.LEGALIZED_DOCUMENT.getName());
 
         //Primer nodo
         addTaskAction(requestProcessTask, TaskType.REQUEST_PROCESS.getCode(), reviewRequirementsTask, ActionFlowType.AUTOMATIC);
@@ -221,6 +224,15 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         task.getResourceList().add(resource);
     }
 
+    private void addResourceDocument(Task task, boolean isOutput, String code, String name) {
+        Resource resource = new Resource();
+        resource.setResourceType(ResourceType.DOCUMENT);
+        resource.setTask(task);
+        resource.setOutput(isOutput);
+        resource.setDocument(new ResourceDocument(code, name));
+        task.getResourceList().add(resource);
+    }
+
     private Task addTaskAction(Task task, String actionName, Task nextTask, ActionFlowType actionFlowType) {
         TaskAction taskAction = new TaskAction();
         taskAction.setName(actionName);
@@ -249,7 +261,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         }
     }
 
-    private void createUser(String email, Employee employee) {
+    private void createUser(String email, Employee employee, Long roleId) {
         User user = new User();
         Role role = new Role();
         HashSet<Role> roles = new HashSet<>();
@@ -262,13 +274,13 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         if (employee.getFirstName()=="System") {
             user.setSystemUser(true);
         }
-        role.setId(1L);
+        role.setId(roleId);
         roles.add(role);
         user.setRoles(roles);
         userService.save(user);
     }
 
-    private void createEmployee(String firstName, String lastName, Set<Task> tasks, String email) {
+    private void createEmployee(String firstName, String lastName, Set<Task> tasks, String email, Long roleId) {
         Employee employee = new Employee();
         employee.setFirstName(firstName);
         employee.setLastName(lastName);
@@ -280,7 +292,6 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
             employeeTaskService.save(employeeTask);
         }
 
-        createUser(email, employee);
+        createUser(email, employee, roleId);
     }
-
 }

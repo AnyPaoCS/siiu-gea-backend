@@ -30,9 +30,6 @@ public class Employee extends ModelBase<EmployeeDto> {
     /*@OneToMany(mappedBy = "employee", fetch = FetchType.EAGER)
     private Set<EmployeeTask> employeeTasks;*/
 
-    @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
-    private List<Contract> contracts;
-
     public String getFirstName() {
         return firstName;
     }
@@ -70,20 +67,12 @@ public class Employee extends ModelBase<EmployeeDto> {
         this.user = user;
     }
 
-    public void setContracts(List<Contract> contracts) {
-        this.contracts = contracts;
-    }
-
     public Boolean getFeatured() {
         return featured;
     }
 
     public void setFeatured(Boolean featured) {
         this.featured = featured;
-    }
-
-    public List<Contract> getContracts() {
-        return contracts;
     }
 
     public Byte[] getImage() {

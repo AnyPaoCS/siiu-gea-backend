@@ -19,15 +19,10 @@ import java.nio.charset.StandardCharsets;
 //@Component
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
     private EmployeeRepository employeeRepository;
-    private PositionRepository positionRepository;
-    private ContractRepository contractRepository;
 
-    public DevBootstrap(EmployeeRepository employeeRepository,
-            PositionRepository positionRepository, ContractRepository contractRepository) {
+    public DevBootstrap(EmployeeRepository employeeRepository) {
 
         this.employeeRepository = employeeRepository;
-        this.positionRepository = positionRepository;
-        this.contractRepository = contractRepository;
     }
 
     @Override

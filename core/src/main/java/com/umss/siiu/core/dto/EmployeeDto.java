@@ -4,7 +4,6 @@
 
 package com.umss.siiu.core.dto;
 
-import com.umss.siiu.core.model.Contract;
 import com.umss.siiu.core.model.Employee;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.modelmapper.ModelMapper;
@@ -91,10 +90,6 @@ public class EmployeeDto extends DtoBase<Employee> {
     @Override
     public EmployeeDto toDto(Employee employee, ModelMapper mapper) {
         super.toDto(employee, mapper);
-        for (Contract contract : employee.getContracts()) {
-            jobPosition = contract.getPosition().getName();
-            jobCode = contract.getPosition().getName();
-        }
         setImageBase64(employee);
         jobDescription = "Descripcion de job";
         return this;

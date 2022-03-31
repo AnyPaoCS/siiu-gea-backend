@@ -13,6 +13,7 @@ import com.umss.siiu.bpmn.model.processes.TaskInstance;
 import com.umss.siiu.bpmn.model.processes.TaskStatus;
 import com.umss.siiu.bpmn.schedulers.JobScheduler;
 import com.umss.siiu.bpmn.service.*;
+import com.umss.siiu.core.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -73,4 +73,5 @@ public class User extends ModelBase<UserDto> {
     public void setSystemUser(Boolean system) {
         this.systemUser = system;
     }
+
 }
