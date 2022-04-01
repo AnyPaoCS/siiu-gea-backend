@@ -26,6 +26,7 @@ public class UserServiceImpl extends GenericServiceImpl<User> implements UserSer
 
     private UserRepository userRepository;
     private EmployeeService employeeService;
+
     private final String TYPE_APPLICANT = "APPLICANT";
 
     public UserServiceImpl(UserRepository userSystemRepository, EmployeeService employeeService) {

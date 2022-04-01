@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.umss.siiu.bpmn.dto.MailDto;
 import com.umss.siiu.bpmn.dto.OperationResultDto;
 import com.umss.siiu.bpmn.dto.TokenDto;
-import com.umss.siiu.bpmn.service.EmailService;
+import com.umss.siiu.bpmn.model.processes.Process;
+import com.umss.siiu.bpmn.model.processes.ProcessInstance;
+import com.umss.siiu.bpmn.service.*;
 import com.umss.siiu.core.controller.GenericController;
 import com.umss.siiu.core.dto.EmployeeDto;
 import com.umss.siiu.core.dto.UserDto;
@@ -38,14 +40,27 @@ public class UserController extends GenericController<User, UserDto> {
     private UserService userService;
     private TokenService tokenService;
     private EmailService emailService;
+    private EmployeeTaskService employeeTaskService;
     private AuthenticationManager authenticationManager;
 
+    private ProcessInstanceService processInstanceService;
+    private ProcessService processService;
+    private JobBpmService jobBpmService;
+
+
     public UserController(UserService userService, TokenService tokenService, EmailService emailService,
-            AuthenticationManager authenticationManager) {
+                          AuthenticationManager authenticationManager, EmployeeTaskService employeeTaskService,
+                          ProcessInstanceService processInstanceService,
+                          ProcessService processService, JobBpmService jobBpmService ) {
         this.userService = userService;
         this.tokenService = tokenService;
         this.emailService = emailService;
         this.authenticationManager = authenticationManager;
+        this.employeeTaskService = employeeTaskService;
+        this.processInstanceService = processInstanceService;
+        this.processService = processService;
+        this.jobBpmService = jobBpmService;
+
     }
 
     @PostMapping("/employees")
@@ -85,10 +100,11 @@ public class UserController extends GenericController<User, UserDto> {
         ResponseEntity<Object> responseEntity = null;
         try {
             UserDto tokenInformation = tokenService.getTokenInformation(token, UserDto.class);
-
+            User user = new User();
             if (!userService.isUserRegistered(tokenInformation.getEmail())) {
-                userService.save(userDto.getFirstName(), userDto.getLastName(), tokenInformation.getEmail(),
+                 user = userService.save(userDto.getFirstName(), userDto.getLastName(), tokenInformation.getEmail(),
                         userDto.getPassword(), tokenInformation.getType());
+                employeeTaskService.setEmployeeTaskForUser(user.getEmployee(), tokenInformation.getType());
                 responseEntity = new ResponseEntity<>(new TokenDto(tokenService.generateTokenByDay(10,
                         userService.findUserDetails(tokenInformation.getEmail()), true)), HttpStatus.OK);
             } else {
@@ -181,5 +197,26 @@ public class UserController extends GenericController<User, UserDto> {
     public User findModelById(Long id) {
         return super.findModelById(id);
     }
+
+    @PostMapping("/createProcessInstances/{idProcess}")
+    public ResponseEntity<Object> createProcessInstanceByUser(@PathVariable String idProcess, @RequestBody UserDto userDto) {
+        ResponseEntity<Object> responseEntity = null;
+        try {
+            User user = userService.findByEmail(userDto.getEmail());
+            Process processUser = processService.findById(Long.parseLong(idProcess));
+            ProcessInstance instance = processInstanceService.createProcessInstance(processUser, user);
+            jobBpmService.createJobBpm(instance);
+            jobBpmService.allocateResources();
+            new ResponseEntity<>(new OperationResultDto<>("message.user.process.done"),
+                    HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseEntity = new ResponseEntity<>(new OperationResultDto<>("invalid.process"),
+                    HttpStatus.UNAUTHORIZED);
+        }
+        return responseEntity;
+    }
+
 
 }

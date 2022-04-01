@@ -60,6 +60,21 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
 
     }
 
+    @Override
+    public ProcessInstance createProcessInstance(Process process, User user) {
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setProcess(process);
+        processInstance.setUser(user);
+        processInstance = save(processInstance);
+
+        TaskInstance taskInstance = taskInstanceService.createTaskInstance(process, processInstance);
+        List<TaskInstance> taskInstances = new ArrayList<>();
+        taskInstances.add(taskInstance);
+        processInstance.setTaskInstances(taskInstances);
+        processInstance = save(processInstance);
+        return processInstance;
+    }
+
     private Process getDefaultJobProcess() {
         if (null == defaultJobProcess) {
             defaultJobProcess = processService.findByName(defaultProcess);

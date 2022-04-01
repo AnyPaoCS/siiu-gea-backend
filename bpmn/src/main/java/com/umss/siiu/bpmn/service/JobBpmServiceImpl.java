@@ -275,6 +275,28 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
         return jobBpm;
     }
 
+    @Override
+    public JobBpm createJobBpm(ProcessInstance process) {
+        Job job = new Job();
+        job = jobService.save(job);
+        JobBpm job1Bpm = new JobBpm();
+        job1Bpm.setProcessInstance(process);
+        job1Bpm.setStatus(JobStatus.PREPARED.toString());
+        job1Bpm.setPriority(NORMAL);
+        job1Bpm = save(job1Bpm);
+        job.setJobBpm(job1Bpm);
+        job.getJobBpm().setJob(job);
+        jobService.save(job);
+        setJobBpmInProcessInstance(job1Bpm, process);
+        return job1Bpm;
+    }
+
+    private void setJobBpmInProcessInstance (JobBpm jobBpm, ProcessInstance instance) {
+        instance.setJobBpm(jobBpm);
+        processInstanceService.save(instance);
+    }
+
+
     private JobBpm setJobBpmInProgress(JobBpm jobBpm) {
         jobBpm.setStatus(JobStatus.IN_PROGRESS.toString());
         return save(jobBpm);

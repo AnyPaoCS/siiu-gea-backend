@@ -291,14 +291,12 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
             resourceInstance = createNewResourceInstance(taskInstance, resource, employee);
             // todo check if we need to send notification when system user
             notificationService.sendNotifications(employee.getUser().getEmail(), 1L, "New job assigned",
-                    MessageFormat.format("Job number {0} assigned to the task of {1}",
-                            jobBpm.getJob().getId(),
+                    MessageFormat.format("Job assigned to the task of {1}",
                             resourceInstance.getTaskInstance().getTask().getName()));
         } else {
             resourceInstance = updateResourceInstanceEmployee(taskInstance, resource, resourceInstance, employee);
             notificationService.sendNotifications(employee.getUser().getEmail(), 2L, "New job reassigned",
-                    MessageFormat.format("Job number {0} reassigned to the task of {1}",
-                            taskInstance.getProcessInstance().getJobBpm().getJob().getId(),
+                    MessageFormat.format("Job reassigned to the task of {1}",
                             resourceInstance.getTaskInstance().getTask().getName()));
         }
         boolean isSystem = employee.getFirstName().equals(SYSTEM_EMPLOYEE_NAME);
