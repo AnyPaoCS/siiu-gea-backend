@@ -2,6 +2,7 @@ package com.umss.siiu.core.config;
 
 import com.umss.siiu.core.util.ApiPath;
 import com.umss.siiu.core.util.ApplicationConstants;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -33,8 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
     private JwtUnauthorizedHandler unauthorizedHandler;
 
-    public SecurityConfig(UserDetailsService userDetailsService,
-            JwtUnauthorizedHandler unauthorizedHandler) {
+    public SecurityConfig(@Qualifier("userServiceImpl") UserDetailsService userDetailsService,
+                          JwtUnauthorizedHandler unauthorizedHandler) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
     }
@@ -65,6 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and()
                 .csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, ApiPath.LOGIN_URL).permitAll()
                 .antMatchers(HttpMethod.POST, "/users/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/users/signUp").permitAll()
                 .antMatchers(HttpMethod.POST, ApiPath.USER_PATH).permitAll()
                 .antMatchers(HttpMethod.POST, ApiPath.FORGOTTEN_PASSWORD).permitAll()
                 .antMatchers(HttpMethod.POST, ApiPath.RESTORE_PASSWORD).permitAll()

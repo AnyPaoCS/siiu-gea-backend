@@ -1,5 +1,10 @@
 # MariaDB or Mysql Server config
 spring:
+  #  jpa:
+  #    hibernate:
+  #      ddl-auto: validate
+  #    show-sql: false
+  #    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
   # Mail configurations
   mail:
     test-connection: false
@@ -29,6 +34,7 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: false
+
 
 logging:
   level:

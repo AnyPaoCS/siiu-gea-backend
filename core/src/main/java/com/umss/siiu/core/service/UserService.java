@@ -19,7 +19,7 @@ public interface UserService extends GenericService<User> {
 
     int updatePasswordByEmail(String email, String newPassword);
 
-    User save(String firstName, String lastName, String email, String password);
+    User save(String firstName, String lastName, String email, String password, String typeUser);
 
     UserDetails findUserDetails(String email);
 

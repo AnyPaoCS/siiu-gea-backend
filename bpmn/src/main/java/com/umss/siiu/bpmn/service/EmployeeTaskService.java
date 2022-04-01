@@ -12,4 +12,6 @@ import java.util.Set;
 
 public interface EmployeeTaskService extends GenericService<EmployeeTask> {
     Set<EmployeeTask> findByEmployee(Employee employee);
+
+    void setEmployeeTaskForUser(Employee employee, String typeUser);
 }

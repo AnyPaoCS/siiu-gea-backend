@@ -28,7 +28,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     private static final String NORMAL = "normal";
     private static final String COMPLETE_ACTION_NAME = "DONE";
     private static final String PATH_SEPARATOR = "/";
-    private static final String BOOTSTRAP = "Bootstrap";
+    private static final String REQUEST_PROCESS = "req_pro";
 
     private JobBpmRepository repository;
 
@@ -208,10 +208,10 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
             TaskInstance taskInstance, List<Employee> employeesForTask,
             Map<Long, Map<String, List<TaskInstance>>> groupingByProcessId) {
         Task task = taskInstance.getTask();
+        ProcessInstance processInstance = taskInstance.getProcessInstance();
         for (Resource resource : task.getResourceList()) {
             if (resource.getResourceType().equals(ResourceType.EMPLOYEE)) {
                 Employee employee = employeesForTask.get(0);
-                ProcessInstance processInstance = taskInstance.getProcessInstance();
                 boolean getSystem = employee.getUser().getSystemUser();
                 if (!getSystem) {
                     employeesForTask.remove(0);
@@ -232,7 +232,24 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
                         }
                     }
                 }
-                if (getSystem && taskInstance.getTask().getName().compareTo(BOOTSTRAP) == 0) {
+                if (getSystem && taskInstance.getTask().getCode().compareTo(REQUEST_PROCESS) == 0) {
+                    taskInstance = taskInstanceService.findById(taskInstance.getId());
+                    taskInstanceService.complete(taskInstance, Collections.singletonList(COMPLETE_ACTION_NAME));
+                }
+            } else {
+                Employee employee = processInstance.getUser().getEmployee();
+                ResourceInstance resourceInstance = taskInstanceService.allocateResource(taskInstance, resource, null,
+                        employee);
+                String parallelGroupingCode = taskInstance.getTask().getParallelGroupingCode();
+                if (parallelGroupingCode != null) {
+                    for (TaskInstance groupedTaskInstance : groupingByProcessId.get(processInstance.getId())
+                            .get(parallelGroupingCode)) {
+                        if (groupedTaskInstance.getId().equals(taskInstance.getId())) {
+                            groupedTaskInstance.getResourceInstances().add(resourceInstance);
+                        }
+                    }
+                }
+                if (taskInstance.getTask().getCode().compareTo(REQUEST_PROCESS) == 0) {
                     taskInstance = taskInstanceService.findById(taskInstance.getId());
                     taskInstanceService.complete(taskInstance, Collections.singletonList(COMPLETE_ACTION_NAME));
                 }
@@ -258,6 +275,28 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
         return jobBpm;
     }
 
+    @Override
+    public JobBpm createJobBpm(ProcessInstance process) {
+        Job job = new Job();
+        job = jobService.save(job);
+        JobBpm job1Bpm = new JobBpm();
+        job1Bpm.setProcessInstance(process);
+        job1Bpm.setStatus(JobStatus.PREPARED.toString());
+        job1Bpm.setPriority(NORMAL);
+        job1Bpm = save(job1Bpm);
+        job.setJobBpm(job1Bpm);
+        job.getJobBpm().setJob(job);
+        jobService.save(job);
+        setJobBpmInProcessInstance(job1Bpm, process);
+        return job1Bpm;
+    }
+
+    private void setJobBpmInProcessInstance (JobBpm jobBpm, ProcessInstance instance) {
+        instance.setJobBpm(jobBpm);
+        processInstanceService.save(instance);
+    }
+
+
     private JobBpm setJobBpmInProgress(JobBpm jobBpm) {
         jobBpm.setStatus(JobStatus.IN_PROGRESS.toString());
         return save(jobBpm);
@@ -273,7 +312,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     }
 
     private TaskInstance exceptionFlow(TaskInstance task) {
-        if (task.getTask().getCode().equals(TaskType.VALIDATE_PARCEL.getCode())) {
+        if (task.getTask().getCode().equals(TaskType.VALIDATION_DOCUMENTS.getCode())) {
             restartProcess(task);
             taskInstanceService.createTaskInstance(task.getProcessInstance().getProcess(), task.getProcessInstance());
             return taskInstanceService.findById(task.getId());

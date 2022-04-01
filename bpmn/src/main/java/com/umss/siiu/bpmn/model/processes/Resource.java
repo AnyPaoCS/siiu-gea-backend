@@ -15,6 +15,10 @@ public class Resource extends ModelBase<ResourceDto> {
     @Enumerated(EnumType.STRING)
     private ResourceType resourceType;
 
+    @OneToOne(cascade = CascadeType.ALL, optional = true)
+    @JoinColumn(foreignKey = @ForeignKey(name = "FK_RESOURCE_RESOURCEDOCUMENT"))
+    private ResourceDocument document;
+
     private boolean isOutput = false;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -45,4 +49,9 @@ public class Resource extends ModelBase<ResourceDto> {
     public void setOutput(boolean output) {
         isOutput = output;
     }
+
+    public ResourceDocument getDocument() { return document; }
+
+    public void setDocument(ResourceDocument document) { this.document = document; }
+
 }

@@ -7,6 +7,7 @@ package com.umss.siiu.bpmn.model.processes;
 import com.umss.siiu.bpmn.dto.ProcessInstanceDto;
 import com.umss.siiu.bpmn.model.JobBpm;
 import com.umss.siiu.core.model.ModelBase;
+import com.umss.siiu.core.model.User;
 
 import javax.persistence.*;
 import java.util.List;
@@ -22,6 +23,10 @@ public class ProcessInstance extends ModelBase<ProcessInstanceDto> {
 
     @OneToMany(mappedBy = "processInstance")
     private List<TaskInstance> taskInstances;
+
+    @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "FK_PROCESS_INSTANCE_USER"))
+    private User user;
 
     //todo this should be encapsulated in a object representing all the process properties it could be a map if we
     // need more properties
@@ -67,4 +72,13 @@ public class ProcessInstance extends ModelBase<ProcessInstanceDto> {
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
 }

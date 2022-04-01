@@ -4,13 +4,12 @@
 
 package com.umss.siiu.bpmn.dto;
 
-import com.umss.siiu.bpmn.model.processes.ResourceInstance;
-import com.umss.siiu.bpmn.model.processes.TaskInstance;
-import com.umss.siiu.bpmn.model.processes.TaskStatus;
+import com.umss.siiu.bpmn.model.processes.*;
 import com.umss.siiu.core.dto.DtoBase;
 import com.umss.siiu.core.dto.EmployeeDto;
 import org.modelmapper.ModelMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
     private Boolean isComplete;
     private long taskId;
     private String relatedAreaCode;
+    private List<ResourceDocumentDto> resourceDocuments;
 
     public TaskStatus getTaskStatus() {
         return taskStatus;
@@ -99,6 +99,14 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
         this.relatedAreaCode = relatedAreaCode;
     }
 
+    public List<ResourceDocumentDto> getResourceDocuments() {
+        return resourceDocuments;
+    }
+
+    public void setResourceDocuments(List<ResourceDocumentDto> resourceDocuments) {
+        this.resourceDocuments = resourceDocuments;
+    }
+
     @Override
     protected void afterConversion(TaskInstance taskInstance, ModelMapper mapper) {
         setName(taskInstance.getTask().getName());
@@ -107,6 +115,7 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
         setEmployee(getEmployeeFromResource(taskInstance, mapper));
         setTaskId(taskInstance.getTask().getId());
         setRelatedAreaCode(taskInstance.getTask().getRelatedAreaCode());
+        setResourceDocuments(getDocumentsFromResource(taskInstance, mapper));
     }
 
     private Optional<EmployeeDto> getEmployeeFromResource(TaskInstance taskInstance, ModelMapper mapper) {
@@ -118,6 +127,17 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
                     .toDto(resources.iterator().next().getEmployee(), mapper));
         }
         return Optional.ofNullable(null);
+    }
+
+    private List<ResourceDocumentDto> getDocumentsFromResource(TaskInstance taskInstance, ModelMapper mapper) {
+       List<ResourceDocumentDto> documents = new ArrayList<>();
+       List<ResourceInstance> resources = taskInstance.getResourceInstances().stream()
+                .filter(resource -> resource.getResource().getResourceType().equals(ResourceType.DOCUMENT))
+                .collect(Collectors.toList());
+       for (ResourceInstance resource : resources) {
+           documents.add(new ResourceDocumentDto().toDto(resource.getResource().getDocument(), mapper));
+       }
+       return documents;
     }
 
 }

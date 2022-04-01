@@ -12,9 +12,12 @@ import com.umss.siiu.bpmn.repository.NotificationTypeRepository;
 import com.umss.siiu.bpmn.repository.ProcessRepository;
 import com.umss.siiu.bpmn.service.EmployeeTaskService;
 import com.umss.siiu.bpmn.service.RoleService;
-import com.umss.siiu.core.model.*;
-import com.umss.siiu.core.repository.*;
-import com.umss.siiu.core.service.*;
+import com.umss.siiu.core.model.Employee;
+import com.umss.siiu.core.model.Role;
+import com.umss.siiu.core.model.RoleType;
+import com.umss.siiu.core.model.User;
+import com.umss.siiu.core.repository.EmployeeRepository;
+import com.umss.siiu.core.service.UserService;
 import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -28,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
+public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
     private static final String COMPLETE_ACTION = "DONE";
     private static final String CRM_JOB = "CRMJob";
 
@@ -65,7 +68,8 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         initializeRoles();
         initializeEmployees();
     }
-    private void initializeNotificationType(){
+
+    private void initializeNotificationType() {
         NotificationType n1 = new NotificationType();
         n1.setName("Tipo 1");
         NotificationType n2 = new NotificationType();
@@ -141,7 +145,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         Process process = new Process();
         process.setName(CRM_JOB);
 
-        requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(),false, Area.NONE.getCode());
+        requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(), false, Area.NONE.getCode());
         addResourceDocument(requestProcessTask, false, ResourceDocumentType.ORIGINAL_DOCUMENT.getCode(), ResourceDocumentType.ORIGINAL_DOCUMENT.getName());
         addResourceDocument(requestProcessTask, false, ResourceDocumentType.COPY_ORIGINAL_DOCUMENT.getCode(), ResourceDocumentType.COPY_ORIGINAL_DOCUMENT.getName());
 
@@ -150,17 +154,17 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         reviewRequirementsTask = createProcessTask(TaskType.REVIEW_REQUIREMENTS.getName(), TaskType.REVIEW_REQUIREMENTS.getCode(), false, Area.FILES_AREA.getCode());
 
 
-        enablePaymentTask = createProcessTask(TaskType.ENABLE_PAYMENT.getName(), TaskType.ENABLE_PAYMENT.getCode(), false,Area.FILES_AREA.getCode());
+        enablePaymentTask = createProcessTask(TaskType.ENABLE_PAYMENT.getName(), TaskType.ENABLE_PAYMENT.getCode(), false, Area.FILES_AREA.getCode());
 
-        validationPaymentTask = createProcessTask(TaskType.VALIDATION_PAYMENT.getName(), TaskType.VALIDATION_PAYMENT.getCode(), false,Area.CASH_AREA.getCode());
+        validationPaymentTask = createProcessTask(TaskType.VALIDATION_PAYMENT.getName(), TaskType.VALIDATION_PAYMENT.getCode(), false, Area.CASH_AREA.getCode());
         addResourceDocument(validationPaymentTask, false, ResourceDocumentType.VALUED.getCode(), ResourceDocumentType.VALUED.getName());
 
-        validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(),false, Area.DEPARTMENT_AREA.getCode());
+        validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(), false, Area.DEPARTMENT_AREA.getCode());
 
-        signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(),false, Area.FACULTY_AREA.getCode());
+        signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(), false, Area.FACULTY_AREA.getCode());
 
 
-        concludeProcessTask= createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), false, Area.FILES_AREA.getCode());
+        concludeProcessTask = createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), false, Area.FILES_AREA.getCode());
         addResourceDocument(concludeProcessTask, true, ResourceDocumentType.LEGALIZED_DOCUMENT.getCode(), ResourceDocumentType.LEGALIZED_DOCUMENT.getName());
 
         //Primer nodo
@@ -271,7 +275,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         user.setPassword("$2a$10$XURPShQNCsLjp1ESc2laoObo9QZDhxz73hJPaEv7/cBha4pk0AgP."); //el password es: password
         user.setEmployee(employee);
 
-        if (employee.getFirstName()=="System") {
+        if (employee.getFirstName() == "System") {
             user.setSystemUser(true);
         }
         role.setId(roleId);

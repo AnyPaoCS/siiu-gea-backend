@@ -27,6 +27,8 @@ public class UserServiceImpl extends GenericServiceImpl<User> implements UserSer
     private UserRepository userRepository;
     private EmployeeService employeeService;
 
+    private final String TYPE_APPLICANT = "APPLICANT";
+
     public UserServiceImpl(UserRepository userSystemRepository, EmployeeService employeeService) {
         this.userRepository = userSystemRepository;
         this.employeeService = employeeService;
@@ -39,7 +41,7 @@ public class UserServiceImpl extends GenericServiceImpl<User> implements UserSer
 
     @Override
     @Transactional
-    public User save(String firstName, String lastName, String email, String password) {
+    public User save(String firstName, String lastName, String email, String password, String typeUser) {
         Role role = new Role();
         Set<Role> roles = new HashSet<>();
         Employee employee = new Employee();
@@ -52,7 +54,13 @@ public class UserServiceImpl extends GenericServiceImpl<User> implements UserSer
         user.setEmail(email);
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         user.setEnabled(true);
-        role.setId(RoleType.GENERAL.getId());
+        if (typeUser.equals(TYPE_APPLICANT)){
+            role.setName(RoleType.APPLICANT.getType());
+            role.setId(RoleType.APPLICANT.getId());
+        } else {
+            role.setName(RoleType.GENERAL.getType());
+            role.setId(RoleType.GENERAL.getId());
+        }
         roles.add(role);
         user.setRoles(roles);
         user.setEmployee(employee);

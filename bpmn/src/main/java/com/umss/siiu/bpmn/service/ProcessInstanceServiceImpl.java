@@ -11,8 +11,10 @@ import com.umss.siiu.bpmn.model.processes.TaskInstance;
 import com.umss.siiu.bpmn.model.processes.TaskStatus;
 import com.umss.siiu.bpmn.repository.ProcessInstanceRepository;
 import com.umss.siiu.core.dto.DtoBase;
+import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.repository.GenericRepository;
 import com.umss.siiu.core.service.GenericServiceImpl;
+import com.umss.siiu.core.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -28,6 +30,7 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
 
     private ProcessService processService;
     private TaskInstanceService taskInstanceService;
+    private UserService userService;
 
     private Process defaultJobProcess;
 
@@ -35,16 +38,18 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
     private String defaultProcess;
 
     public ProcessInstanceServiceImpl(ProcessInstanceRepository repository, ProcessService processService,
-            TaskInstanceService taskInstanceService) {
+            TaskInstanceService taskInstanceService, UserService userService) {
         this.repository = repository;
         this.processService = processService;
         this.taskInstanceService = taskInstanceService;
+        this.userService = userService;
     }
 
     @Override
     public ProcessInstance createProcessInstance() {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setProcess(getDefaultJobProcess());
+        processInstance.setUser(getDefaultUserSolicitante());
         processInstance = save(processInstance);
 
         TaskInstance taskInstance = taskInstanceService.createTaskInstance(getDefaultJobProcess(), processInstance);
@@ -55,11 +60,30 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
 
     }
 
+    @Override
+    public ProcessInstance createProcessInstance(Process process, User user) {
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setProcess(process);
+        processInstance.setUser(user);
+        processInstance = save(processInstance);
+
+        TaskInstance taskInstance = taskInstanceService.createTaskInstance(process, processInstance);
+        List<TaskInstance> taskInstances = new ArrayList<>();
+        taskInstances.add(taskInstance);
+        processInstance.setTaskInstances(taskInstances);
+        processInstance = save(processInstance);
+        return processInstance;
+    }
+
     private Process getDefaultJobProcess() {
         if (null == defaultJobProcess) {
             defaultJobProcess = processService.findByName(defaultProcess);
         }
         return defaultJobProcess;
+    }
+
+    private User getDefaultUserSolicitante() {
+        return userService.findByEmail("csorialopez11+1@gmail.com");
     }
 
     @Override

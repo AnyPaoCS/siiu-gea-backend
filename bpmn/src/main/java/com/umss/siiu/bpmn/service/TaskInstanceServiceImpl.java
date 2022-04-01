@@ -30,7 +30,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     private static final String COMPLETE_ACTION_NAME = "DONE";
     private static final String STATUS_CHANGE_MSG = "You can't change the task status manually from state %s";
     private static final String SYSTEM_EMPLOYEE_NAME = "System";
-    private static final String BOOTSTRAP = "Bootstrap";
+    private static final String REQUEST_PROCESS = "req_pro";
 
     private TaskInstanceRepository repository;
 
@@ -282,23 +282,25 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     @Override
     public ResourceInstance allocateResource(TaskInstance taskInstance, Resource resource,
             ResourceInstance resourceInstance, Employee employee) {
+        if (taskInstance.getTask().getCode().equals(TaskType.REQUEST_PROCESS.getCode()) ||
+            taskInstance.getTask().getCode().equals(TaskType.VALIDATION_PAYMENT.getCode())) {
+            employee = taskInstance.getProcessInstance().getUser().getEmployee();
+        }
         if (resourceInstance == null) {
             JobBpm jobBpm = taskInstance.getProcessInstance().getJobBpm();
             resourceInstance = createNewResourceInstance(taskInstance, resource, employee);
             // todo check if we need to send notification when system user
             notificationService.sendNotifications(employee.getUser().getEmail(), 1L, "New job assigned",
-                    MessageFormat.format("Job number {0} assigned to the task of {1}",
-                            jobBpm.getJob().getId(),
+                    MessageFormat.format("Job assigned to the task of {1}",
                             resourceInstance.getTaskInstance().getTask().getName()));
         } else {
             resourceInstance = updateResourceInstanceEmployee(taskInstance, resource, resourceInstance, employee);
             notificationService.sendNotifications(employee.getUser().getEmail(), 2L, "New job reassigned",
-                    MessageFormat.format("Job number {0} reassigned to the task of {1}",
-                            taskInstance.getProcessInstance().getJobBpm().getJob().getId(),
+                    MessageFormat.format("Job reassigned to the task of {1}",
                             resourceInstance.getTaskInstance().getTask().getName()));
         }
         boolean isSystem = employee.getFirstName().equals(SYSTEM_EMPLOYEE_NAME);
-        if (taskInstance.getTask().getName().compareTo(BOOTSTRAP) == 0) {
+        if (taskInstance.getTask().getCode().compareTo(REQUEST_PROCESS) == 0) {
             taskInstance.setTaskStatus(TaskStatus.ALLOCATED);
         }
 
