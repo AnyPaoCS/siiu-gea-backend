@@ -84,8 +84,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
         Map<Long, List<Employee>> taskEmployeeMap = new HashMap<>();
         unassignedEmployees.forEach(
                 employee -> {
-                    Set<EmployeeTask> employeeTasks =
-                            employeeTaskService.findByEmployee(employee);
+                    Set<EmployeeTask> employeeTasks = employeeTaskService.findByEmployee(employee);
                     employeeTasks.forEach(employeeTask -> addToTaskEmployeeMap(taskEmployeeMap, employee,
                             employeeTask.getTask()));
                 });
@@ -139,8 +138,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
                     // override employee and use if it has privileges
                     if (groupingEmployee != null) {
 
-                        Set<EmployeeTask> employeeTasks =
-                                employeeTaskService.findByEmployee(groupingEmployee);
+                        Set<EmployeeTask> employeeTasks = employeeTaskService.findByEmployee(groupingEmployee);
                         for (EmployeeTask groupingEmployeeTask : employeeTasks) {
                             if (groupingEmployeeTask.getTask().getId().equals(taskId)) {
                                 isGroupingEmployeeQualified = true;
@@ -168,10 +166,12 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
                 .filter(taskInstance -> taskInstance.getTask().getId().equals(taskId)
                         && taskInstance.getTaskStatus().equals(TaskStatus.DONE)
                         && taskInstance.getResourceInstances().stream()
-                        .anyMatch(resourceInstance -> !resourceInstance.getEmployee().getUser().getSystemUser()))
+                                .anyMatch(
+                                        resourceInstance -> !resourceInstance.getEmployee().getUser().getSystemUser()))
                 .sorted(Comparator.comparing(ModelBase::getId))
                 .map(taskInstance -> taskInstance.getResourceInstances().stream()
-                        .filter(resourceInstance -> !resourceInstance.getEmployee().getUser().getSystemUser()).findFirst()
+                        .filter(resourceInstance -> !resourceInstance.getEmployee().getUser().getSystemUser())
+                        .findFirst()
                         .get().getEmployee())
                 .collect(Collectors.toList());
         if (isGroupingEmployeeQualified) {
@@ -295,11 +295,10 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
         return job1Bpm;
     }
 
-    private void setJobBpmInProcessInstance (JobBpm jobBpm, ProcessInstance instance) {
+    private void setJobBpmInProcessInstance(JobBpm jobBpm, ProcessInstance instance) {
         instance.setJobBpm(jobBpm);
         processInstanceService.save(instance);
     }
-
 
     private JobBpm setJobBpmInProgress(JobBpm jobBpm) {
         jobBpm.setStatus(JobStatus.IN_PROGRESS.toString());
@@ -389,6 +388,23 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
             return String.format("%s >> %s", name, employee.get().getFullName(false));
         }
         return "";
+    }
+
+    @Override
+    public List<JobBpm> findByUserId(long userId) {
+        Employee employee = employeeService.findById(userId);
+        if (employee != null) {
+            List<ProcessInstance> processInstances = processInstanceService.findByUserId(employee.getId());
+            return processInstances.parallelStream().map(processInstance -> {
+                return this.findByProcessInstance(processInstance);
+            }).sorted().collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    @Override
+    public JobBpm findByProcessInstance(ProcessInstance processInstance) {
+        return repository.findByProcessInstance(processInstance);
     }
 
 }
