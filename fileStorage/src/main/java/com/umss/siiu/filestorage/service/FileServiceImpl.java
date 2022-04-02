@@ -5,6 +5,7 @@ import com.umss.siiu.core.exceptions.BlockedFileException;
 import com.umss.siiu.core.exceptions.NotFoundException;
 import com.umss.siiu.core.exceptions.RepositoryException;
 import com.umss.siiu.core.model.Employee;
+import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.core.service.EmployeeService;
 import com.umss.siiu.core.util.ApplicationConstants;
@@ -58,8 +59,8 @@ public class FileServiceImpl implements FileService {
 
 
     public FileServiceImpl(JackRabbitService jackRabbitService, JackRabbitNodeService jackRabbitNodeService,
-            JobFileTypeLockService jobFileTypeLockService,
-            FileTypeService fileTypeService, EmployeeService employeeService) {
+                           JobFileTypeLockService jobFileTypeLockService,
+                           FileTypeService fileTypeService, EmployeeService employeeService) {
         this.jackRabbitService = jackRabbitService;
         this.jackRabbitNodeService = jackRabbitNodeService;
         this.jobFileTypeLockService = jobFileTypeLockService;
@@ -79,7 +80,7 @@ public class FileServiceImpl implements FileService {
 
 
     private void exportByteArrayOutputStream(HttpServletResponse response, ByteArrayOutputStream document,
-            String filename) {
+                                             String filename) {
         try {
             response.setHeader("Expires", "0");
             response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
@@ -116,7 +117,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private void downloadFilesAsZip(HttpServletResponse response, List<JackRabbitNode> jackRabbitNodes,
-            String fileNameOutput) {
+                                    String fileNameOutput) {
         try {
             response.setContentType("application/zip");
             response.setHeader(ApplicationConstants.CONTENT_DISPOSITION,
@@ -179,10 +180,10 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteFile(String path) {
         try {
-            if (jackRabbitService.getRootNode().hasNode(path)) {
-                jackRabbitService.getRootNode().getNode(path).remove();
+            if (jackRabbitService.getRootNode().hasNode(path.substring(1))) {
+                jackRabbitService.getRootNode().getNode(path.substring(1)).remove();
                 jackRabbitService.save();
-                jackRabbitNodeService.deleteByPath(SLASH_SEPARATOR + path);
+                jackRabbitNodeService.deleteByPath(path);
             } else {
                 throw new RepositoryException(String.format("Could not find file %s", path));
             }
@@ -194,14 +195,13 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void unlockAndSaveFile(JackRabbitNodeDto jackRabbitNodeDto, String fileName, String employeeEmail,
-            String category) {
+                                  String category) {
         try {
             JobFileTypeLock jobFileTypeLock = null;
             Job job = new Job();
             job.setId(jackRabbitNodeDto.getOwnerId());
             Set<FileType> fileTypes = fileTypeService.getFileTypesByJobIdAndCategory(jackRabbitNodeDto.getOwnerId(),
                     FileTypeCategory.valueOf(category));
-
             Employee employee = employeeService.findByEmail(employeeEmail);
             for (FileType fileType : fileTypes) {
                 jobFileTypeLock = jobFileTypeLockService.findByJobAndFileType(job, fileType);
@@ -225,13 +225,9 @@ public class FileServiceImpl implements FileService {
             String parentPath = jackRabbitNodeDto.getParentPath();
             JackRabbitNode jackRabbitNode = jackRabbitNodeService
                     .findByFilePath((!StringUtils.isEmpty(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
-            if (fileName.contains(".xls")) {
+            if (fileName.contains(".png") || fileName.contains(".jpg") || fileName.contains(".jpeg")) {
                 clearFileType(modelBase.getId(), jackRabbitNodeDto.getFileTypeId(), jackRabbitNode,
-                        FileTypeCategory.ROI);
-            }
-            if (fileName.contains(".doc")) {
-                clearFileType(modelBase.getId(), jackRabbitNodeDto.getFileTypeId(), jackRabbitNode,
-                        FileTypeCategory.ROI_WORD);
+                        FileTypeCategory.IMAGEN_FIRMA);
             }
             saveFile(fileName, jackRabbitNodeDto.getFileTypeId(), jackRabbitNodeDto.getDescription(),
                     jackRabbitNodeDto.getFile().getInputStream(), modelBase, parentPath, true);
@@ -242,7 +238,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private void clearFileType(Long modelBaseId, Long currentFileTypeId, JackRabbitNode protectedNode,
-            FileTypeCategory targetFileType) {
+                               FileTypeCategory targetFileType) {
         FileType fileType = null != currentFileTypeId ? fileTypeService.findById(currentFileTypeId) : null;
         Long protectedId = null != protectedNode ? protectedNode.getId() : 0L;
         if (null != fileType && null != fileType.getFileTypeCategory()
@@ -261,7 +257,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void saveFile(String fileName, long fileTypeCode, String description, InputStream stream,
-            ModelBase<?> modelBase, String nodePath, boolean flush) {
+                         ModelBase<?> modelBase, String nodePath, boolean flush) {
         try {
             if (nodePath.equals("public") && !jackRabbitService.getRootNode().hasNode(nodePath)) {
                 jackRabbitService.createFolderNode(nodePath, "");
@@ -284,8 +280,10 @@ public class FileServiceImpl implements FileService {
             if (hasNode && jackRabbitNode != null) {
                 jackRabbitNode.setNodeId(node.getIdentifier());
                 //jackRabbitNode.setPath(node.getPath());
+                System.out.println("jackrabbitnode no es nulo");
                 jackRabbitNodeService.save(jackRabbitNode);
             } else {
+                System.out.println("jackrabbitnode SI es nulo");
                 jackRabbitNodeService.createJackRabbitNode(modelBase, fileTypeCode, false, fileName, description.trim(),
                         modelBase.getId(), node, nodePath, flush);
             }
@@ -358,7 +356,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private void createFolderEntries(Object owner, List<String> entries, Job job, String yearNode, String monthNode,
-            String nodePath) {
+                                     String nodePath) {
         for (String entry : entries) {
             createFolderEntry((ModelBase<?>) owner, nodePath,
                     String.format("year %s, month %s, job %s, " + "folder %s entry level", yearNode, monthNode,
@@ -488,7 +486,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<String> getFilePathsByOwnerAndFileTypeIdsAndOwnerIds(String ownerName, List<Long> ownerIds,
-            List<Long> fileTypeIds) {
+                                                                     List<Long> fileTypeIds) {
         return jackRabbitNodeService
                 .findByOwnerClassAndFileTypeIdsAndOwnerIds(ModelBaseFactory.createModelBase(ownerName, 0L), fileTypeIds,
                         ownerIds)
@@ -507,6 +505,52 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public JackRabbitNode findByFileId(long fileId) {
+        return jackRabbitNodeService.findById(fileId);
+    }
+
+    @Override
+    public JackRabbitNode findByPath(String path) {
+        return jackRabbitNodeService.findByFilePath(path);
+    }
+
+    @Override
+    public List<JackRabbitNode> getFilesByUserId(long userId) {
+        return jackRabbitNodeService.findByOwnerId(userId);
+    }
+
+    @Override
+    public JackRabbitNode getNodeByUserIdAndFileTypeId(long userId, long fileTypeId) {
+        return jackRabbitNodeService.findByOwnerIdAndFileTypeId(userId, fileTypeId);
+    }
+
+    @Override
+    public JackRabbitNode updateFileVerified(long fileId, boolean isVerified, String physicCode) {
+        JackRabbitNode jackRabbitNode = jackRabbitNodeService.findById(fileId);
+        if (jackRabbitNode != null) {
+            jackRabbitNode.setVerified(isVerified);
+            if (isVerified) {
+                jackRabbitNode.setPhysicCode(physicCode);
+            } else {
+                jackRabbitNode.setPhysicCode(null);
+            }
+            return jackRabbitNodeService.save(jackRabbitNode);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public JackRabbitNode updateFileIsPermanent(long fileId, boolean isPermanent) {
+        JackRabbitNode jackRabbitNode = jackRabbitNodeService.findById(fileId);
+        if (jackRabbitNode != null) {
+            jackRabbitNode.setPermanent(isPermanent);
+            return jackRabbitNodeService.save(jackRabbitNode);
+        }
+        return null;
+    }
+
+    @Override
     public List<String> getFilePathsByJobIdsAndCategoryType(List<Long> jobIds, String category) {
         return jackRabbitNodeService.findByOwnerClassAndFileCategoryTypeAndOwnerIds(new Job(), category, jobIds)
                 .stream().map(this::getNameFromNode).collect(Collectors.toList());
@@ -520,7 +564,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void saveWordDocument(long jobId, long fileTypeId, JackRabbitNode jackRabbitNode, XWPFDocument xwpfDocument,
-            String removedWordFromFile) {
+                                 String removedWordFromFile) {
         try {
             Job job = new Job();
             job.setId(jobId);
@@ -548,7 +592,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void lockAndDownloadFilesByJobIdAndCategory(HttpServletResponse response, long jobId, String category,
-            String employeeEmail) {
+                                                       String employeeEmail) {
         // Return file(s) to the user (it doesn't matter if the file is blocked)
         downloadFilesByJobIdAndCategory(response, jobId, category);
         try {
@@ -569,18 +613,18 @@ public class FileServiceImpl implements FileService {
     }
 
 
-    private JackRabbitNode obtainNode(Job job) {
+/*    private JackRabbitNode obtainNode(Job job) {
         List<FileType> fileTypes = fileTypeService.findByFileTypeCategory(FileTypeCategory.ROI);
         List<JackRabbitNode> nodes = jackRabbitNodeService.findByOwnerClassAndOwnerIdAndFileTypeIn(job, fileTypes,
                 job.getId());
         return nodes.stream().filter(node -> node.getPath().contains("xls")).findFirst().get();
-    }
+    }*/
 
 
     @Override
     @Transactional
     public void saveTemplate(Job job, JackRabbitNode jackRabbitNode, ByteArrayOutputStream baos,
-            String removedWordFromFile) {
+                             String removedWordFromFile) {
         try {
             // Getting the name of the file
             String fileName = removedWordFromFile != null

@@ -19,7 +19,7 @@ public interface FileService {
     void downloadFilesByJobIdAndCategory(HttpServletResponse response, long jobId, String category);
 
     void lockAndDownloadFilesByJobIdAndCategory(HttpServletResponse response, long jobId, String category,
-            String employeeEmail);
+                                                String employeeEmail);
 
     InputStream getInputStreamFromNode(String file);
 
@@ -31,7 +31,7 @@ public interface FileService {
 
 
     void saveFile(String fileName, long fileTypeCode, String description, InputStream stream,
-            ModelBase<?> modelBase, String nodePath, boolean flush);
+                  ModelBase<?> modelBase, String nodePath, boolean flush);
 
     /*void deleteOutdatedFiles(JobCrm jobCrm, JackRabbitNode jackRabbitNode);
 
@@ -54,7 +54,7 @@ public interface FileService {
     List<String> getFilePathsByJobAndCategoryType(long jobId, String category);
 
     public void saveWordDocument(long jobId, long fileTypeId, JackRabbitNode jackRabbitNode, XWPFDocument xwpfDocument,
-            String removedWordFromFile);
+                                 String removedWordFromFile);
 
     void saveTemplate(Job job, JackRabbitNode jackRabbitNode, ByteArrayOutputStream baos, String removedWordFromFile);
 
@@ -63,7 +63,7 @@ public interface FileService {
     void createFolderEntry(ModelBase<?> owner, String rootNode, String description, String path);
 
     List<String> getFilePathsByOwnerAndFileTypeIdsAndOwnerIds(String ownerName, List<Long> ownerIds,
-            List<Long> fileTypeIds);
+                                                              List<Long> fileTypeIds);
 
     List<String> getFilePathsByJobIdsAndCategoryType(List<Long> jobIds, String category);
 
@@ -73,4 +73,15 @@ public interface FileService {
 
     List<JackRabbitNode> getFilesByJobAndCategoryType(long jobId, String category);
 
+    JackRabbitNode findByFileId (long fileId);
+
+    JackRabbitNode findByPath (String path);
+
+    List<JackRabbitNode> getFilesByUserId(long userId);
+
+    JackRabbitNode getNodeByUserIdAndFileTypeId(long userId, long fileTypeId);
+
+    JackRabbitNode updateFileVerified (long fileId, boolean isVerified, String physicCode);
+
+    JackRabbitNode updateFileIsPermanent (long fileId, boolean isPermanent);
 }

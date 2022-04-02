@@ -43,7 +43,7 @@ public class JobScheduler {
         this.jobBpmService = jobBpmService;
     }
 
-    @Scheduled(fixedDelayString = "${scheduler.jobFetch.interval}")
+//    @Scheduled(fixedDelayString = "${scheduler.jobFetch.interval}")
     public synchronized void execFetchJobsFromCrm() throws InterruptedException {
         try {
             lock.lock();
@@ -68,7 +68,7 @@ public class JobScheduler {
 
     }
 
-    @Scheduled(fixedDelayString = "${scheduler.allocation.interval}")
+//    @Scheduled(fixedDelayString = "${scheduler.allocation.interval}")
     public synchronized void execAllocation() throws InterruptedException {
         try {
             lock.lock();
@@ -89,7 +89,7 @@ public class JobScheduler {
         }
     }
 
-    @Scheduled(fixedDelayString = "${scheduler.downloadTemplates.interval}")
+//    @Scheduled(fixedDelayString = "${scheduler.downloadTemplates.interval}")
     public synchronized void downloadJobInformation() throws InterruptedException {
         try {
             lock.lock();

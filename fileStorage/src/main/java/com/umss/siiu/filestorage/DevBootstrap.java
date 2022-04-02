@@ -5,50 +5,34 @@
 package com.umss.siiu.filestorage;
 
 import com.umss.siiu.bpmn.model.EmployeeTask;
-import com.umss.siiu.bpmn.model.processes.Process;
 import com.umss.siiu.bpmn.model.processes.*;
 import com.umss.siiu.bpmn.repository.ProcessRepository;
 import com.umss.siiu.bpmn.service.EmployeeTaskService;
 import com.umss.siiu.bpmn.service.RoleService;
 import com.umss.siiu.core.model.*;
-import com.umss.siiu.core.model.market.ItemInstance;
 import com.umss.siiu.core.repository.*;
 import com.umss.siiu.core.service.*;
-import com.umss.siiu.filestorage.model.FileType;
-import com.umss.siiu.filestorage.model.FileTypeCategory;
 import com.umss.siiu.filestorage.service.FileService;
 import com.umss.siiu.filestorage.service.FileTypeService;
 import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Component
+//@Component
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
     private static final String COMPLETE_ACTION = "DONE";
     private static final String CRM_JOB = "CRMJob";
     private static final String VALIDATE_PARCEL_ROI_GROUP = "ValidateParcel_ROI";
 
-    private CategoryRepository categoryRepository;
-    private SubCategoryRepository subCategoryRepository;
-    private ItemRepository itemRepository;
     private EmployeeRepository employeeRepository;
     private EmployeeTaskService employeeTaskService;
-    private PositionRepository positionRepository;
-    private ContractRepository contractRepository;
-    private BuyRepository buyRepository;
-    private final CategoryService categoryService;
-    private final SubCategoryService subCategoryService;
-    private final ItemService itemService;
-    private final ItemInstanceService itemInstanceService;
     private final UserService userService;
     private ProcessRepository processRepository;
     private RoleService roleService;
@@ -69,27 +53,12 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private Task formattingTask;
     private Task reformattingTask;
 
-    SubCategory beverageSubCat = null;
-
-    public DevBootstrap(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository,
-            ItemRepository itemRepository, EmployeeRepository employeeRepository,
-            EmployeeTaskService employeeTaskService, PositionRepository positionRepository,
-            ContractRepository contractRepository, BuyRepository buyRepository, CategoryService categoryService,
-            SubCategoryService subCategoryService, ItemService itemService, ItemInstanceService itemInstanceService,
+    public DevBootstrap(EmployeeRepository employeeRepository,
+            EmployeeTaskService employeeTaskService,
             UserService userService, ProcessRepository processRepository, RoleService roleService,
             FileTypeService fileTypeService, FileService fileService) {
-        this.categoryRepository = categoryRepository;
-        this.subCategoryRepository = subCategoryRepository;
-        this.itemRepository = itemRepository;
         this.employeeRepository = employeeRepository;
         this.employeeTaskService = employeeTaskService;
-        this.positionRepository = positionRepository;
-        this.contractRepository = contractRepository;
-        this.buyRepository = buyRepository;
-        this.categoryService = categoryService;
-        this.subCategoryService = subCategoryService;
-        this.itemService = itemService;
-        this.itemInstanceService = itemInstanceService;
         this.userService = userService;
         this.processRepository = processRepository;
         this.roleService = roleService;
@@ -99,15 +68,9 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        initializeFileType();
-        initializeJobProcess();
+//        initializeJobProcess();
         initializeRoles();
         initializeEmployees();
-        persistBuy(BigDecimal.TEN);
-        persistBuy(BigDecimal.ONE);
-        persistCategoriesAndSubCategories();
-        Item maltinItem = persistItems(beverageSubCat);
-        persistItemInstances(maltinItem);
     }
 
     private void initializeRoles() {
@@ -164,15 +127,15 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         }
     }
 
-    private void initializeJobProcess() {
+/*    private void initializeJobProcess() {
         Process crmJob = processRepository.findByName(CRM_JOB);
         if (null == crmJob) {
             Process process = createDefaultProcess();
             processRepository.save(process);
         }
-    }
+    }*/
 
-    private Process createDefaultProcess() {
+/*    private Process createDefaultProcess() {
         Process process = new Process();
         process.setName(CRM_JOB);
 
@@ -281,7 +244,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         process.setTask(bootstrapTask);
         return process;
     }
-
+*/
     private Task createProcessTask(String taskName, String code, boolean isOutput, String relatedAreaCode) {
         Task task = new Task();
         task.setName(taskName);
@@ -311,39 +274,6 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         return task;
     }
 
-    private void persistItemInstances(Item maltinItem) {
-        ItemInstance maltinItem1 = createItem(maltinItem, "SKU-77721106006158", 5D);
-        ItemInstance maltinItem2 = createItem(maltinItem, "SKU-77721106006159", 5D);
-        ItemInstance maltinItem3 = createItem(maltinItem, "SKU-77721106006160", 5D);
-        ItemInstance maltinItem4 = createItem(maltinItem, "SKU-77721106006161", 5D);
-        itemInstanceService.save(maltinItem1);
-        itemInstanceService.save(maltinItem2);
-        itemInstanceService.save(maltinItem3);
-        itemInstanceService.save(maltinItem4);
-    }
-
-    private ItemInstance createItem(Item maltinItem, String sku, double price) {
-        ItemInstance itemInstance = new ItemInstance();
-        itemInstance.setItem(maltinItem);
-        itemInstance.setFeatured(true);
-        itemInstance.setPrice(price);
-        itemInstance.setIdentifier(sku);
-        return itemInstance;
-    }
-
-    private Item persistItems(SubCategory subCategory) {
-        Item item = new Item();
-        item.setCode("B-MALTIN");
-        item.setName("MALTIN");
-        item.setSubCategory(subCategory);
-        /*try {
-            item.setImage(ImageUtils.inputStreamToByteArray(getResourceAsStream("/images/maltin.jpg")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        return itemService.save(item);
-    }
-
     private String getResourceAsString(String resourceName) {
         try (InputStream inputStream = this.getClass().getResourceAsStream(resourceName)) {
             return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
@@ -358,33 +288,6 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    private void persistCategoriesAndSubCategories() {
-        Category category = persistCategory();
-        persistSubCategory("SUBCAT1-NAME", "SUBCAT1-CODE", category);
-        beverageSubCat = persistSubCategory("BEVERAGE", "BEVERAGE-CODE", category);
-    }
-
-    private Category persistCategory() {
-        Category category = new Category();
-        category.setName("CAT1-NAME");
-        category.setCode("CAT1-CODE");
-        return categoryService.save(category);
-    }
-
-    private SubCategory persistSubCategory(String name, String code, Category category) {
-        SubCategory subCategory = new SubCategory();
-        subCategory.setName(name);
-        subCategory.setCode(code);
-        subCategory.setCategory(category);
-        return subCategoryService.save(subCategory);
-    }
-
-    private void persistBuy(BigDecimal value) {
-        Buy buy = new Buy();
-        buy.setValue(value);
-        buyRepository.save(buy);
     }
 
     private void createUser(String email, Employee employee) {
@@ -416,49 +319,6 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         }
 
         createUser(email, employee);
-    }
-
-    private void initializeFileType() {
-        if (fileTypeService.findAll().isEmpty()) {
-            createFileType("None", "None", FileTypeCategory.OTHER);
-            createFileType("EL", "Engagement letter", FileTypeCategory.ENGAGEMENT_LETTER);
-            createFileType("GIS", "Gismap", FileTypeCategory.MAPS);
-            createFileType("Final_R", "Final report", FileTypeCategory.OTHER);
-            createFileType("retail", "Roi template", FileTypeCategory.ROI);
-            createFileType("reloma", "Reloma template", FileTypeCategory.RELOMA);
-            createFileType("Self-Stg", "Roi Self-Storage", FileTypeCategory.ROI);
-            createFileType("mhc", "Roi Manufactured housing community", FileTypeCategory.ROI);
-            createFileType("hospitality", "Roi hospitality", FileTypeCategory.ROI);
-            createFileType("Apartments", "Roi Apartments", FileTypeCategory.ROI);
-            createFileType("txdot", "Roi txdot", FileTypeCategory.ROI);
-            createFileType("retail_selfcontainedroi_roisingletenantdircapscRemove", "Roi word retail",
-                    FileTypeCategory.ROI_WORD);
-            createFileType("Self-Stg_wordRemove", "Roi word Self-Stg", FileTypeCategory.ROI_WORD);
-            createFileType("mhc_combo_mhcRemove", "Roi word mhc_combo_mhc", FileTypeCategory.ROI_WORD);
-            createFileType("Apartments_wordRemove", "Roi word Apartments", FileTypeCategory.ROI_WORD);
-            createFileType("hospitality_wordRemove", "Roi word hospitality", FileTypeCategory.ROI_WORD);
-            createFileType("txdot_wordRemove", "Roi word txdot", FileTypeCategory.ROI_WORD);
-            createFileType("QA_R", "QA report", FileTypeCategory.OTHER);
-            createFileType("Generated_Final_R", "Generated final report", FileTypeCategory.OTHER);
-            createFileType("Formatted_Final_R", "Formatted final report", FileTypeCategory.OTHER);
-            createFileType("Flat_Maps", "Flat maps", FileTypeCategory.MAPS);
-            createFileType("Plat_Maps", "Plat maps", FileTypeCategory.MAPS);
-            createFileType("Parcel_Maps", "Parcel maps", FileTypeCategory.MAPS);
-            createFileType("Other_Maps", "Other maps", FileTypeCategory.MAPS);
-            createFileType("Signature", "Signature", FileTypeCategory.SIGNATURE);
-            createFileType("Zoning_Maps", "Zoning maps", FileTypeCategory.MAPS);
-            createFileType("Flood_Maps", "Flood maps", FileTypeCategory.MAPS);
-            createFileType("Local_Narrative_Template", "Narrative template", FileTypeCategory.OTHER);
-            createFileType("Regional_Narrative_Template", "Narrative template", FileTypeCategory.OTHER);
-        }
-    }
-
-    private FileType createFileType(String abbreviation, String name, FileTypeCategory fileTypeCategory) {
-        FileType fileType = new FileType();
-        fileType.setAbbreviation(abbreviation);
-        fileType.setName(name);
-        fileType.setFileTypeCategory(fileTypeCategory);
-        return fileTypeService.save(fileType);
     }
 
 

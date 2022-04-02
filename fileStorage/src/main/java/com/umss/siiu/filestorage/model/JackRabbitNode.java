@@ -27,6 +27,9 @@ public class JackRabbitNode extends ModelBase<JackRabbitNodeDto> {
     private String description;
     private String fileName;
     private String parentPath;
+    private boolean isPermanent;
+    private boolean isVerified;
+    private String physicCode;
 
     public Long getOwnerId() {
         return ownerId;
@@ -108,4 +111,27 @@ public class JackRabbitNode extends ModelBase<JackRabbitNodeDto> {
         this.parentPath = parentPath;
     }
 
+    public boolean isPermanent() {
+        return isPermanent;
+    }
+
+    public void setPermanent(boolean permanent) {
+        isPermanent = permanent;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
+    }
+
+    public String getPhysicCode() {
+        return physicCode;
+    }
+
+    public void setPhysicCode(String physicCode) {
+        this.physicCode = physicCode;
+    }
 }
