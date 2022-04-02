@@ -1,5 +1,6 @@
 package com.umss.siiu.bpmn.service;
 
+import com.umss.siiu.bpmn.dto.PaymentInfoDto;
 import com.umss.siiu.bpmn.model.Payment;
 import com.umss.siiu.core.service.GenericService;
 
@@ -9,7 +10,15 @@ import java.util.List;
 
 public interface PaymentService extends GenericService<Payment> {
 
-    Payment findByProcessInstanceId (Long processInstanceId);
+    long savePayment (PaymentInfoDto paymentInfoDto);
+
+    PaymentInfoDto realizePayment (Long paymentId);
+
+    PaymentInfoDto realizePaymentByProcessInstanceId (Long processInstanceId);
+
+    PaymentInfoDto findByPaymentId (Long paymentId);
+
+    PaymentInfoDto findByProcessInstanceId (Long processInstanceId);
 
     boolean verifyPaymentInformationIsCorrect (Long processInstanceId, BigDecimal amount);
 

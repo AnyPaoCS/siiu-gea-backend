@@ -4,8 +4,7 @@
 
 package com.umss.siiu.siiurest;
 
-import com.umss.siiu.bpmn.model.EmployeeTask;
-import com.umss.siiu.bpmn.model.NotificationType;
+import com.umss.siiu.bpmn.model.*;
 import com.umss.siiu.bpmn.model.processes.Process;
 import com.umss.siiu.bpmn.model.processes.*;
 import com.umss.siiu.bpmn.repository.NotificationTypeRepository;
