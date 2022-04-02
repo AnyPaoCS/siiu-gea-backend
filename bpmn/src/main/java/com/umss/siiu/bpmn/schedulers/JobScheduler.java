@@ -45,7 +45,6 @@ public class JobScheduler {
 
    // @Scheduled(fixedDelayString = "${scheduler.jobFetch.interval}")
     public synchronized void execFetchJobsFromCrm() throws InterruptedException {
-
         try {
             lock.lock();
             while (runningDaemon.get()) {

@@ -284,7 +284,6 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
             ResourceInstance resourceInstance, Employee employee) {
         if (taskInstance.getTask().getCode().equals(TaskType.REQUEST_PROCESS.getCode()) ||
             taskInstance.getTask().getCode().equals(TaskType.VALIDATION_PAYMENT.getCode())) {
-            //ERROR SCHEDULED
             employee = taskInstance.getProcessInstance().getUser().getEmployee();
         }
         if (resourceInstance == null) {

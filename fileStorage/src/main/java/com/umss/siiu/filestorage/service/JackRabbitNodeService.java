@@ -15,7 +15,7 @@ import java.util.List;
 public interface JackRabbitNodeService extends GenericService<JackRabbitNode> {
 
     JackRabbitNode createJackRabbitNode(Object owner, long fileTypeCode, boolean isFolder, String fileName,
-            String description, Long ownerId, Node node, String parenthPath, boolean flush);
+                                        String description, Long ownerId, Node node, String parenthPath, boolean flush);
 
     List<JackRabbitNode> findByOwnerClassAndFileTypeIdAndOwnerId(Object owner, List<Long> fileTypesId, Long ownerId);
 
@@ -24,7 +24,7 @@ public interface JackRabbitNodeService extends GenericService<JackRabbitNode> {
     List<JackRabbitNode> findByOwnerClassAndFileCategoryTypeAndOwnerId(Object owner, String category, Long ownerId);
 
     List<JackRabbitNode> findByOwnerClassAndFileCategoryTypeAndOwnerIds(Object owner, String category,
-            List<Long> ownerIds);
+                                                                        List<Long> ownerIds);
 
     List<JackRabbitNode> findByOwnerClassAndOwnerId(Object owner, Long ownerId);
 
@@ -33,7 +33,12 @@ public interface JackRabbitNodeService extends GenericService<JackRabbitNode> {
     void deleteByPath(String path);
 
     List<JackRabbitNode> findByOwnerClassAndFileTypeIdsAndOwnerIds(Object owner, List<Long> fileTypeIds,
-            List<Long> ownerIds);
+                                                                   List<Long> ownerIds);
 
     JackRabbitNode findByFilePath(String filePath);
+
+    JackRabbitNode findByOwnerIdAndFileTypeId(Long ownerId, Long fileTypeId);
+
+    List<JackRabbitNode> findByOwnerId(Long ownerId);
+
 }

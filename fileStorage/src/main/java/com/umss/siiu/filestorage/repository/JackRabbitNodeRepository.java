@@ -28,7 +28,11 @@ public interface JackRabbitNodeRepository extends GenericRepository<JackRabbitNo
 
     List<JackRabbitNode> findByOwnerClassAndOwnerId(String canonicalName, Long ownerId);
 
+    JackRabbitNode findByOwnerIdAndFileTypeId(Long ownerId, Long fileTypeId);
+
     void deleteByPath(String path);
 
     JackRabbitNode findByPath(String path);
+
+    List<JackRabbitNode> findByOwnerId (Long ownerId);
 }
