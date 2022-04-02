@@ -77,6 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/h2-console/*").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/h2-console/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/actuator/*").permitAll()
+                .antMatchers(HttpMethod.POST, "/payment/mock").permitAll()
 
                 .anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                 .and().addFilterBefore(authorizationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);

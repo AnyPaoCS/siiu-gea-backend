@@ -1,7 +1,10 @@
 package com.umss.siiu.bpmn.service;
 
+import com.umss.siiu.bpmn.dto.PaymentInfoDto;
 import com.umss.siiu.bpmn.model.Payment;
+import com.umss.siiu.bpmn.model.PaymentStatus;
 import com.umss.siiu.bpmn.model.PaymentType;
+import com.umss.siiu.bpmn.model.processes.ProcessInstance;
 import com.umss.siiu.bpmn.repository.PaymentRepository;
 import com.umss.siiu.core.repository.GenericRepository;
 import com.umss.siiu.core.service.GenericServiceImpl;
@@ -11,59 +14,87 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final static long TEN_DAYS = 1000 * 60 * 10;
+    private final ProcessInstanceService processInstanceService;
+    private final static long TIME_DIFFERENCE = 1000 * 60 * 30;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, ProcessInstanceService processInstanceService) {
         this.paymentRepository = paymentRepository;
+        this.processInstanceService = processInstanceService;
     }
 
     @Override
-    public Payment findByProcessInstanceId(Long processInstanceId) {
-        return paymentRepository.findByProcessInstanceId(processInstanceId);
+    public long savePayment(PaymentInfoDto paymentInfoDto) {
+        Payment p = new Payment();
+        ProcessInstance pI = processInstanceService.findById(paymentInfoDto.getProcessId());
+        p.setAmount(new BigDecimal(paymentInfoDto.getAmount()));
+        p.setDescription(paymentInfoDto.getDescription());
+        p.setPaymentCode("PT" + pI.getId());
+        p.setPaymentStatus(PaymentStatus.valueOf(paymentInfoDto.getPaymentStatus()));
+        p.setPaymentType(PaymentType.valueOf(paymentInfoDto.getPaymentType()));
+        p.setProcessInstance(pI);
+        return paymentRepository.save(p).getId();
+    }
+
+    @Override
+    public PaymentInfoDto realizePayment(Long paymentId) {
+        Payment p = paymentRepository.findById(paymentId).orElse(null);
+        if (p == null) {
+            return null;
+        }
+        p.setPaymentStatus(PaymentStatus.DONE);
+        return new PaymentInfoDto(paymentRepository.save(p));
+    }
+
+    @Override
+    public PaymentInfoDto realizePaymentByProcessInstanceId(Long processInstanceId) {
+        Payment p = paymentRepository.findByProcessInstanceId(processInstanceId);
+        if (p == null) {
+            return null;
+        }
+        p.setPaymentStatus(PaymentStatus.DONE);
+        return new PaymentInfoDto(paymentRepository.save(p));
+    }
+
+    @Override
+    public PaymentInfoDto findByPaymentId(Long paymentId) {
+        Payment p = paymentRepository.findById(paymentId).orElse(null);
+        if (p == null) {
+            return null;
+        }
+        return new PaymentInfoDto(p);
+    }
+
+    @Override
+    public PaymentInfoDto findByProcessInstanceId(Long processInstanceId) {
+        return new PaymentInfoDto(paymentRepository.findByProcessInstanceId(processInstanceId));
     }
 
     @Override
     public boolean verifyPaymentInformationIsCorrect(Long processInstanceId, BigDecimal amount) {
         Payment payment = paymentRepository.findByProcessInstanceId(processInstanceId);
+        if (payment == null) {
+            return false;
+        }
         return payment.getAmount().equals(amount);
     }
 
     @Override
     public List<Payment> getPTPaymentsForScheduledTask() {
         Date now = new Date();
-        Date datePast = new Date((now.getTime()-TEN_DAYS));
+        Date datePast = new Date((now.getTime()-TIME_DIFFERENCE));
         List<Payment> paymentList = paymentRepository.findPaymentsBetweenDates(datePast, now);
         List<Payment> res = new ArrayList<>();
-        System.out.println(paymentList.size());
         paymentList.forEach(p -> {
-            System.out.println("########");
-            System.out.println(p.getPaymentCode());
-            System.out.println(p.getCreatedAt());
-            System.out.println(p.getId());
-            System.out.println(p.getProcessInstance());
-            if (p.getPaymentType().equals(PaymentType.TRANSFERENCIA)) {
+            if (p.getPaymentType().equals(PaymentType.TRANSFERENCIA) && p.getPaymentStatus().equals(PaymentStatus.PENDING)) {
                 res.add(p);
             }
         });
-        System.out.println("*************");
-        res.forEach(p -> {
-            System.out.println("########");
-            System.out.println(p.getPaymentCode());
-            System.out.println(p.getCreatedAt());
-            System.out.println(p.getId());
-            System.out.println(p.getProcessInstance());
-        });
-        System.out.println("*************");
-        paymentList = paymentList.stream().filter(item -> item.getPaymentType().equals(PaymentType.TRANSFERENCIA)).collect(Collectors.toList());
-        System.out.println(paymentList.size());
-        /* hacer query personal o ver como hacer para obtener entre un rango de fehcas*/
-        return paymentList;
+        return res;
     }
 
     @Override
