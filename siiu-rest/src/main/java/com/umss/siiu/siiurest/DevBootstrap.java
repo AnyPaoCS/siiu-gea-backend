@@ -15,6 +15,10 @@ import com.umss.siiu.bpmn.service.RoleService;
 import com.umss.siiu.core.model.*;
 import com.umss.siiu.core.repository.*;
 import com.umss.siiu.core.service.*;
+import com.umss.siiu.filestorage.model.FileType;
+import com.umss.siiu.filestorage.model.FileTypeCategory;
+import com.umss.siiu.filestorage.service.FileService;
+import com.umss.siiu.filestorage.service.FileTypeService;
 import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -41,6 +45,8 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private ProcessRepository processRepository;
     private RoleService roleService;
     private NotificationTypeRepository notificationTypeRepository;
+    private final FileTypeService fileTypeService;
+    private FileService fileService;
 
     private Task requestProcessTask;
     private Task reviewRequirementsTask;
@@ -52,17 +58,20 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
     public DevBootstrap(EmployeeRepository employeeRepository,
                         EmployeeTaskService employeeTaskService,
-                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository) {
+                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository, FileTypeService fileTypeService, FileService fileService) {
         this.employeeRepository = employeeRepository;
         this.employeeTaskService = employeeTaskService;
         this.userService = userService;
         this.processRepository = processRepository;
         this.roleService = roleService;
         this.notificationTypeRepository = notificationTypeRepository;
+        this.fileTypeService = fileTypeService;
+        this.fileService = fileService;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        initializeFileType();
         initializeNotificationType();
         initializeJobProcess();
         initializeRoles();
@@ -298,4 +307,52 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
         createUser(email, employee, roleId);
     }
+
+    private void initializeFileType() {
+        if (fileTypeService.findAll().isEmpty()) {
+
+            createFileType("R_Diploma_Bachiller", "Requisito Diploma Bachiller", FileTypeCategory.DIPLOMA_BACHILLER);
+            createFileType("R_V_Diploma_Bachiller", "Requisito Valorado Diploma Bachiller", FileTypeCategory.DIPLOMA_BACHILLER);
+            createFileType("L_Diploma_Bachiller", "Legalizado Diploma Bachiller", FileTypeCategory.DIPLOMA_BACHILLER);
+
+            createFileType("R_Titulo_Provision_Nacional", "Requisito Titulo Provision Nacional", FileTypeCategory.TITULO_PROVISION_NACIONAL);
+            createFileType("R_V_Titulo_Provision_Nacional", "Requisito Valorado Titulo Provision Nacional", FileTypeCategory.TITULO_PROVISION_NACIONAL);
+            createFileType("L_Titulo_Provision_Nacional", "Legalizado Titulo Provision Nacional", FileTypeCategory.TITULO_PROVISION_NACIONAL);
+
+            createFileType("R_Diploma_Academico", "Requisito Diploma Academico", FileTypeCategory.DIPLOMA_ACADEMICO);
+            createFileType("R_V_Diploma_Academico", "Requisito Valorado Diploma Academico", FileTypeCategory.DIPLOMA_ACADEMICO);
+            createFileType("L_Diploma_Academico", "Legalizado Diploma Academico", FileTypeCategory.DIPLOMA_ACADEMICO);
+
+            createFileType("R_Titulo_Postgrado", "Requisito Titulo Postgrado", FileTypeCategory.TITULO_POSTGRADO);
+            createFileType("R_V_Titulo_Postgrado", "Requisito Valorado Titulo Postgrado", FileTypeCategory.TITULO_POSTGRADO);
+            createFileType("L_Titulo_Postgrado", "Legalizado Titulo Postgrado", FileTypeCategory.TITULO_POSTGRADO);
+
+            createFileType("R_RR_Homologacion_Diploma_Bachiler", "Requisito RR Homologacion Diploma Bachiller", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_BACHILLER);
+            createFileType("R_V_RR_Homologacion_Diploma_Bachiler", "Requisito Valorado RR Homologacion Diploma Bachiller", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_BACHILLER);
+            createFileType("L_RR_Homologacion_Diploma_Bachiler", "Legalizado RR Homologacion Diploma Bachiller", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_BACHILLER);
+
+            createFileType("R_RR_Homologacion_Diploma_Policia", "Requisito RR Homologacion Diploma Policia", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_POLICIA);
+            createFileType("R_V_RR_Homologacion_Diploma_Policia", "Requisito Valorado RR Homologacion Diploma Policia", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_POLICIA);
+            createFileType("L_RR_Homologacion_Diploma_Policia", "Legalizado RR Homologacion Diploma Policia", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_POLICIA);
+
+            createFileType("R_RR_Homologacion_Diploma_Militar", "Requisito RR Homologacion Diploma Militar", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_MILITAR);
+            createFileType("R_V_RR_Homologacion_Diploma_Militar", "Requisito Valorado RR Homologacion Diploma Militar", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_MILITAR);
+            createFileType("L_RR_Homologacion_Diploma_Militar", "Legalizado RR Homologacion Diploma Militar", FileTypeCategory.RR_HOMOLOGACION_DIPLOMA_MILITAR);
+
+            createFileType("R_Documentos_Varios", "Requisito Documentos Varios", FileTypeCategory.DOCUMENTO_VARIOS);
+            createFileType("R_V_Documentos_Varios", "Requisito Valorado Documentos Varios", FileTypeCategory.DOCUMENTO_VARIOS);
+            createFileType("L_Documentos_Varios", "Legalizado Documentos Varios", FileTypeCategory.DOCUMENTO_VARIOS);
+
+            createFileType("I_Firma", "Firma Digital", FileTypeCategory.IMAGEN_FIRMA);
+        }
+    }
+
+    private void createFileType(String abbreviation, String name, FileTypeCategory fileTypeCategory) {
+        FileType fileType = new FileType();
+        fileType.setAbbreviation(abbreviation);
+        fileType.setName(name);
+        fileType.setFileTypeCategory(fileTypeCategory);
+        fileTypeService.save(fileType);
+    }
+
 }

@@ -36,8 +36,8 @@ public class JackRabbitNodeServiceImpl extends GenericServiceImpl<JackRabbitNode
 
     @Override
     public JackRabbitNode createJackRabbitNode(Object owner, long fileTypeCode, boolean isFolder, String fileName,
-            String description,
-            Long ownerId, Node node, String parentPath, boolean flush) {
+                                               String description,
+                                               Long ownerId, Node node, String parentPath, boolean flush) {
         try {
             JackRabbitNode jackRabbitNode = new JackRabbitNode();
             FileType fileType = new FileType();
@@ -51,6 +51,8 @@ public class JackRabbitNodeServiceImpl extends GenericServiceImpl<JackRabbitNode
             jackRabbitNode.setPath(node.getPath());
             jackRabbitNode.setFileName(fileName);
             jackRabbitNode.setParentPath(parentPath);
+            jackRabbitNode.setPermanent(false);
+            jackRabbitNode.setVerified(false);
             return flush ? saveAndFlush(jackRabbitNode) : save(jackRabbitNode);
         } catch (javax.jcr.RepositoryException e) {
             throw new RepositoryException("Error retrieving node information", e);
@@ -59,35 +61,35 @@ public class JackRabbitNodeServiceImpl extends GenericServiceImpl<JackRabbitNode
 
     @Override
     public List<JackRabbitNode> findByOwnerClassAndFileTypeIdAndOwnerId(Object owner, List<Long> fileTypesId,
-            Long ownerId) {
+                                                                        Long ownerId) {
         return repository.findByOwnerClassAndFileTypeIdInAndOwnerId(owner.getClass().getCanonicalName(), fileTypesId,
                 ownerId);
     }
 
     @Override
     public List<JackRabbitNode> findByOwnerClassAndFileTypeIdsAndOwnerIds(Object owner, List<Long> fileTypeIds,
-            List<Long> ownerIds) {
+                                                                          List<Long> ownerIds) {
         return repository.findByOwnerClassAndFileTypeIdInAndOwnerIdIn(owner.getClass().getCanonicalName(), fileTypeIds,
                 ownerIds);
     }
 
     @Override
     public List<JackRabbitNode> findByOwnerClassAndOwnerIdAndFileTypeIn(Object owner, List<FileType> fileTypes,
-            Long ownerId) {
+                                                                        Long ownerId) {
         return repository.findByOwnerClassAndOwnerIdAndFileTypeIn(owner.getClass().getCanonicalName(), ownerId,
                 fileTypes);
     }
 
     @Override
     public List<JackRabbitNode> findByOwnerClassAndFileCategoryTypeAndOwnerId(Object owner, String category,
-            Long ownerId) {
+                                                                              Long ownerId) {
         return repository.findByOwnerClassAndFileTypeFileTypeCategoryAndOwnerId(owner.getClass().getCanonicalName(),
                 FileTypeCategory.valueOf(category), ownerId);
     }
 
     @Override
     public List<JackRabbitNode> findByOwnerClassAndFileCategoryTypeAndOwnerIds(Object owner, String category,
-            List<Long> ownerIds) {
+                                                                               List<Long> ownerIds) {
         return repository.findByOwnerClassAndFileTypeFileTypeCategoryAndOwnerIdIn(owner.getClass().getCanonicalName(),
                 FileTypeCategory.valueOf(category), ownerIds);
     }
@@ -119,5 +121,15 @@ public class JackRabbitNodeServiceImpl extends GenericServiceImpl<JackRabbitNode
     @Override
     public JackRabbitNode findByFilePath(String filePath) {
         return repository.findByPath(filePath);
+    }
+
+    @Override
+    public JackRabbitNode findByOwnerIdAndFileTypeId(Long ownerId, Long fileTypeId) {
+        return repository.findByOwnerIdAndFileTypeId(ownerId, fileTypeId);
+    }
+
+    @Override
+    public List<JackRabbitNode> findByOwnerId(Long ownerId) {
+        return repository.findByOwnerId(ownerId);
     }
 }
