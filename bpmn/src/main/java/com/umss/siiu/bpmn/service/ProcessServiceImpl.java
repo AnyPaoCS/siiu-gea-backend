@@ -28,4 +28,9 @@ public class ProcessServiceImpl extends GenericServiceImpl<Process> implements P
     public Process findByName(String name) {
         return repository.findByName(name);
     }
+
+    @Override
+    public Process findByCode(String code) {
+        return repository.findByCode(code);
+    }
 }

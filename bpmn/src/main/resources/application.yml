@@ -41,7 +41,7 @@ scheduler:
     interval: 900000
   allocation:
     interval: 120000
-    process: CRMJob
+    process: TRA-LEG-VARIOS
 
 # INFO ENDPOINT CONFIGURATION
 info:

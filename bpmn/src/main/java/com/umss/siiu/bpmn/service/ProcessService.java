@@ -9,4 +9,5 @@ import com.umss.siiu.core.service.GenericService;
 
 public interface ProcessService extends GenericService<Process> {
     Process findByName(String name);
+    Process findByCode(String code);
 }

@@ -5,4 +5,5 @@ import com.umss.siiu.core.repository.GenericRepository;
 
 public interface ProcessRepository extends GenericRepository<Process> {
     Process findByName(String name);
+    Process findByCode(String code);
 }

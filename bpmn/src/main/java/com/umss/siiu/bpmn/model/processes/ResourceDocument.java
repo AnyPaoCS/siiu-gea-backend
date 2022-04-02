@@ -15,9 +15,9 @@ public class ResourceDocument extends ModelBase<ResourceDocumentDto> {
     @OneToOne(mappedBy = "document")
     private Resource resource;
 
-    public ResourceDocument(String name, String code) {
-        this.name = name;
+    public ResourceDocument(String code, String name) {
         this.code = code;
+        this.name = name;
     }
 
     public ResourceDocument() {
