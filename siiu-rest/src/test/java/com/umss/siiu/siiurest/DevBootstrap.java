@@ -33,7 +33,9 @@ import java.util.Set;
 @Component
 public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
     private static final String COMPLETE_ACTION = "DONE";
-    private static final String CRM_JOB = "CRMJob";
+    private static final String PROC1_CODE = "TRA-LEG-VARIOS";
+    private static final String PROC1_NAME = "LEGALIZACION DOCUMENTOS VARIOS";
+
 
     private EmployeeRepository employeeRepository;
     private EmployeeTaskService employeeTaskService;
@@ -68,8 +70,7 @@ public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent
         initializeRoles();
         initializeEmployees();
     }
-
-    private void initializeNotificationType() {
+    private void initializeNotificationType(){
         NotificationType n1 = new NotificationType();
         n1.setName("Tipo 1");
         NotificationType n2 = new NotificationType();
@@ -134,7 +135,7 @@ public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent
     }
 
     private void initializeJobProcess() {
-        Process crmJob = processRepository.findByName(CRM_JOB);
+        Process crmJob = processRepository.findByCode(PROC1_CODE);
         if (null == crmJob) {
             Process process = createDefaultProcess();
             processRepository.save(process);
@@ -143,7 +144,8 @@ public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent
 
     private Process createDefaultProcess() {
         Process process = new Process();
-        process.setName(CRM_JOB);
+        process.setCode(PROC1_CODE);
+        process.setName(PROC1_NAME);
 
         requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(), false, Area.NONE.getCode());
         addResourceDocument(requestProcessTask, false, ResourceDocumentType.ORIGINAL_DOCUMENT.getCode(), ResourceDocumentType.ORIGINAL_DOCUMENT.getName());

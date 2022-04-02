@@ -77,7 +77,7 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
 
     private Process getDefaultJobProcess() {
         if (null == defaultJobProcess) {
-            defaultJobProcess = processService.findByName(defaultProcess);
+            defaultJobProcess = processService.findByCode(defaultProcess);
         }
         return defaultJobProcess;
     }

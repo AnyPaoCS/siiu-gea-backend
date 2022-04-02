@@ -64,4 +64,5 @@ public class  ResourceDocumentDto extends DtoBase<ResourceDocument> {
             }
         });
     }
+
 }
