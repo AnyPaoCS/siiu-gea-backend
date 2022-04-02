@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class PaymentScheduler {
 
-    private static final int TIME_DELAY = 1000 * 30;
+    private static final int TIME_DELAY = 1000 * 60 * 10;
 
     private final PaymentService paymentService;
 

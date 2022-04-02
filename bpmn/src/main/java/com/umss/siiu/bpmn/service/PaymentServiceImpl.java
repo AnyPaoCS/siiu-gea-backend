@@ -20,7 +20,7 @@ public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements P
 
     private final PaymentRepository paymentRepository;
     private final ProcessInstanceService processInstanceService;
-    private final static long TEN_MINUTES = 1000 * 60 * 10;
+    private final static long TIME_DIFFERENCE = 1000 * 60 * 30;
 
     public PaymentServiceImpl(PaymentRepository paymentRepository, ProcessInstanceService processInstanceService) {
         this.paymentRepository = paymentRepository;
@@ -86,7 +86,7 @@ public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements P
     @Override
     public List<Payment> getPTPaymentsForScheduledTask() {
         Date now = new Date();
-        Date datePast = new Date((now.getTime()-TEN_MINUTES));
+        Date datePast = new Date((now.getTime()-TIME_DIFFERENCE));
         List<Payment> paymentList = paymentRepository.findPaymentsBetweenDates(datePast, now);
         List<Payment> res = new ArrayList<>();
         paymentList.forEach(p -> {
