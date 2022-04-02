@@ -106,10 +106,12 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         if (employees.isEmpty()) {
             Set<Task> edsonTasks = new HashSet<>();
             edsonTasks.add(validationDocumentsTask);
+            edsonTasks.add(reviewRequirementsTask);
             createEmployee("Edson", "Terceros", edsonTasks, "edson@maecre.com", RoleType.GENERAL.getId());
 
             Set<Task> arielTasks = new HashSet<>();
             arielTasks.add(enablePaymentTask);
+            arielTasks.add(reviewRequirementsTask);
             createEmployee("Ariel", "Terceros", arielTasks, "ariel@maecre.com", RoleType.GENERAL.getId());
 
             Set<Task> victorTasks = new HashSet<>();
