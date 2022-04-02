@@ -98,10 +98,12 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         if (employees.isEmpty()) {
             Set<Task> edsonTasks = new HashSet<>();
             edsonTasks.add(validationDocumentsTask);
+            edsonTasks.add(reviewRequirementsTask);
             createEmployee("Edson", "Terceros", edsonTasks, "edson@maecre.com", RoleType.GENERAL.getId());
 
             Set<Task> arielTasks = new HashSet<>();
             arielTasks.add(enablePaymentTask);
+            arielTasks.add(reviewRequirementsTask);
             createEmployee("Ariel", "Terceros", arielTasks, "ariel@maecre.com", RoleType.GENERAL.getId());
 
             Set<Task> victorTasks = new HashSet<>();
@@ -129,6 +131,10 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
             user2Tasks.add(requestProcessTask);
             user2Tasks.add(validationPaymentTask);
             createEmployee("Solicitante2", "2", user2Tasks, "csorialopez11+1@gmail.com", RoleType.APPLICANT.getId());
+//            Set<Task> user3Tasks = new HashSet<>();
+//            user3Tasks.add(requestProcessTask);
+//            user3Tasks.add(validationPaymentTask);
+//            createEmployee("Solicitante3", "3", user3Tasks, "any.cespedes8@gmail.com", RoleType.APPLICANT.getId());
         }
     }
 

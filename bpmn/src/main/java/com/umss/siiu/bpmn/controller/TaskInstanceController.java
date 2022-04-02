@@ -26,8 +26,8 @@ public class TaskInstanceController extends GenericController<TaskInstance, Task
     private JobBpmService jobBpmService;
     private JobService jobService;
 
-    public TaskInstanceController(TaskInstanceService service, JobBpmService jobBpmService, JobService jobService,
-            JobScheduler jobScheduler) {
+    public TaskInstanceController(TaskInstanceService service, JobBpmService jobBpmService, JobService jobService
+            ) {
         this.service = service;
         this.jobBpmService = jobBpmService;
         this.jobService = jobService;
