@@ -52,6 +52,16 @@ public class  ResourceDocumentDto extends DtoBase<ResourceDocument> {
         return resourceList;
     }
 
+    public Set<ResourceDocumentDto> toDocumentListByTask(Task task, ModelMapper mapper){
+        Set<ResourceDocumentDto> resourceList = new HashSet<>();
+        task.getResourceList().forEach(resource -> {
+            if (resource.getResourceType() == ResourceType.DOCUMENT && !resource.isOutput()) {
+                resourceList.add(new ResourceDocumentDto().toDto(resource.getDocument(), mapper));
+            }
+        });
+        return resourceList;
+    }
+
     private void getResourceDocument(Set<ResourceDocumentDto> list, Task task, ModelMapper mapper) {
         task.getTaskActions().forEach(taskAction -> {
             taskAction.getTask().getResourceList().forEach(resource -> {
