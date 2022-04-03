@@ -10,6 +10,8 @@ import java.util.List;
 
 public class ProcessInstanceDto extends DtoBase<ProcessInstance> {
 
+    private ProcessDto process;
+
     private List<TaskInstanceDto> tasks;
 
     private UserDto user;
@@ -49,12 +51,21 @@ public class ProcessInstanceDto extends DtoBase<ProcessInstance> {
         this.paused = paused;
     }
 
+    public ProcessDto getProcess() {
+        return process;
+    }
+
+    public void setProcess(ProcessDto process) {
+        this.process = process;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public ProcessInstanceDto toDto(ProcessInstance process, ModelMapper mapper) {
         super.toDto(process, mapper);
         setTasks(new TaskInstanceDto().toListDto(process.getTaskInstances(), mapper));
         setUser((UserDto) new UserDto().toDto(process.getUser(), mapper));
+        setProcess((ProcessDto) new ProcessDto().toDto(process.getProcess(), mapper));
         return this;
     }
 

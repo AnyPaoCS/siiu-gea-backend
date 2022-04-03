@@ -13,6 +13,7 @@ import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.core.repository.GenericRepository;
 import com.umss.siiu.core.service.EmployeeService;
 import com.umss.siiu.core.service.GenericServiceImpl;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -391,10 +392,10 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     }
 
     @Override
-    public List<JobBpm> findByUserId(long userId) {
-        Employee employee = employeeService.findById(userId);
+    public List<JobBpm> findByUserEmail(String email) {
+        Employee employee = employeeService.findByEmail(email);
         if (employee != null) {
-            List<ProcessInstance> processInstances = processInstanceService.findByUserId(employee.getId());
+            List<ProcessInstance> processInstances = processInstanceService.findByUserEmail(employee.getUser().getEmail());
             return processInstances.parallelStream().map(processInstance -> {
                 return this.findByProcessInstance(processInstance);
             }).sorted().collect(Collectors.toList());

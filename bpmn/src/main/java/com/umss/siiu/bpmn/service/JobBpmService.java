@@ -23,7 +23,7 @@ public interface JobBpmService extends GenericService<JobBpm> {
 
     List<String> getAssigneesByProcessInstanceId(Long id);
 
-    List<JobBpm> findByUserId(long userId);
+    List<JobBpm> findByUserEmail(String email);
 
     JobBpm findByProcessInstance(ProcessInstance processInstance);
 }

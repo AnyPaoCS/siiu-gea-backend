@@ -17,5 +17,5 @@ public interface ProcessInstanceService extends GenericService<ProcessInstance> 
 
     ProcessInstance findByJobId(Long id);
 
-    List<ProcessInstance> findByUserId(Long id);
+    List<ProcessInstance> findByUserEmail(String email);
 }
