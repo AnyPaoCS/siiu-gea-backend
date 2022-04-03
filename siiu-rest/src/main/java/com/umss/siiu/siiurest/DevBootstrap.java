@@ -9,6 +9,7 @@ import com.umss.siiu.bpmn.model.processes.Process;
 import com.umss.siiu.bpmn.model.processes.*;
 import com.umss.siiu.bpmn.repository.NotificationTypeRepository;
 import com.umss.siiu.bpmn.repository.ProcessRepository;
+import com.umss.siiu.bpmn.repository.TaskRepository;
 import com.umss.siiu.bpmn.service.EmployeeTaskService;
 import com.umss.siiu.bpmn.service.RoleService;
 import com.umss.siiu.core.model.*;
@@ -32,10 +33,11 @@ import java.util.Set;
 
 @Component
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
-    private static final String COMPLETE_ACTION = "DONE";
-    private static final String CRM_JOB = "CRMJob";
     private static final String PROC1_CODE = "TRA-LEG-VARIOS";
     private static final String PROC1_NAME = "LEGALIZACION DOCUMENTOS VARIOS";
+
+    private static final String PROC2_CODE = "TRA-LEG-DIPLOMA";
+    private static final String PROC2_NAME = "LEGALIZACION DIPLOMA DE BACHILLER/TITULO PROFESIONAL/DIPLOMA ACADEMICO/TITULO POSTGRADO/ RR.HOMOLOGACIÓN DIPLOMABACHILLER, POLICÍA O MILITAR";
 
 
     private EmployeeRepository employeeRepository;
@@ -46,6 +48,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private NotificationTypeRepository notificationTypeRepository;
     private final FileTypeService fileTypeService;
     private FileService fileService;
+    private TaskRepository taskRepository;
 
     private Task requestProcessTask;
     private Task reviewRequirementsTask;
@@ -57,6 +60,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
     public DevBootstrap(EmployeeRepository employeeRepository,
                         EmployeeTaskService employeeTaskService,
+                        TaskRepository taskRepository,
                         UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository, FileTypeService fileTypeService, FileService fileService) {
         this.employeeRepository = employeeRepository;
         this.employeeTaskService = employeeTaskService;
@@ -66,6 +70,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         this.notificationTypeRepository = notificationTypeRepository;
         this.fileTypeService = fileTypeService;
         this.fileService = fileService;
+        this.taskRepository = taskRepository;
     }
 
     @Override
@@ -73,6 +78,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         initializeFileType();
         initializeNotificationType();
         initializeJobProcess();
+        createProcessDos();
         initializeRoles();
         initializeEmployees();
     }
@@ -156,27 +162,21 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         process.setName(PROC1_NAME);
 
         requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(),false, Area.NONE.getCode());
-        addResourceDocument(requestProcessTask, false, ResourceDocumentType.ORIGINAL_DOCUMENT.getCode(), ResourceDocumentType.ORIGINAL_DOCUMENT.getName());
-        addResourceDocument(requestProcessTask, false, ResourceDocumentType.COPY_ORIGINAL_DOCUMENT.getCode(), ResourceDocumentType.COPY_ORIGINAL_DOCUMENT.getName());
-
+        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DOCUMENTO_VARIOS_DOCUMENTO_ORIGINAL.getCode(), ResourceDocumentType.DOCUMENTO_VARIOS_DOCUMENTO_ORIGINAL.getName(), PROC1_CODE);
+        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DOCUMENTOS_VARIOS_FOTOCOPIA.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_FOTOCOPIA.getName(), PROC1_CODE);
         // La tarea necesita de dos recursos.
-        //uploadFilesTask = createProcessTask(TaskType.UPLOAD_FILES.getName(), TaskType.UPLOAD_FILES.getCode(), Area.FILES_AREA.getCode());
-        reviewRequirementsTask = createProcessTask(TaskType.REVIEW_REQUIREMENTS.getName(), TaskType.REVIEW_REQUIREMENTS.getCode(), false, Area.FILES_AREA.getCode());
 
+        reviewRequirementsTask = createProcessTask(TaskType.REVIEW_REQUIREMENTS.getName(), TaskType.REVIEW_REQUIREMENTS.getCode(), false, Area.FILES_AREA.getCode());
 
         enablePaymentTask = createProcessTask(TaskType.ENABLE_PAYMENT.getName(), TaskType.ENABLE_PAYMENT.getCode(), false,Area.FILES_AREA.getCode());
 
         validationPaymentTask = createProcessTask(TaskType.VALIDATION_PAYMENT.getName(), TaskType.VALIDATION_PAYMENT.getCode(), false,Area.CASH_AREA.getCode());
-        addResourceDocument(validationPaymentTask, false, ResourceDocumentType.VALUED.getCode(), ResourceDocumentType.VALUED.getName());
-
-        validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(),false, Area.DEPARTMENT_AREA.getCode());
+        addResourceDocument(validationPaymentTask, false, ResourceDocumentType.DOCUMENTOS_VARIOS_VALORADO.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_VALORADO.getName(), PROC1_CODE);
 
         signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(),false, Area.FACULTY_AREA.getCode());
 
-
         concludeProcessTask= createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), false, Area.FILES_AREA.getCode());
-        addResourceDocument(concludeProcessTask, true, ResourceDocumentType.LEGALIZED_DOCUMENT.getCode(), ResourceDocumentType.LEGALIZED_DOCUMENT.getName());
-
+        addResourceDocument(concludeProcessTask, true, ResourceDocumentType.DOCUMENTOS_VARIOS_DOCUMENTO_LEGALIZADO.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_DOCUMENTO_LEGALIZADO.getName(), PROC1_CODE);
         //Primer nodo
         addTaskAction(requestProcessTask, TaskType.REQUEST_PROCESS.getCode(), reviewRequirementsTask, ActionFlowType.AUTOMATIC);
 
@@ -189,28 +189,18 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         addTaskAction(enablePaymentTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(enablePaymentTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
 
-        addTaskAction(validationPaymentTask, TaskType.VALIDATION_PAYMENT.getCode(), validationDocumentsTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationPaymentTask, TaskType.VALIDATION_PAYMENT.getCode(), signatureDocumentsTask, ActionFlowType.AUTOMATIC);
         addTaskAction(validationPaymentTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(validationPaymentTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(validationPaymentTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
 
-
-        addTaskAction(validationDocumentsTask, TaskType.VALIDATION_DOCUMENTS.getCode(), signatureDocumentsTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationPaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
-
-
         addTaskAction(signatureDocumentsTask, TaskType.CONCLUDE_PROCESS.getCode(), concludeProcessTask, ActionFlowType.AUTOMATIC);
-        addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationDocumentsTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationPaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
 
         addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), signatureDocumentsTask, ActionFlowType.FORCE_GATE_ENTRY);
-        addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), validationDocumentsTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), validationPaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
         addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
@@ -219,6 +209,67 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
         process.setTask(requestProcessTask);
         return process;
+    }
+
+    private void createProcessDos() {
+        Process process2 = new Process();
+        process2.setCode(PROC2_CODE);
+        process2.setName(PROC2_NAME);
+        requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(),false, Area.NONE.getCode());
+        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_ORIGINAL.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_ORIGINAL.getName(), PROC2_CODE);
+
+        reviewRequirementsTask = createProcessTask(TaskType.REVIEW_REQUIREMENTS.getName(), TaskType.REVIEW_REQUIREMENTS.getCode(), false, Area.FILES_AREA.getCode());
+
+        enablePaymentTask = createProcessTask(TaskType.ENABLE_PAYMENT.getName(), TaskType.ENABLE_PAYMENT.getCode(), false,Area.FILES_AREA.getCode());
+
+        validationPaymentTask = createProcessTask(TaskType.VALIDATION_PAYMENT.getName(), TaskType.VALIDATION_PAYMENT.getCode(), false,Area.CASH_AREA.getCode());
+        addResourceDocument(validationPaymentTask, false, ResourceDocumentType.DIPLOMA_BACHILLER_VALORADO.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_VALORADO.getName(), PROC2_CODE);
+
+        validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(),false, Area.DEPARTMENT_AREA.getCode());
+
+        signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(),false, Area.FACULTY_AREA.getCode());
+
+        concludeProcessTask= createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), false, Area.FILES_AREA.getCode());
+        addResourceDocument(concludeProcessTask, true, ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_LEGALIZADO.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_LEGALIZADO.getName(), PROC2_CODE);
+        //Primer nodo
+        addTaskAction(requestProcessTask, TaskType.REQUEST_PROCESS.getCode(), reviewRequirementsTask, ActionFlowType.AUTOMATIC);
+
+        //Segundo nodo
+        addTaskAction(reviewRequirementsTask, TaskType.REVIEW_REQUIREMENTS.getCode(), enablePaymentTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(reviewRequirementsTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        //Tercer nodo
+        addTaskAction(enablePaymentTask, TaskType.ENABLE_PAYMENT.getCode(), validationPaymentTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(enablePaymentTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(enablePaymentTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        addTaskAction(validationPaymentTask, TaskType.VALIDATION_PAYMENT.getCode(), signatureDocumentsTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationPaymentTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(validationPaymentTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(validationPaymentTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        addTaskAction(signatureDocumentsTask, TaskType.CONCLUDE_PROCESS.getCode(), validationDocumentsTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationPaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(signatureDocumentsTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        addTaskAction(validationDocumentsTask, TaskType.VALIDATION_DOCUMENTS.getCode(), concludeProcessTask, ActionFlowType.AUTOMATIC);
+        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), signatureDocumentsTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), validationPaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(validationDocumentsTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), validationDocumentsTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), signatureDocumentsTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), validationPaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), enablePaymentTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), reviewRequirementsTask, ActionFlowType.FORCE_GATE_ENTRY);
+        addTaskAction(concludeProcessTask, TaskType.OBSERVATIONS.getCode(), requestProcessTask, ActionFlowType.FORCE_GATE_ENTRY);
+
+        process2.setTask(requestProcessTask);
+        processRepository.save(process2);
     }
 
     private Task createProcessTask(String taskName, String code, boolean isOutput, String relatedAreaCode) {
@@ -238,7 +289,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         task.getResourceList().add(resource);
     }
 
-    private void addResourceDocument(Task task, boolean isOutput, String code, String name) {
+    private void addResourceDocument(Task task, boolean isOutput, String code, String name, String processCode) {
         Resource resource = new Resource();
         resource.setResourceType(ResourceType.DOCUMENT);
         resource.setTask(task);
@@ -300,10 +351,17 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         employee.setLastName(lastName);
         employeeRepository.save(employee);
         for (Task task : tasks) {
-            EmployeeTask employeeTask = new EmployeeTask();
-            employeeTask.setTask(task);
-            employeeTask.setEmployee(employee);
-            employeeTaskService.save(employeeTask);
+            if (task != null) {
+                List<Task> taskOfTaskCode = taskRepository.findAllByCode(task.getCode());
+                if (!taskOfTaskCode.isEmpty()) {
+                    for (Task taskR : taskOfTaskCode) {
+                        EmployeeTask employeeTask = new EmployeeTask();
+                        employeeTask.setTask(taskR);
+                        employeeTask.setEmployee(employee);
+                        employeeTaskService.save(employeeTask);
+                    }
+                }
+            }
         }
 
         createUser(email, employee, roleId);
@@ -343,6 +401,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
             createFileType("R_Documentos_Varios", "Requisito Documentos Varios", FileTypeCategory.DOCUMENTO_VARIOS);
             createFileType("R_V_Documentos_Varios", "Requisito Valorado Documentos Varios", FileTypeCategory.DOCUMENTO_VARIOS);
             createFileType("L_Documentos_Varios", "Legalizado Documentos Varios", FileTypeCategory.DOCUMENTO_VARIOS);
+            createFileType("R_F_Documentos_Varios", "Requisito Fotocopia Documentos Varios", FileTypeCategory.DOCUMENTO_VARIOS);
 
             createFileType("I_Firma", "Firma Digital", FileTypeCategory.IMAGEN_FIRMA);
         }
