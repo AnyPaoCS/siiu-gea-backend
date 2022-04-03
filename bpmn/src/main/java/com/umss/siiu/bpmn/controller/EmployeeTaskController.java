@@ -11,10 +11,7 @@ import com.umss.siiu.core.model.Employee;
 import com.umss.siiu.core.service.EmployeeService;
 import com.umss.siiu.core.service.GenericService;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "api/employees-tasks")
@@ -33,6 +30,17 @@ public class EmployeeTaskController extends GenericController<EmployeeTask, Empl
     Employee employee = employeeService.findById(Long.parseLong(employeeId));
     Set<EmployeeTask> employeeTasks = employeeTaskService.findByEmployee(employee);
     return (List<EmployeeTaskDto>) super.toDto(employeeTasks);
+  }
+
+
+  @PostMapping(value = "deleteByCode")
+  public void deleteElement(@RequestBody EmployeeTaskDto element) {
+    employeeTaskService.deleteByCode(toModel(element));
+  }
+
+  @PostMapping(value="saveAllByCode")
+  protected void saveAll(@RequestBody EmployeeTaskDto element) {
+    employeeTaskService.saveAllTask(toModel(element));
   }
 
   @Override

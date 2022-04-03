@@ -10,6 +10,7 @@ import com.umss.siiu.core.model.ModelBase;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -86,5 +87,19 @@ public class Task extends ModelBase<DtoBase<?>> {
 
     public void setRelatedAreaCode(String relatedAreaCode) {
         this.relatedAreaCode = relatedAreaCode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(name, task.name) &&
+                Objects.equals(code, task.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, code);
     }
 }

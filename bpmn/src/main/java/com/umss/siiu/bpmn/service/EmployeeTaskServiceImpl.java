@@ -13,9 +13,11 @@ import com.umss.siiu.core.repository.GenericRepository;
 import com.umss.siiu.core.service.GenericServiceImpl;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeTaskServiceImpl extends GenericServiceImpl<EmployeeTask> implements EmployeeTaskService {
@@ -57,11 +59,32 @@ public class EmployeeTaskServiceImpl extends GenericServiceImpl<EmployeeTask> im
     private List<Task> getUserTask (){
         List<Task> tasks = new ArrayList<>();
         try {
-            tasks.add(taskService.findByCode(TaskType.REQUEST_PROCESS.getCode()));
-            tasks.add(taskService.findByCode(TaskType.VALIDATION_PAYMENT.getCode()));
+            tasks.addAll(taskService.findAllTaskWithCode(TaskType.REQUEST_PROCESS.getCode()));
+            tasks.addAll(taskService.findAllTaskWithCode(TaskType.VALIDATION_PAYMENT.getCode()));
         }catch (Exception e) {
             return tasks;
         }
         return tasks;
+    }
+
+    public void saveAllTask(EmployeeTask model) {
+        List<Task> taskWithTaskCode = taskService.findAllTaskWithCode(model.getTask().getCode());
+        if (!taskWithTaskCode.isEmpty()) {
+            for (Task taskR : taskWithTaskCode) {
+                EmployeeTask employeeTask = new EmployeeTask();
+                employeeTask.setTask(taskR);
+                employeeTask.setEmployee(model.getEmployee());
+                repository.save(employeeTask);
+            }
+        }
+    }
+
+    @Transactional
+    @Override
+    public void deleteByCode(EmployeeTask employeeTask) {
+        List<Long> taskWithTaskCode = taskService.findAllTaskWithCode(employeeTask.getTask().getCode()).stream().map(Task::getId).collect(Collectors.toList());
+        if (!taskWithTaskCode.isEmpty()) {
+           repository.deleteTaskEmployeeIdAndListTaskId(employeeTask.getEmployee().getId(), taskWithTaskCode);
+        }
     }
 }
