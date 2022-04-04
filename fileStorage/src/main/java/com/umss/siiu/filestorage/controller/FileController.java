@@ -1,6 +1,8 @@
 package com.umss.siiu.filestorage.controller;
 
 import com.google.gson.Gson;
+import com.umss.siiu.core.model.User;
+import com.umss.siiu.core.service.UserService;
 import com.umss.siiu.filestorage.dto.FileSimpleInfoDto;
 import com.umss.siiu.filestorage.dto.FileUploadDto;
 import com.umss.siiu.filestorage.dto.ImageSimpleInfoDto;
@@ -28,27 +30,30 @@ public class FileController {
 
     private final FileService fileService;
     private final FileTypeService fileTypeService;
+    private UserService userService;
     private final Gson gson;
 
-    public FileController(FileService fileService, FileTypeService fileTypeService, Gson gson) {
+    public FileController(FileService fileService, FileTypeService fileTypeService, Gson gson, UserService userService) {
         this.fileService = fileService;
         this.fileTypeService = fileTypeService;
         this.gson = gson;
+        this.userService = userService;
     }
 
     @PostMapping("/upload")
     public ResponseEntity<Object> uploadFile (@RequestParam("file")MultipartFile file, @RequestParam("fileInfoDto")String fileUpload) {
         FileUploadDto fileUploadDto = gson.fromJson(fileUpload, FileUploadDto.class);
+        User user = userService.findByEmail(fileUploadDto.getEmail());
         JackRabbitNodeDto dto = new JackRabbitNodeDto();
         dto.setFile(file);
         dto.setDescription(fileUploadDto.getDescription());
-        dto.setOwnerId(fileUploadDto.getUserId());
+        dto.setOwnerId(user.getId());
         dto.setOwnerClass("user");
         FileType fileType = fileTypeService.findByAbbreviation(fileUploadDto.getFileTypeAbbreviation());
         dto.setFileTypeId(fileType.getId());
-        String folderPath = fileUploadDto.getUserId() + "/" + fileType.getFileTypeCategory().name();
+        String folderPath = user.getId() + "/" + fileType.getFileTypeCategory().name();
         dto.setParentPath(folderPath);
-        JackRabbitNode jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(fileUploadDto.getUserId(), fileType.getId());
+        JackRabbitNode jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
         if (jackRabbitNode != null) {
             if (jackRabbitNode.isVerified()) {
                 return new ResponseEntity<>("El tipo de archivo que desea subir ya se encuentra verificado.", HttpStatus.BAD_REQUEST);
@@ -61,7 +66,7 @@ public class FileController {
         }
         fileService.createFolderStructure(folderPath);
         fileService.saveFile(dto, file.getOriginalFilename());
-        JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(fileUploadDto.getUserId(), fileType.getId());
+        JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
         return new ResponseEntity<>(new FileSimpleInfoDto(node), HttpStatus.OK);
     }
 

@@ -113,7 +113,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
             Set<Task> edsonTasks = new HashSet<>();
             edsonTasks.add(validationDocumentsTask);
             edsonTasks.add(reviewRequirementsTask);
-            createEmployee("Edson", "Terceros", edsonTasks, "edson@maecre.com", RoleType.GENERAL.getId());
+            createEmployee("Edson", "Terceros", edsonTasks, "edson@maecre.com", RoleType.SUPERVISOR.getId());
 
             Set<Task> arielTasks = new HashSet<>();
             arielTasks.add(enablePaymentTask);
@@ -133,7 +133,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
             Set<Task> systemTasks = new HashSet<>();
             systemTasks.add(signatureDocumentsTask);
-            createEmployee("System", "", systemTasks, "maecre.appgestion@gmail.com", RoleType.SUPERVISOR.getId());
+            createEmployee("System", "", systemTasks, "maecre.appgestion@gmail.com", RoleType.ADMIN.getId());
 
             //Usuario solicitante puede hacer esos recursos porque necesita subir documentos
             Set<Task> user1Tasks = new HashSet<>();

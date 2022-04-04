@@ -71,13 +71,9 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     @Transactional
     public void allocateResources() {
         logger.debug("allocating resources");
-        // todas los tipos de  tareas en estados pendiente
         List<TaskInstance> unallocatedTasks = taskInstanceService.findNotAllocatedTasks(TaskStatus.PENDING, false);
-        //todos los empleados en estado true
         List<Employee> unassignedEmployees = employeeService.findAvailableEmployees();
-        //empleados con esa tarea de habilidad
         Map<Long, List<Employee>> taskEmployeeMap = mapEmployeesByTask(unassignedEmployees);
-        //asignamos tareas
         allocateTasks(unallocatedTasks, unassignedEmployees, taskEmployeeMap);
     }
 

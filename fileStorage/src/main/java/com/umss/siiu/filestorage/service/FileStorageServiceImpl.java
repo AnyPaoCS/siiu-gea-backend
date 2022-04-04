@@ -1,6 +1,8 @@
 package com.umss.siiu.filestorage.service;
 
 import com.google.gson.Gson;
+import com.umss.siiu.core.model.User;
+import com.umss.siiu.core.service.UserService;
 import com.umss.siiu.filestorage.dto.FileSimpleInfoDto;
 import com.umss.siiu.filestorage.dto.FileUploadDto;
 import com.umss.siiu.filestorage.dto.ImageSimpleInfoDto;
@@ -23,6 +25,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     private final FileService fileService;
     private final FileTypeService fileTypeService;
+    private UserService userService;
     private final Gson gson;
 
     public FileStorageServiceImpl(FileService fileService, FileTypeService fileTypeService, Gson gson) {
@@ -34,16 +37,17 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     public FileSimpleInfoDto uploadFile(MultipartFile file, String fileUpload) {
         FileUploadDto fileUploadDto = gson.fromJson(fileUpload, FileUploadDto.class);
+        User user = userService.findByEmail(fileUploadDto.getEmail());
         JackRabbitNodeDto dto = new JackRabbitNodeDto();
         dto.setFile(file);
         dto.setDescription(fileUploadDto.getDescription());
-        dto.setOwnerId(fileUploadDto.getUserId());
+        dto.setOwnerId(user.getId());
         dto.setOwnerClass("user");
         FileType fileType = fileTypeService.findByAbbreviation(fileUploadDto.getFileTypeAbbreviation());
         dto.setFileTypeId(fileType.getId());
-        String folderPath = fileUploadDto.getUserId() + "/" + fileType.getFileTypeCategory().name();
+        String folderPath = user.getId() + "/" + fileType.getFileTypeCategory().name();
         dto.setParentPath(folderPath);
-        JackRabbitNode jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(fileUploadDto.getUserId(), fileType.getId());
+        JackRabbitNode jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
         if (jackRabbitNode != null) {
             if (jackRabbitNode.isVerified()) {
                 return null;
@@ -55,7 +59,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             fileService.createFolderStructure(folderPath);
             fileService.saveFile(dto, file.getOriginalFilename());
         }
-        JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(fileUploadDto.getUserId(), fileType.getId());
+        JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
         return new FileSimpleInfoDto(node);
     }
 

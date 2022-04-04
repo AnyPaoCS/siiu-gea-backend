@@ -2,16 +2,16 @@ package com.umss.siiu.filestorage.dto;
 
 public class FileUploadDto {
 
-    private Long userId;
+    private String email;
     private String fileTypeAbbreviation;
     private String description;
 
-    public Long getUserId() {
-        return userId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getFileTypeAbbreviation() {
