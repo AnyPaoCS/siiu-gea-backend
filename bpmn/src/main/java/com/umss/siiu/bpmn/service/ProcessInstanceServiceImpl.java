@@ -126,4 +126,9 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
             });
         }
     }
+
+    @Override
+    public List<ProcessInstance> findByUserEmail(String email) {
+        return repository.findByUserEmail(email);
+    }
 }

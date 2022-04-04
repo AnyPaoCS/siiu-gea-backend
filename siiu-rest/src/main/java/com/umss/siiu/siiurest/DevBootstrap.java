@@ -139,7 +139,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
             Set<Task> user1Tasks = new HashSet<>();
             user1Tasks.add(requestProcessTask);
             user1Tasks.add(validationPaymentTask);
-            createEmployee("Solicitante", "1", user1Tasks, "csorialopez11@gmail.com", RoleType.APPLICANT.getId());
+            createEmployee("Daniel", "Soliz", user1Tasks, "danielsoliz80@gmail.com", RoleType.APPLICANT.getId());
 
             Set<Task> user2Tasks = new HashSet<>();
             user2Tasks.add(requestProcessTask);
