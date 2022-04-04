@@ -25,6 +25,9 @@ public class TaskInstance extends ModelBase<TaskInstanceDto> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "taskInstance", fetch = FetchType.EAGER)
     private List<ResourceInstance> resourceInstances;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "taskInstance", fetch = FetchType.LAZY)
+    private List<Observation> observations;
+
     private LocalDateTime startTime;
     private LocalDateTime completionTime;
     private Long workedTime;
@@ -78,6 +81,14 @@ public class TaskInstance extends ModelBase<TaskInstanceDto> {
 
     public void setProcessInstance(ProcessInstance processInstance) {
         this.processInstance = processInstance;
+    }
+
+    public List<Observation> getObservations() {
+        return observations;
+    }
+
+    public void setObservations(List<Observation> observations) {
+        this.observations = observations;
     }
 
     public List<ResourceInstance> getResourceInstances() {

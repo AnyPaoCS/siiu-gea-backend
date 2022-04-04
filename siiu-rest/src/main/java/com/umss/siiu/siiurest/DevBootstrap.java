@@ -133,7 +133,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
             Set<Task> systemTasks = new HashSet<>();
             systemTasks.add(signatureDocumentsTask);
-            createEmployee("System", "", systemTasks, "maecre.appgestion@gmail.com", RoleType.GENERAL.getId());
+            createEmployee("System", "", systemTasks, "maecre.appgestion@gmail.com", RoleType.SUPERVISOR.getId());
 
             //Usuario solicitante puede hacer esos recursos porque necesita subir documentos
             Set<Task> user1Tasks = new HashSet<>();

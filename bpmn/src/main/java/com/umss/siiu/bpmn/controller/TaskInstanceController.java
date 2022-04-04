@@ -66,10 +66,10 @@ public class TaskInstanceController extends GenericController<TaskInstance, Task
     }
 
     @PutMapping("/reassignResources")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPERVISOR')")
     public OperationResultDto<TaskInstanceDto> reassignResources(@RequestBody TaskInstanceDto taskInstanceDto) {
         return new OperationResultDto<>("messages.taskInstance.userReassigned",
-                toDto(service.reassignResources(taskInstanceDto.getId(), taskInstanceDto.getEmployeeId())));
+                toDto(service.reassignResources(taskInstanceDto.getId(), taskInstanceDto.getEmployeeId(), taskInstanceDto.getObservation())));
 
     }
 
