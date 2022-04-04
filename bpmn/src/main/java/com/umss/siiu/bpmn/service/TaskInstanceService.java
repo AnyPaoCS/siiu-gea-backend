@@ -24,7 +24,7 @@ public interface TaskInstanceService extends GenericService<TaskInstance> {
 
     List<TaskInstance> findByCodeNotAndJobIdAndTaskStatusNot(String taskCode, Long jobId, String taskStatus);
 
-    TaskInstance reassignResources(long taskInstanceId, long employeeId);
+    TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation);
 
     TaskInstance createTaskInstance(Process defaultJobProcess, ProcessInstance processInstance);
 

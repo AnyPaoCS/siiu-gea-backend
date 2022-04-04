@@ -65,9 +65,10 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
 
     @Override
     @Transactional
-    public TaskInstance reassignResources(long taskInstanceId, long employeeId) {
+    public TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation) {
         TaskInstance taskInstance = findById(taskInstanceId);
         taskInstance.setTaskStatus(TaskStatus.PENDING);
+        taskInstance.setObservations(setObservationsTaskInstance(taskInstance, observation));
         deAllocateResources(taskInstance);
         taskInstance = findById(taskInstanceId);
 
@@ -85,6 +86,12 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
             }
         }
         return taskInstance;
+    }
+
+    private List<Observation> setObservationsTaskInstance(TaskInstance task, String observation) {
+        List<Observation> obs = (task.getObservations() != null) ? task.getObservations() : new ArrayList<>();
+        obs.add(new Observation(observation, task));
+        return obs;
     }
 
     @Override
