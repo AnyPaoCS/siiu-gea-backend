@@ -10,4 +10,6 @@ public interface TaskService extends GenericService<Task> {
 
     List<Task> findAssociatedTasksByTaskCode(String taskCode);
 
+    List<Task> findAllTaskWithCode(String code);
+
 }

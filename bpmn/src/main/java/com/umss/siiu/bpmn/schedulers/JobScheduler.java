@@ -43,7 +43,7 @@ public class JobScheduler {
         this.jobBpmService = jobBpmService;
     }
 
-//    @Scheduled(fixedDelayString = "${scheduler.jobFetch.interval}")
+   // @Scheduled(fixedDelayString = "${scheduler.jobFetch.interval}")
     public synchronized void execFetchJobsFromCrm() throws InterruptedException {
         try {
             lock.lock();
@@ -68,8 +68,11 @@ public class JobScheduler {
 
     }
 
-//    @Scheduled(fixedDelayString = "${scheduler.allocation.interval}")
+    //@Scheduled(fixedDelayString = "${scheduler.allocation.interval}")
+    // por el momento se ejecuta en 2min para ver el funcionamiento
+    @Scheduled(cron = "0 */10 * * * *")
     public synchronized void execAllocation() throws InterruptedException {
+        System.out.println("Se esta ejecutando la asignacion de tareas a empleados disponibles");
         try {
             lock.lock();
             while (runningDaemon.get()) {
@@ -89,7 +92,7 @@ public class JobScheduler {
         }
     }
 
-//    @Scheduled(fixedDelayString = "${scheduler.downloadTemplates.interval}")
+   // @Scheduled(fixedDelayString = "${scheduler.downloadTemplates.interval}")
     public synchronized void downloadJobInformation() throws InterruptedException {
         try {
             lock.lock();

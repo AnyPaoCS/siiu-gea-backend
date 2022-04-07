@@ -26,8 +26,8 @@ public class TaskInstanceController extends GenericController<TaskInstance, Task
     private JobBpmService jobBpmService;
     private JobService jobService;
 
-    public TaskInstanceController(TaskInstanceService service, JobBpmService jobBpmService, JobService jobService,
-            JobScheduler jobScheduler) {
+    public TaskInstanceController(TaskInstanceService service, JobBpmService jobBpmService, JobService jobService
+            ) {
         this.service = service;
         this.jobBpmService = jobBpmService;
         this.jobService = jobService;
@@ -66,10 +66,10 @@ public class TaskInstanceController extends GenericController<TaskInstance, Task
     }
 
     @PutMapping("/reassignResources")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPERVISOR')")
     public OperationResultDto<TaskInstanceDto> reassignResources(@RequestBody TaskInstanceDto taskInstanceDto) {
         return new OperationResultDto<>("messages.taskInstance.userReassigned",
-                toDto(service.reassignResources(taskInstanceDto.getId(), taskInstanceDto.getEmployeeId())));
+                toDto(service.reassignResources(taskInstanceDto.getId(), taskInstanceDto.getEmployeeId(), taskInstanceDto.getObservation())));
 
     }
 

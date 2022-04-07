@@ -5,11 +5,9 @@ import com.umss.siiu.bpmn.model.processes.Task;
 import com.umss.siiu.bpmn.service.TaskService;
 import com.umss.siiu.core.controller.GenericController;
 import com.umss.siiu.core.service.GenericService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController

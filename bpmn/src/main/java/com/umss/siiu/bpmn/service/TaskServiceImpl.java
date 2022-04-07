@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl extends GenericServiceImpl<Task> implements TaskService {
@@ -27,6 +28,11 @@ public class TaskServiceImpl extends GenericServiceImpl<Task> implements TaskSer
     @Override
     public Task findByCode(String code) {
         return repository.findByCode(code);
+    }
+
+    @Override
+    public List<Task> findAll() {
+        return repository.findAll().stream().distinct().collect(Collectors.toList());
     }
 
     @Override
@@ -50,6 +56,11 @@ public class TaskServiceImpl extends GenericServiceImpl<Task> implements TaskSer
                 }
             }
         }
+    }
+
+    @Override
+    public List<Task> findAllTaskWithCode(String code) {
+        return repository.findAllByCode(code);
     }
 
     @Override

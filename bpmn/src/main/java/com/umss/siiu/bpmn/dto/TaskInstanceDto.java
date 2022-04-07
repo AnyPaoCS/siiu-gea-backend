@@ -24,8 +24,11 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
     private String code;
     private Boolean isComplete;
     private long taskId;
+    private String observation;
     private String relatedAreaCode;
     private List<ResourceDocumentDto> resourceDocuments;
+
+    private List<ObservationDto> observations;
 
     public TaskStatus getTaskStatus() {
         return taskStatus;
@@ -107,6 +110,22 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
         this.resourceDocuments = resourceDocuments;
     }
 
+    public List<ObservationDto> getObservations() {
+        return observations;
+    }
+
+    public void setObservations(List<ObservationDto> observations) {
+        this.observations = observations;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
+    }
+
     @Override
     protected void afterConversion(TaskInstance taskInstance, ModelMapper mapper) {
         setName(taskInstance.getTask().getName());
@@ -116,6 +135,7 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
         setTaskId(taskInstance.getTask().getId());
         setRelatedAreaCode(taskInstance.getTask().getRelatedAreaCode());
         setResourceDocuments(getDocumentsFromResource(taskInstance, mapper));
+        setObservations(new ObservationDto().toListDto(taskInstance.getObservations(), mapper));
     }
 
     private Optional<EmployeeDto> getEmployeeFromResource(TaskInstance taskInstance, ModelMapper mapper) {
