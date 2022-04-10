@@ -391,10 +391,11 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     public List<JobBpm> findByUserEmail(String email) {
         Employee employee = employeeService.findByEmail(email);
         if (employee != null) {
-            List<ProcessInstance> processInstances = processInstanceService.findByUserEmail(employee.getUser().getEmail());
+            List<ProcessInstance> processInstances = processInstanceService
+                    .findByUserEmail(employee.getUser().getEmail());
             return processInstances.parallelStream().map(processInstance -> {
                 return this.findByProcessInstance(processInstance);
-            }).sorted().collect(Collectors.toList());
+            }).collect(Collectors.toList());
         }
         return null;
     }
