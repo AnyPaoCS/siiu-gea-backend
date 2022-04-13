@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.umss.siiu.bpmn.dto.MailDto;
 import com.umss.siiu.bpmn.dto.OperationResultDto;
 import com.umss.siiu.bpmn.dto.TokenDto;
-import com.umss.siiu.bpmn.model.processes.Process;
-import com.umss.siiu.bpmn.model.processes.ProcessInstance;
 import com.umss.siiu.bpmn.service.*;
 import com.umss.siiu.core.controller.GenericController;
 import com.umss.siiu.core.dto.EmployeeDto;
@@ -43,24 +41,13 @@ public class UserController extends GenericController<User, UserDto> {
     private EmployeeTaskService employeeTaskService;
     private AuthenticationManager authenticationManager;
 
-    private ProcessInstanceService processInstanceService;
-    private ProcessService processService;
-    private JobBpmService jobBpmService;
-
-
     public UserController(UserService userService, TokenService tokenService, EmailService emailService,
-                          AuthenticationManager authenticationManager, EmployeeTaskService employeeTaskService,
-                          ProcessInstanceService processInstanceService,
-                          ProcessService processService, JobBpmService jobBpmService ) {
+            AuthenticationManager authenticationManager, EmployeeTaskService employeeTaskService) {
         this.userService = userService;
         this.tokenService = tokenService;
         this.emailService = emailService;
         this.authenticationManager = authenticationManager;
         this.employeeTaskService = employeeTaskService;
-        this.processInstanceService = processInstanceService;
-        this.processService = processService;
-        this.jobBpmService = jobBpmService;
-
     }
 
     @PostMapping("/employees")
@@ -102,7 +89,7 @@ public class UserController extends GenericController<User, UserDto> {
             UserDto tokenInformation = tokenService.getTokenInformation(token, UserDto.class);
             User user = new User();
             if (!userService.isUserRegistered(tokenInformation.getEmail())) {
-                 user = userService.save(userDto.getFirstName(), userDto.getLastName(), tokenInformation.getEmail(),
+                user = userService.save(userDto.getFirstName(), userDto.getLastName(), tokenInformation.getEmail(),
                         userDto.getPassword(), tokenInformation.getType());
                 employeeTaskService.setEmployeeTaskForUser(user.getEmployee(), tokenInformation.getType());
                 responseEntity = new ResponseEntity<>(new TokenDto(tokenService.generateTokenByDay(10,
@@ -125,7 +112,7 @@ public class UserController extends GenericController<User, UserDto> {
             @RequestParam("redirect") String redirect)
             throws JsonProcessingException {
         Map<String, Object> parameters = new HashMap<>();
-        String[] to = {user.getEmail()};
+        String[] to = { user.getEmail() };
         String url = redirect + "?token=" + tokenService.generateTokenByDay(1, user, false);
         parameters.put("invitationLink", url);
         emailService.sendMail(new MailDto(to, "Subscription link", "invitation-template", parameters));
@@ -139,7 +126,7 @@ public class UserController extends GenericController<User, UserDto> {
         ResponseEntity<Object> responseEntity = null;
         if (userService.isUserRegistered(user.getEmail())) {
             Map<String, Object> parameters = new HashMap<>();
-            String[] to = {user.getEmail()};
+            String[] to = { user.getEmail() };
             String url = redirect + "?token=" + tokenService.generateTokenByDay(1, user, false);
             parameters.put("forgottenPasswordLink", url);
             emailService.sendMail(new MailDto(to, "Forgotten password", "forgotten-password-template", parameters));
@@ -161,9 +148,9 @@ public class UserController extends GenericController<User, UserDto> {
             int operationResult = userService.updatePasswordByEmail(tokenInformation.getEmail(), userDto.getPassword());
             responseEntity = (operationResult == ApplicationConstants.ONE_RESULT_MODIFIED)
                     ? new ResponseEntity<>(new TokenDto(tokenService.generateTokenByDay(10,
-                    userService.findUserDetails(tokenInformation.getEmail()), true)), HttpStatus.OK)
+                            userService.findUserDetails(tokenInformation.getEmail()), true)), HttpStatus.OK)
                     : new ResponseEntity<>(new OperationResultDto<>("messages.user.notRestoredPassword"),
-                    HttpStatus.BAD_REQUEST);
+                            HttpStatus.BAD_REQUEST);
         } catch (JwtException e) {
             responseEntity = new ResponseEntity<>(new OperationResultDto<>("messages.token.invalidToken"),
                     HttpStatus.UNAUTHORIZED);
@@ -197,26 +184,4 @@ public class UserController extends GenericController<User, UserDto> {
     public User findModelById(Long id) {
         return super.findModelById(id);
     }
-
-    @PostMapping("/createProcessInstances/{idProcess}")
-    public ResponseEntity<Object> createProcessInstanceByUser(@PathVariable String idProcess, @RequestBody UserDto userDto) {
-        ResponseEntity<Object> responseEntity = null;
-        try {
-            User user = userService.findByEmail(userDto.getEmail());
-            Process processUser = processService.findById(Long.parseLong(idProcess));
-            ProcessInstance instance = processInstanceService.createProcessInstance(processUser, user);
-            jobBpmService.createJobBpm(instance);
-            jobBpmService.allocateResources();
-            new ResponseEntity<>(new OperationResultDto<>("message.user.process.done"),
-                    HttpStatus.OK);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            responseEntity = new ResponseEntity<>(new OperationResultDto<>("invalid.process"),
-                    HttpStatus.UNAUTHORIZED);
-        }
-        return responseEntity;
-    }
-
-
 }
