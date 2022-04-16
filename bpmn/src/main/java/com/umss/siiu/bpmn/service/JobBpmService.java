@@ -26,4 +26,6 @@ public interface JobBpmService extends GenericService<JobBpm> {
     List<JobBpm> findByUserEmail(String email);
 
     JobBpm findByProcessInstance(ProcessInstance processInstance);
+    
+    List<JobBpm> findByTaskAssigned(String email);
 }
