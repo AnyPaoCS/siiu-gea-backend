@@ -405,4 +405,24 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
         return repository.findByProcessInstance(processInstance);
     }
 
+    @Override
+    public List<JobBpm> findByTaskAssigned(String email) {
+        Employee employee = employeeService.findByEmail(email);
+        List<JobBpm> result = new ArrayList<JobBpm>();
+        if (!email.isEmpty()) {
+            List<JobBpm> jobBpms = this.findAll();
+            for (JobBpm jobBpm : jobBpms) {
+                Long jobId = jobBpm.getJob().getId();
+                try {
+                    TaskInstance taskInstance = taskInstanceService.findByJobIdAndEmployeeId(jobId, employee.getId());
+                    if (taskInstance != null) {
+                        result.add(jobBpm);
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+        return result;
+    }
+
 }

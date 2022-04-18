@@ -50,6 +50,11 @@ public class JobBpmController extends GenericController<JobBpm, JobBpmDto> {
         return (List<JobBpmDto>) super.toDto(service.findByUserEmail(userDto.getEmail()));
     }
 
+    @PostMapping(value = "/byAssignedEmployee")
+    public List<JobBpmDto> findProcessByAssignedTasks(@RequestBody UserDto userDto) {
+        return (List<JobBpmDto>) super.toDto(service.findByTaskAssigned(userDto.getEmail()));
+    }
+
     @PostMapping("/createProcessInstances/{idProcess}")
     public ResponseEntity<Object> createProcessInstanceByUser(@PathVariable String idProcess,
             @RequestBody UserDto userDto) {
