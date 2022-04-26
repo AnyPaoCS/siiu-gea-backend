@@ -3,6 +3,7 @@ package com.umss.siiu.bpmn.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umss.siiu.core.service.TokenService;
+import com.umss.siiu.core.util.ApplicationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -34,7 +35,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket").setAllowedOriginPatterns("*").withSockJS();
+        registry.addEndpoint("/websocket").setAllowedOrigins(ApplicationConstants.ALLOWED_DOMAIN.get(0)).withSockJS()
+                .setSessionCookieNeeded(false);
     }
 
     @Override
@@ -42,6 +44,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
         registry.enableSimpleBroker("/chatroom","/user");
         registry.setUserDestinationPrefix("/user");
+        //registry.enableSimpleBroker("/notifications");
     }
 
     /*@Override
@@ -66,4 +69,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
         });
     }*/
+
 }
