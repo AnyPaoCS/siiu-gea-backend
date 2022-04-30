@@ -24,7 +24,6 @@ public class PaymentScheduler {
 
     @Scheduled(fixedRate = TIME_DELAY)
     public void execRealizePTPayments () throws ServerException {
-        System.out.println("scheduler payment");
         List<Payment> list = paymentService.getPTPaymentsForScheduledTask();
         if (list == null || list.isEmpty()) {
             System.out.println("No hay pagos pendientes por el momento");
@@ -32,8 +31,7 @@ public class PaymentScheduler {
         }
         List<Long> idList = new ArrayList<>();
         for (Payment p : list) {
-            idList.add(p.getId());
-//            paymentService.realizePayment(p.getId());
+            idList.add(p.getProcessInstance().getId());
         }
         PaymentList paymentList = new PaymentList();
         paymentList.setPaymenListId(idList);
@@ -43,8 +41,7 @@ public class PaymentScheduler {
             throw new ServerException("Error en la api de banco union");
         }
         for (Long id : paymentsAccepted.getPaymenListId()) {
-            System.out.println(id);
-            paymentService.realizePayment(id);
+            paymentService.realizePaymentByProcessInstanceId(id);
         }
     }
 

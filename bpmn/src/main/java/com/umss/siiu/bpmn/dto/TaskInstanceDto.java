@@ -30,6 +30,8 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
 
     private List<ObservationDto> observations;
 
+    private Long userProcessId;
+
     public TaskStatus getTaskStatus() {
         return taskStatus;
     }
@@ -126,6 +128,14 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
         this.observation = observation;
     }
 
+    public Long getUserProcessId() {
+        return userProcessId;
+    }
+
+    public void setUserProcessId(Long userProcessId) {
+        this.userProcessId = userProcessId;
+    }
+
     @Override
     protected void afterConversion(TaskInstance taskInstance, ModelMapper mapper) {
         setName(taskInstance.getTask().getName());
@@ -136,6 +146,7 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
         setRelatedAreaCode(taskInstance.getTask().getRelatedAreaCode());
         setResourceDocuments(getDocumentsFromResource(taskInstance, mapper));
         setObservations(new ObservationDto().toListDto(taskInstance.getObservations(), mapper));
+        setUserProcessId(taskInstance.getProcessInstance().getUser().getId());
     }
 
     private Optional<EmployeeDto> getEmployeeFromResource(TaskInstance taskInstance, ModelMapper mapper) {
