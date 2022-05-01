@@ -199,9 +199,12 @@ public class FileController {
 
     @PostMapping("/upload/image")
     public ResponseEntity<Object> uploadSignatureImage(@RequestParam("userId") long userId, @RequestParam("image") MultipartFile file) {
+        System.out.println(userId);
+        System.out.println(file);
         JackRabbitNodeDto dto = new JackRabbitNodeDto();
         dto.setFile(file);
         dto.setOwnerId(userId);
+        dto.setOwnerClass("user");
         FileType fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         dto.setFileTypeId(fileType.getId());
         String folderPath = userId + "/" + fileType.getFileTypeCategory().name();
@@ -223,6 +226,8 @@ public class FileController {
         FileType fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
         if (node == null) {
+
+            System.out.println(userId);
             return new ResponseEntity<>("El archivo con el id solicitado no existe.", HttpStatus.BAD_REQUEST);
         }
         InputStream is = fileService.getInputStreamFromNode(node.getPath());
@@ -232,6 +237,7 @@ public class FileController {
         } catch (IOException e) {
             return new ResponseEntity<>("Error de servidor", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+//        System.out.println("firma", signatureImage);
         return new ResponseEntity<>(signatureImage, HttpStatus.OK);
     }
 
