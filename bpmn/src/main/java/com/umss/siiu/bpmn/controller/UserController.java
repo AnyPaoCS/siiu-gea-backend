@@ -171,7 +171,6 @@ public class UserController extends GenericController<User, UserDto> {
     protected GenericService<User> getService() {
         return userService;
     }
-
     private EmployeeDto getEmployee(User user) {
         if (user != null && user.getEmployee() != null) {
             return (EmployeeDto) new EmployeeDto().toDto(user.getEmployee(), modelMapper);

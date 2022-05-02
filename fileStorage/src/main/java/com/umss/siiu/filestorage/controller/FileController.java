@@ -202,6 +202,10 @@ public class FileController {
         JackRabbitNodeDto dto = new JackRabbitNodeDto();
         dto.setFile(file);
         dto.setOwnerId(userId);
+        dto.setDescription("imagen subida");
+        dto.setOwnerClass("user");
+
+
         FileType fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         dto.setFileTypeId(fileType.getId());
         String folderPath = userId + "/" + fileType.getFileTypeCategory().name();

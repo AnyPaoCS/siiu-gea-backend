@@ -225,10 +225,7 @@ public class FileServiceImpl implements FileService {
             String parentPath = jackRabbitNodeDto.getParentPath();
             JackRabbitNode jackRabbitNode = jackRabbitNodeService
                     .findByFilePath((!StringUtils.isEmpty(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
-            if (fileName.contains(".png") || fileName.contains(".jpg") || fileName.contains(".jpeg")) {
-                clearFileType(modelBase.getId(), jackRabbitNodeDto.getFileTypeId(), jackRabbitNode,
-                        FileTypeCategory.IMAGEN_FIRMA);
-            }
+
             saveFile(fileName, jackRabbitNodeDto.getFileTypeId(), jackRabbitNodeDto.getDescription(),
                     jackRabbitNodeDto.getFile().getInputStream(), modelBase, parentPath, true);
         } catch (Exception e) {
