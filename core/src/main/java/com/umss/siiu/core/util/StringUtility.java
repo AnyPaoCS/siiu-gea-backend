@@ -99,7 +99,7 @@ public class StringUtility {
     }
 
     public static boolean isStringEmpty(String text) {
-        return text == null || text == "";
+        return text == null || text.equals("");
     }
 
     /**

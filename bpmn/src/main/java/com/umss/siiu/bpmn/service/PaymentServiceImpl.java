@@ -20,7 +20,7 @@ public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements P
 
     private final PaymentRepository paymentRepository;
     private final ProcessInstanceService processInstanceService;
-    private final static long TIME_DIFFERENCE = 1000 * 60 * 30;
+    private final static long TIME_DIFFERENCE = 1000L * 60L * 30L;
 
     public PaymentServiceImpl(PaymentRepository paymentRepository, ProcessInstanceService processInstanceService) {
         this.paymentRepository = paymentRepository;
