@@ -106,7 +106,6 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
     }
 
     @Override
-    @PatchMapping(value = "/{id}")
     public ProcessInstance patch(DtoBase dto, ProcessInstance model) {
         if (((ProcessInstanceDto) dto).isManual() && !model.isManual()) {
             setManual(model);

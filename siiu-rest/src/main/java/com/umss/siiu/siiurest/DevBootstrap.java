@@ -341,7 +341,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         user.setPassword("$2a$10$XURPShQNCsLjp1ESc2laoObo9QZDhxz73hJPaEv7/cBha4pk0AgP."); //el password es: password
         user.setEmployee(employee);
 
-        if (employee.getFirstName()=="System") {
+        if (employee.getFirstName().equals("System")) {
             user.setSystemUser(true);
         }
         role.setId(roleId);

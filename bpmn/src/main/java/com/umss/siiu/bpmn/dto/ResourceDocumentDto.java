@@ -69,7 +69,7 @@ public class  ResourceDocumentDto extends DtoBase<ResourceDocument> {
                     list.add(new ResourceDocumentDto().toDto(resource.getDocument(), mapper));
                 }
             });
-            if (taskAction.getNextTask().getCode() != task.getCode() && taskAction.getActionFlowType() != ActionFlowType.FORCE_GATE_ENTRY ) {
+            if (!taskAction.getNextTask().getCode().equals(task.getCode()) && taskAction.getActionFlowType() != ActionFlowType.FORCE_GATE_ENTRY ) {
                 getResourceDocument(list, taskAction.getNextTask(), mapper);
             }
         });
