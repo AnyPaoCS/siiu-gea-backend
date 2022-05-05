@@ -11,8 +11,6 @@ import java.util.List;
 public interface EmployeeService extends GenericService<Employee> {
     List<Employee> findAvailableEmployees();
 
-//    List<Employee> findByTasksId(long taskId);
-
     Employee findByEmail(String email);
 
     Employee findSystemEmployee();

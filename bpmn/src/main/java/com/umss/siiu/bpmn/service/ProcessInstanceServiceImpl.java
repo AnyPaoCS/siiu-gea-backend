@@ -18,7 +18,6 @@ import com.umss.siiu.core.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,12 +46,12 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
 
     @Override
     public ProcessInstance createProcessInstance() {
-        ProcessInstance processInstance = new ProcessInstance();
+        var processInstance = new ProcessInstance();
         processInstance.setProcess(getDefaultJobProcess());
         processInstance.setUser(getDefaultUserSolicitante());
         processInstance = save(processInstance);
 
-        TaskInstance taskInstance = taskInstanceService.createTaskInstance(getDefaultJobProcess(), processInstance);
+        var taskInstance = taskInstanceService.createTaskInstance(getDefaultJobProcess(), processInstance);
         List<TaskInstance> taskInstances = new ArrayList<>();
         taskInstances.add(taskInstance);
         processInstance.setTaskInstances(taskInstances);
@@ -62,12 +61,12 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
 
     @Override
     public ProcessInstance createProcessInstance(Process process, User user) {
-        ProcessInstance processInstance = new ProcessInstance();
+        var processInstance = new ProcessInstance();
         processInstance.setProcess(process);
         processInstance.setUser(user);
         processInstance = save(processInstance);
 
-        TaskInstance taskInstance = taskInstanceService.createTaskInstance(process, processInstance);
+        var taskInstance = taskInstanceService.createTaskInstance(process, processInstance);
         List<TaskInstance> taskInstances = new ArrayList<>();
         taskInstances.add(taskInstance);
         processInstance.setTaskInstances(taskInstances);
@@ -93,14 +92,14 @@ public class ProcessInstanceServiceImpl extends GenericServiceImpl<ProcessInstan
 
     @Override
     public ProcessInstance findById(Long id) {
-        ProcessInstance processInstance = super.findById(id);
+        var processInstance = super.findById(id);
         processInstance.setTaskInstances(taskInstanceService.findByProcessInstance(processInstance));
         return processInstance;
     }
 
     @Override
     public ProcessInstance findByJobId(Long id) {
-        ProcessInstance processInstance = repository.findByJobBpmJobId(id);
+        var processInstance = repository.findByJobBpmJobId(id);
         processInstance.setTaskInstances(taskInstanceService.findByProcessInstance(processInstance));
         return processInstance;
     }

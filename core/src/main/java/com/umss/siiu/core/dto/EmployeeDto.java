@@ -104,11 +104,11 @@ public class EmployeeDto extends DtoBase<Employee> {
 
     private void setImageBase64(Employee employee) {
         if (employee.getImage() != null) {
-            byte[] bytes = new byte[employee.getImage().length];
-            for (int i = 0; i < employee.getImage().length; i++) {
+            var bytes = new byte[employee.getImage().length];
+            for (var i = 0; i < employee.getImage().length; i++) {
                 bytes[i] = employee.getImage()[i];
             }
-            String imageStr = Base64.encodeBase64String(bytes);
+            var imageStr = Base64.encodeBase64String(bytes);
             this.setImage(imageStr);
         }
     }

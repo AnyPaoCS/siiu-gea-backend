@@ -20,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,7 +62,7 @@ public class UserController extends GenericController<User, UserDto> {
     public ResponseEntity<Object> signIn(@RequestBody UserDto userDto) throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = null;
         try {
-            Authentication authentication = authenticationManager
+            var authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
             responseEntity = new ResponseEntity<>(
                     new TokenDto(tokenService.generateTokenByDay(10, authentication.getPrincipal(), true)),
@@ -87,9 +86,8 @@ public class UserController extends GenericController<User, UserDto> {
         ResponseEntity<Object> responseEntity = null;
         try {
             UserDto tokenInformation = tokenService.getTokenInformation(token, UserDto.class);
-            User user = new User();
             if (!userService.isUserRegistered(tokenInformation.getEmail())) {
-                user = userService.save(userDto.getFirstName(), userDto.getLastName(), tokenInformation.getEmail(),
+                var user = userService.save(userDto.getFirstName(), userDto.getLastName(), tokenInformation.getEmail(),
                         userDto.getPassword(), tokenInformation.getType());
                 employeeTaskService.setEmployeeTaskForUser(user.getEmployee(), tokenInformation.getType());
                 responseEntity = new ResponseEntity<>(new TokenDto(tokenService.generateTokenByDay(10,
@@ -112,7 +110,7 @@ public class UserController extends GenericController<User, UserDto> {
             @RequestParam("redirect") String redirect)
             throws JsonProcessingException {
         Map<String, Object> parameters = new HashMap<>();
-        String[] to = { user.getEmail() };
+        var to = new String[]{user.getEmail()};
         String url = redirect + "?token=" + tokenService.generateTokenByDay(1, user, false);
         parameters.put("invitationLink", url);
         emailService.sendMail(new MailDto(to, "Subscription link", "invitation-template", parameters));
@@ -126,7 +124,7 @@ public class UserController extends GenericController<User, UserDto> {
         ResponseEntity<Object> responseEntity = null;
         if (userService.isUserRegistered(user.getEmail())) {
             Map<String, Object> parameters = new HashMap<>();
-            String[] to = { user.getEmail() };
+            var to = new String[]{user.getEmail()};
             String url = redirect + "?token=" + tokenService.generateTokenByDay(1, user, false);
             parameters.put("forgottenPasswordLink", url);
             emailService.sendMail(new MailDto(to, "Forgotten password", "forgotten-password-template", parameters));
@@ -173,7 +171,7 @@ public class UserController extends GenericController<User, UserDto> {
     }
     private EmployeeDto getEmployee(User user) {
         if (user != null && user.getEmployee() != null) {
-            return (EmployeeDto) new EmployeeDto().toDto(user.getEmployee(), modelMapper);
+            return new EmployeeDto().toDto(user.getEmployee(), modelMapper);
         }
         throw new NoSuchElementException("User does not have an employee asociated or does not exist");
     }

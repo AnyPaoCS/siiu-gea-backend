@@ -34,9 +34,9 @@ public class NodeDto {
     }
 
     private void getNode(List<NodeDto> list, Task task, ModelMapper mapper) {
-        task.getTaskActions().forEach(taskAction -> { ;
+        task.getTaskActions().forEach(taskAction -> {
             if (!taskAction.getNextTask().getCode().equals(task.getCode()) && taskAction.getActionFlowType() == ActionFlowType.AUTOMATIC ) {
-                NodeDto node = new NodeDto();
+                var node = new NodeDto();
                 node.setTask(new TaskDto().toDto(taskAction.getTask(), mapper));
                 node.setNextTask(new TaskDto().toDto(taskAction.getNextTask(), mapper));
                 list.add(node);

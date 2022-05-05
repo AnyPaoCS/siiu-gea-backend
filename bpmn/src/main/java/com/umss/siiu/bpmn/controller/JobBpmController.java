@@ -9,14 +9,11 @@ import java.util.List;
 import com.umss.siiu.bpmn.dto.JobBpmDto;
 import com.umss.siiu.bpmn.dto.OperationResultDto;
 import com.umss.siiu.bpmn.model.JobBpm;
-import com.umss.siiu.bpmn.model.processes.Process;
-import com.umss.siiu.bpmn.model.processes.ProcessInstance;
 import com.umss.siiu.bpmn.service.JobBpmService;
 import com.umss.siiu.bpmn.service.ProcessInstanceService;
 import com.umss.siiu.bpmn.service.ProcessService;
 import com.umss.siiu.core.controller.GenericController;
 import com.umss.siiu.core.dto.UserDto;
-import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.service.GenericService;
 import com.umss.siiu.core.service.UserService;
 
@@ -47,12 +44,12 @@ public class JobBpmController extends GenericController<JobBpm, JobBpmDto> {
 
     @PostMapping(value = "/byUser")
     public List<JobBpmDto> findProcessByJobId(@RequestBody UserDto userDto) {
-        return (List<JobBpmDto>) super.toDto(service.findByUserEmail(userDto.getEmail()));
+        return new JobBpmDto().toListDto(service.findByUserEmail(userDto.getEmail()), modelMapper);
     }
 
     @PostMapping(value = "/byAssignedEmployee")
     public List<JobBpmDto> findProcessByAssignedTasks(@RequestBody UserDto userDto) {
-        return (List<JobBpmDto>) super.toDto(service.findByTaskAssigned(userDto.getEmail()));
+        return new JobBpmDto().toListDto(service.findByTaskAssigned(userDto.getEmail()), modelMapper);
     }
 
     @PostMapping("/createProcessInstances/{idProcess}")
@@ -60,10 +57,10 @@ public class JobBpmController extends GenericController<JobBpm, JobBpmDto> {
             @RequestBody UserDto userDto) {
         ResponseEntity<Object> responseEntity = null;
         try {
-            User user = userService.findByEmail(userDto.getEmail());
-            Process processUser = processService.findById(Long.parseLong(idProcess));
-            ProcessInstance instance = processInstanceService.createProcessInstance(processUser, user);
-            JobBpm processCreated = service.createJobBpm(instance);
+            var user = userService.findByEmail(userDto.getEmail());
+            var processUser = processService.findById(Long.parseLong(idProcess));
+            var instance = processInstanceService.createProcessInstance(processUser, user);
+            var processCreated = service.createJobBpm(instance);
             service.allocateResources();
             responseEntity = new ResponseEntity<>(toDto(processCreated),
                     HttpStatus.OK);

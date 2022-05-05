@@ -154,7 +154,7 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
                 .filter(resource -> !resource.getEmployee().getFirstName().equalsIgnoreCase("System"))
                 .collect(Collectors.toList());
         if (resources.iterator().hasNext()) {
-            return Optional.of((EmployeeDto) new EmployeeDto()
+            return Optional.of( new EmployeeDto()
                     .toDto(resources.iterator().next().getEmployee(), mapper));
         }
         return Optional.ofNullable(null);

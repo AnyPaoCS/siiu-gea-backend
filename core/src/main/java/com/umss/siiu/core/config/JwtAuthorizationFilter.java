@@ -1,6 +1,5 @@
 package com.umss.siiu.core.config;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umss.siiu.core.service.TokenService;
 import io.jsonwebtoken.JwtException;
@@ -32,16 +31,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String token = tokenService.extractToken(req);
         if (token != null) {
             try {
-                String principal = tokenService.getTokenInformationAsString(token);
-                JsonNode jsonNode = objectMapper.readTree(principal);
-                JsonNode json = jsonNode.get("authorities");
+                var principal = tokenService.getTokenInformationAsString(token);
+                var jsonNode = objectMapper.readTree(principal);
+                var json = jsonNode.get("authorities");
                 if (json != null) {
                     List<GrantedAuthority> authorities = new ArrayList<>();
                     json.forEach(authority -> authorities.add(
                             new SimpleGrantedAuthority(authority.get("authority").textValue())));
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(principal,
-                                    null, authorities);
+                            var authentication = new UsernamePasswordAuthenticationToken(principal,null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (JwtException e) {

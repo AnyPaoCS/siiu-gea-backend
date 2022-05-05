@@ -93,7 +93,7 @@ public class Task extends ModelBase<DtoBase<?>> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
+        var task = (Task) o;
         return Objects.equals(name, task.name) &&
                 Objects.equals(code, task.code);
     }

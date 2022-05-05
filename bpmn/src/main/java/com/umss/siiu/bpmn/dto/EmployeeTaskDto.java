@@ -34,8 +34,10 @@ public class EmployeeTaskDto extends DtoBase<EmployeeTask> {
     @Override
     public EmployeeTaskDto toDto(EmployeeTask element, ModelMapper mapper) {
         super.toDto(element, mapper);
-        setEmployee((EmployeeDto) new EmployeeDto().toDto(element.getEmployee(), mapper));
+        setEmployee(new EmployeeDto().toDto(element.getEmployee(), mapper));
         setTask(new TaskDto().toDto(element.getTask(), mapper));
         return this;
     }
+
+
 }

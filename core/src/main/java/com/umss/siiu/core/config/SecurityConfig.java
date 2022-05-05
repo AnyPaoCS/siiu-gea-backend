@@ -31,6 +31,8 @@ import java.util.Collections;
         jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private static final String H2_CONSOLE = "/h2-console/*";
+
     private UserDetailsService userDetailsService;
     private JwtUnauthorizedHandler unauthorizedHandler;
 
@@ -72,10 +74,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, ApiPath.FORGOTTEN_PASSWORD).permitAll()
                 .antMatchers(HttpMethod.POST, ApiPath.RESTORE_PASSWORD).permitAll()
                 .antMatchers(HttpMethod.GET, "/websocket/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/h2-console/*").permitAll()
-                .antMatchers(HttpMethod.POST, "/h2-console/*").permitAll()
-                .antMatchers(HttpMethod.PUT, "/h2-console/*").permitAll()
-                .antMatchers(HttpMethod.DELETE, "/h2-console/*").permitAll()
+                .antMatchers(HttpMethod.GET, H2_CONSOLE).permitAll()
+                .antMatchers(HttpMethod.POST, H2_CONSOLE).permitAll()
+                .antMatchers(HttpMethod.PUT, H2_CONSOLE).permitAll()
+                .antMatchers(HttpMethod.DELETE, H2_CONSOLE).permitAll()
                 .antMatchers(HttpMethod.GET, "/actuator/*").permitAll()
                 .antMatchers(HttpMethod.POST, "/payment/mock").permitAll()
 
@@ -86,13 +88,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+        var configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(ApplicationConstants.ALLOWED_DOMAIN);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
         configuration.setExposedHeaders(Collections.singletonList("x-auth-token"));
         configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

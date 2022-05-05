@@ -25,11 +25,6 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee> implements
         return repository.findByAvailableTrue();
     }
 
-    /*@Override
-    public List<Employee> findByTasksId(long taskId) {
-        return repository.findByEmployeeTasksIs(taskId);
-    }*/
-
     @Override
     protected GenericRepository<Employee> getRepository() {
         return repository;

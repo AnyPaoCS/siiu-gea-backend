@@ -12,13 +12,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.util.StringUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,15 +41,15 @@ public class EmailService {
         new Thread(() -> {
             try {
                 String[] recipients = filterRecipients(mail.getTo());
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true);
+                var message = mailSender.createMimeMessage();
+                var helper = new MimeMessageHelper(message, true);
                 helper.setTo(recipients);
                 helper.setSubject(mail.getSubject());
                 helper.setFrom(host);
                 message.setContent(getHtmlTemplate(mail.getTemplateName(), mail.getParameters()),
                         MimeTypeUtils.TEXT_HTML_VALUE);
                 addAttachment(mail, helper);
-                if (!StringUtils.isEmpty(Arrays.asList(recipients))) {
+                if (!Arrays.asList(recipients).isEmpty()) {
                     mailSender.send(message);
                 }
             } catch (MessagingException | MailException e) {
@@ -82,7 +80,7 @@ public class EmailService {
     }
 
     private String getHtmlTemplate(String templateName, Map<String, Object> parameters) {
-        final Context context = new Context();
+        final var context = new Context();
         context.setVariables(parameters);
         return springTemplateEngine.process(templateName, context);
     }
