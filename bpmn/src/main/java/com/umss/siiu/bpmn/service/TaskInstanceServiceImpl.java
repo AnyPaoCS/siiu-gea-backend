@@ -66,7 +66,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     @Override
     @Transactional
     public TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation) {
-        TaskInstance taskInstance = findById(taskInstanceId);
+        var taskInstance = findById(taskInstanceId);
         taskInstance.setTaskStatus(TaskStatus.PENDING);
         taskInstance.setObservations(setObservationsTaskInstance(taskInstance, observation));
         deAllocateResources(taskInstance);
@@ -74,7 +74,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
 
         if (employeeId > 0) {
             Long taskId = taskInstance.getTask().getId();
-            Employee employee = employeeService.findById(employeeId);
+            var employee = employeeService.findById(employeeId);
             Set<EmployeeTask> employeeTasks =
                     employeeTaskService.findByEmployee(employee);
             if (employeeTasks.stream().anyMatch(employeeTask -> employeeTask.getTask().getId().equals(taskId))) {
@@ -96,7 +96,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
 
     @Override
     public TaskInstance createTaskInstance(Process defaultJobProcess, ProcessInstance processInstance) {
-        TaskInstance taskInstance = new TaskInstance();
+        var taskInstance = new TaskInstance();
         taskInstance.setTask(processInstance.getProcess().getTask());
         taskInstance.setTaskStatus(TaskStatus.PENDING);
         taskInstance.setProcessInstance(processInstance);
@@ -121,7 +121,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
 
     @Override
     public boolean isUserAssigneed(Long id, String username) {
-        Employee employee = getEmployee(username);
+        var employee = getEmployee(username);
         TaskInstance task = findById(id);
         if (task != null && employee != null) {
             ResourceInstance fetched = task.getResourceInstances().stream()
@@ -133,7 +133,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     }
 
     private Employee getEmployee(String username) {
-        User user = userService.findByEmail(username);
+        var user = userService.findByEmail(username);
         if (user != null) {
             return user.getEmployee();
         }
@@ -183,7 +183,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
         List<TaskAction> taskActions = setUpTaskActions(taskInstance, actionNames);
         taskInstance.complete();
         for (TaskAction taskAction : taskActions) {
-            Task nextTask = taskAction.getNextTask();
+            var nextTask = taskAction.getNextTask();
             if (null != nextTask) {
                 createTaskInstance(taskInstance, taskAction);
             }
@@ -220,11 +220,11 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     }
 
     private void createTaskInstance(TaskInstance taskInstance, TaskAction taskAction) {
-        Task nextTask = taskAction.getNextTask();
+        var nextTask = taskAction.getNextTask();
         if (createNextTaskCheck(taskInstance, nextTask)) {
             boolean isRework = taskInstance.getProcessInstance().getTaskInstances().stream()
                     .anyMatch(taskInstanceItem -> taskInstanceItem.getTask().getId().equals(nextTask.getId()));
-            TaskInstance newTaskInstance = new TaskInstance();
+            var newTaskInstance = new TaskInstance();
             newTaskInstance.setTaskStatus(TaskStatus.PENDING);
             newTaskInstance.setProcessInstance(taskInstance.getProcessInstance());
             newTaskInstance.setTask(nextTask);
@@ -235,8 +235,6 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
                     .filter(resourceInstance -> {
                         Set<EmployeeTask> employeeTasks =
                                 employeeTaskService.findByEmployee(resourceInstance.getEmployee());
-                       /* return resourceInstance.getEmployee().getTasks().stream().map(Task::getId)
-                                .collect(Collectors.toList()).contains(newTaskInstance.getTask().getId());*/
                         return employeeTasks.stream().map((EmployeeTask t) -> t.getTask().getId())
                                 .collect(Collectors.toList()).contains(newTaskInstance.getTask().getId());
                     })
@@ -294,14 +292,12 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
             employee = taskInstance.getProcessInstance().getUser().getEmployee();
         }
         if (resourceInstance == null) {
-            JobBpm jobBpm = taskInstance.getProcessInstance().getJobBpm();
             resourceInstance = createNewResourceInstance(taskInstance, resource, employee);
-            // todo check if we need to send notification when system user
             notificationService.sendNotifications(employee.getUser().getEmail(), 1L, "New job assigned",
                     MessageFormat.format("Job assigned to the task of {1}",
                             resourceInstance.getTaskInstance().getTask().getName()));
         } else {
-            resourceInstance = updateResourceInstanceEmployee(taskInstance, resource, resourceInstance, employee);
+            resourceInstance = updateResourceInstanceEmployee(resourceInstance, employee);
             notificationService.sendNotifications(employee.getUser().getEmail(), 2L, "New job reassigned",
                     MessageFormat.format("Job reassigned to the task of {1}",
                             resourceInstance.getTaskInstance().getTask().getName()));
@@ -329,7 +325,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     }
 
     private void allocateEmployee(Employee employee) {
-        Employee databaseEmployee = employeeService.findById(employee.getId());
+        var databaseEmployee = employeeService.findById(employee.getId());
         if (!employee.getFirstName().equals(SYSTEM_EMPLOYEE_NAME)) {
             databaseEmployee.setAvailable(false);
             employeeService.save(databaseEmployee);
@@ -338,7 +334,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
 
     private ResourceInstance createNewResourceInstance(TaskInstance taskInstance, Resource resource,
             Employee employee) {
-        ResourceInstance resourceInstance = new ResourceInstance();
+        var resourceInstance = new ResourceInstance();
         resourceInstance.setActive(true);
         resourceInstance.setTaskInstance(taskInstance);
         resourceInstance.setResource(resource);
@@ -347,8 +343,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
         return resourceInstance;
     }
 
-    private ResourceInstance updateResourceInstanceEmployee(TaskInstance taskInstance, Resource resource,
-            ResourceInstance resourceInstance, Employee employee) {
+    private ResourceInstance updateResourceInstanceEmployee(ResourceInstance resourceInstance, Employee employee) {
         resourceInstance.setActive(true);
         resourceInstance.setEmployee(employee);
         return resourceInstanceService.save(resourceInstance);
@@ -364,7 +359,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
 
     private void deAllocateResource(ResourceInstance resourceInstance) {
         resourceInstance.setActive(false);
-        Employee employee = resourceInstance.getEmployee();
+        var employee = resourceInstance.getEmployee();
         List<ResourceInstance> otherResourceInstances = resourceInstanceService.findByEmployeeAndActive(employee)
                 .stream()
                 .filter(resourceInstanceElement -> !resourceInstanceElement.getId().equals(resourceInstance.getId()))

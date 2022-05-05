@@ -59,7 +59,7 @@ public abstract class GenericServiceImpl<T extends ModelBase> implements Generic
     @Override
     public T save(T model) {
         validateSave(model);
-        T t = getRepository().save(model);
+        var t = getRepository().save(model);
         return findById(t.getId());
     }
 
@@ -71,7 +71,7 @@ public abstract class GenericServiceImpl<T extends ModelBase> implements Generic
     @Override
     public T saveAndFlush(T model) {
         validateSave(model);
-        T t = getRepository().saveAndFlush(model);
+        var t = getRepository().saveAndFlush(model);
         return findById(t.getId());
     }
 
@@ -128,9 +128,9 @@ public abstract class GenericServiceImpl<T extends ModelBase> implements Generic
     }
 
     protected String createFilter(Map<String, String> mappedValues) {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         for (Map.Entry<String, String> entry : mappedValues.entrySet()) {
-            if (!StringUtils.isEmpty(entry.getValue())) {
+            if (StringUtils.hasText(entry.getValue())) {
                 builder.append(String.format("%s:eq:%s,", entry.getKey(), entry.getValue()));
             }
         }
@@ -140,8 +140,8 @@ public abstract class GenericServiceImpl<T extends ModelBase> implements Generic
     @Override
     public Byte[] getBytes(MultipartFile file) {
         try {
-            Byte[] bytes = new Byte[file.getBytes().length];
-            int i = 0;
+            var bytes = new Byte[file.getBytes().length];
+            var i = 0;
             for (Byte aByte : file.getBytes()) {
                 bytes[i++] = aByte;
             }

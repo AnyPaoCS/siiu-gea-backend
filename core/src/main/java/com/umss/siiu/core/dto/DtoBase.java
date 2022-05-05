@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,8 +73,8 @@ public class DtoBase<E extends ModelBase> {
     protected <D extends DtoBase> Set<D> convertToSet(Collection<E> elements, ModelMapper mapper) {
         return (Set<D>) elements.stream().map(element -> {
             try {
-                return this.getClass().newInstance().toDto(element, mapper);
-            } catch (InstantiationException | IllegalAccessException e) {
+                return this.getClass().getDeclaredConstructor().newInstance().toDto(element, mapper);
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 return new DtoBase<>();
             }
         }).sorted(Comparator.comparing(DtoBase::getId)).collect(Collectors.toSet());
@@ -83,8 +84,8 @@ public class DtoBase<E extends ModelBase> {
     protected <D extends DtoBase> List<D> convert(Collection<E> elements, ModelMapper mapper) {
         return (List<D>) elements.stream().map(element -> {
             try {
-                return this.getClass().newInstance().toDto(element, mapper);
-            } catch (InstantiationException | IllegalAccessException e) {
+                return this.getClass().getDeclaredConstructor().newInstance().toDto(element, mapper);
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 return new DtoBase<>();
             }
         }).sorted(Comparator.comparing(DtoBase::getId)).collect(Collectors.toList());

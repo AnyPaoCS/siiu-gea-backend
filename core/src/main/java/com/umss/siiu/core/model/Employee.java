@@ -7,7 +7,6 @@ package com.umss.siiu.core.model;
 import com.umss.siiu.core.dto.EmployeeDto;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 public class Employee extends ModelBase<EmployeeDto> {
@@ -21,14 +20,6 @@ public class Employee extends ModelBase<EmployeeDto> {
 
     @OneToOne(mappedBy = "employee")
     private User user;
-
-    //    @ManyToMany(fetch = FetchType.EAGER)
-//    @JoinTable(name = "employee_task", joinColumns = {
-//            @JoinColumn(name = "employee_id")}, inverseJoinColumns = {
-//            @JoinColumn(name = "task_id")})
-//    private Set<Task> tasks;
-    /*@OneToMany(mappedBy = "employee", fetch = FetchType.EAGER)
-    private Set<EmployeeTask> employeeTasks;*/
 
     public String getFirstName() {
         return firstName;

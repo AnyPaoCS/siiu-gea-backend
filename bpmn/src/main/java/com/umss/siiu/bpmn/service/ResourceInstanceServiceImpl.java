@@ -39,7 +39,7 @@ public class ResourceInstanceServiceImpl extends GenericServiceImpl<ResourceInst
 
     @Override
     protected void processDtoToDomainPatch(DtoBase dto, ResourceInstance updatedDomain) {
-        ResourceInstanceDto resourceInstanceDto = (ResourceInstanceDto) dto;
+        var resourceInstanceDto = (ResourceInstanceDto) dto;
         if (null == resourceInstanceDto.getEmployeeId()) {
             updatedDomain.setEmployee(null);
         } else if (!updatedDomain.getEmployee().getId().equals(resourceInstanceDto.getEmployeeId())) {

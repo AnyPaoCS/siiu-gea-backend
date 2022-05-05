@@ -61,10 +61,10 @@ public class GenericSpecificationsBuilder<E extends ModelBase> {
     }
 
     private void mapSearchCriteria(String filter) {
-        Pattern pattern = Pattern.compile(FILTER_PATTERN, Pattern.UNICODE_CHARACTER_CLASS);
-        Matcher matcher = pattern.matcher(filter + SEPARATOR);
+        var pattern = Pattern.compile(FILTER_PATTERN, Pattern.UNICODE_CHARACTER_CLASS);
+        var matcher = pattern.matcher(filter + SEPARATOR);
         while (matcher.find()) {
-            with(matcher.group(1), matcher.group(2).replaceAll(SPACER, BLANK), matcher.group(3));
+            with(matcher.group(1), matcher.group(2).replace(SPACER, BLANK), matcher.group(3));
         }
     }
 
@@ -78,7 +78,7 @@ public class GenericSpecificationsBuilder<E extends ModelBase> {
 
     protected Specification<E> extractSpecificationOf(List<Specification<E>> specs) {
         Specification<E> result = specs.get(0);
-        for (int i = 1; i < specs.size(); i++) {
+        for (var i = 1; i < specs.size(); i++) {
             result = Specification.where(result).and(specs.get(i));
         }
         return result;

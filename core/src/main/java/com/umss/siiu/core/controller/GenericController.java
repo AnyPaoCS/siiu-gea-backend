@@ -76,7 +76,7 @@ public abstract class GenericController<E extends ModelBase, D extends DtoBase<E
     @PostMapping
     protected D save(@RequestBody D element,
             @RequestParam(name = "bunchSave", required = false, defaultValue = "false") Boolean bunchSave) {
-        return toDto((E) (bunchSave ? getService().bunchSave(toModel(element)) : getService().save(toModel(element))));
+        return toDto((E) (Boolean.TRUE.equals(bunchSave) ? getService().bunchSave(toModel(element)) : getService().save(toModel(element))));
     }
 
     @PutMapping
@@ -100,7 +100,7 @@ public abstract class GenericController<E extends ModelBase, D extends DtoBase<E
         D dto;
         try {
             @SuppressWarnings("deprecation")
-            String jsonString = IOUtils.toString(request.getInputStream());
+            var jsonString = IOUtils.toString(request.getInputStream());
             updatedDomain = objectMapper.readerForUpdating(domain).readValue(jsonString);
             dto = objectMapper.readValue(jsonString, getDtoClass());
         } catch (IOException e) {
@@ -115,7 +115,7 @@ public abstract class GenericController<E extends ModelBase, D extends DtoBase<E
     private D getInstanceOfD() {
         Class<D> type = getDtoClass();
         try {
-            return type.newInstance();
+            return type.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new InternalErrorException("No default constructor.", e);
         }
@@ -124,7 +124,7 @@ public abstract class GenericController<E extends ModelBase, D extends DtoBase<E
     private E getInstanceOfE() {
         Class<E> type = getDomainClass();
         try {
-            return type.newInstance();
+            return type.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new InternalErrorException("No default constructor.", e);
         }

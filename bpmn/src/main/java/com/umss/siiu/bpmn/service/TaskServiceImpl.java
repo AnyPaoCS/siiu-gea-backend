@@ -49,7 +49,7 @@ public class TaskServiceImpl extends GenericServiceImpl<Task> implements TaskSer
     private void getTasks(Set<TaskAction> taskActions, List<Task> tasks) {
         for (TaskAction taskAction : taskActions) {
             if (taskAction.getActionFlowType().equals(ActionFlowType.AUTOMATIC)) {
-                Task task = taskAction.getNextTask();
+                var task = taskAction.getNextTask();
                 if (task.getTaskActions() != null && !task.getTaskActions().isEmpty() && !tasks.contains(task)) {
                     tasks.add(task);
                     getTasks(task.getTaskActions(), tasks);

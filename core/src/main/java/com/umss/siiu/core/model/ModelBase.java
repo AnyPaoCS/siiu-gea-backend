@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -116,8 +117,8 @@ public class ModelBase<D extends DtoBase> {
     protected <E extends ModelBase> List<E> convert(Collection<D> elements, ModelMapper mapper) {
         return (List<E>) elements.stream().map(element -> {
             try {
-                return this.getClass().newInstance().toDomain(element, mapper);
-            } catch (InstantiationException | IllegalAccessException e) {
+                return this.getClass().getDeclaredConstructor().newInstance().toDomain(element, mapper);
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 return new ModelBase<>();
             }
         }).sorted(Comparator.comparing(ModelBase::getIndexedId)).collect(Collectors.toList());
