@@ -5,7 +5,6 @@ import com.umss.siiu.bpmn.repository.NotificationRepository;
 import com.umss.siiu.core.repository.GenericRepository;
 import com.umss.siiu.core.service.GenericServiceImpl;
 import com.umss.siiu.core.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +17,7 @@ public class NotificationServiceImpl extends GenericServiceImpl<Notification> im
     private NotificationTypeService notificationTypeService;
 
     public NotificationServiceImpl(NotificationRepository repository, UserService userService,
-            NotificationTypeService notificationTypeService,
-            ModelMapper modelMapper) {
+            NotificationTypeService notificationTypeService) {
         this.repository = repository;
         this.userService = userService;
         this.notificationTypeService = notificationTypeService;

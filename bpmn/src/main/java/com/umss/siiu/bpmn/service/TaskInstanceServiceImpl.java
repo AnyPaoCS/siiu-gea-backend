@@ -5,12 +5,10 @@
 package com.umss.siiu.bpmn.service;
 
 import com.umss.siiu.bpmn.model.EmployeeTask;
-import com.umss.siiu.bpmn.model.JobBpm;
 import com.umss.siiu.bpmn.model.processes.Process;
 import com.umss.siiu.bpmn.model.processes.*;
 import com.umss.siiu.bpmn.repository.TaskInstanceRepository;
 import com.umss.siiu.core.model.Employee;
-import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.repository.GenericRepository;
 import com.umss.siiu.core.service.EmployeeService;
 import com.umss.siiu.core.service.GenericServiceImpl;

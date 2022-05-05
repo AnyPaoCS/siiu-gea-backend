@@ -1,6 +1,5 @@
 package com.umss.siiu.core.config;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umss.siiu.core.service.TokenService;
 import io.jsonwebtoken.JwtException;
