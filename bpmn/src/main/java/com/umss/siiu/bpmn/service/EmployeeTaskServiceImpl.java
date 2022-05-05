@@ -45,7 +45,7 @@ public class EmployeeTaskServiceImpl extends GenericServiceImpl<EmployeeTask> im
     @Override
     public void setEmployeeTaskForUser(Employee employee, String typeUser) {
         // Solo asignar estas tareas al usuario solicitante
-        if (typeUser.equals(EmployeeRoleType.APPLICANT)) {
+        if (typeUser.equals(EmployeeRoleType.APPLICANT.toString())) {
             for (Task task : getUserTask()) {
                 var employeeTask = new EmployeeTask();
                 employeeTask.setTask(task);

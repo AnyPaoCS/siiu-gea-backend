@@ -7,7 +7,6 @@ import com.umss.siiu.bpmn.dto.EmployeeTaskDto;
 import com.umss.siiu.bpmn.model.EmployeeTask;
 import com.umss.siiu.bpmn.service.EmployeeTaskService;
 import com.umss.siiu.core.controller.GenericController;
-import com.umss.siiu.core.model.Employee;
 import com.umss.siiu.core.service.EmployeeService;
 import com.umss.siiu.core.service.GenericService;
 

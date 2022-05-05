@@ -9,14 +9,11 @@ import java.util.List;
 import com.umss.siiu.bpmn.dto.JobBpmDto;
 import com.umss.siiu.bpmn.dto.OperationResultDto;
 import com.umss.siiu.bpmn.model.JobBpm;
-import com.umss.siiu.bpmn.model.processes.Process;
-import com.umss.siiu.bpmn.model.processes.ProcessInstance;
 import com.umss.siiu.bpmn.service.JobBpmService;
 import com.umss.siiu.bpmn.service.ProcessInstanceService;
 import com.umss.siiu.bpmn.service.ProcessService;
 import com.umss.siiu.core.controller.GenericController;
 import com.umss.siiu.core.dto.UserDto;
-import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.service.GenericService;
 import com.umss.siiu.core.service.UserService;
 
