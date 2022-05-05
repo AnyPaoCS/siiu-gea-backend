@@ -4,7 +4,6 @@ import com.umss.siiu.bpmn.model.processes.Task;
 import com.umss.siiu.core.dto.DtoBase;
 import org.modelmapper.ModelMapper;
 
-import java.util.List;
 import java.util.Set;
 
 public class TaskDto extends DtoBase<Task> {

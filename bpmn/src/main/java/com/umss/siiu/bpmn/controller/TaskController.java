@@ -7,7 +7,6 @@ import com.umss.siiu.core.controller.GenericController;
 import com.umss.siiu.core.service.GenericService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController

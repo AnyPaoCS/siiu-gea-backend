@@ -7,7 +7,6 @@ package com.umss.siiu.bpmn.controller;
 import com.umss.siiu.bpmn.dto.OperationResultDto;
 import com.umss.siiu.bpmn.dto.TaskInstanceDto;
 import com.umss.siiu.bpmn.model.processes.TaskInstance;
-import com.umss.siiu.bpmn.schedulers.JobScheduler;
 import com.umss.siiu.bpmn.service.JobBpmService;
 import com.umss.siiu.bpmn.service.JobService;
 import com.umss.siiu.bpmn.service.TaskInstanceService;

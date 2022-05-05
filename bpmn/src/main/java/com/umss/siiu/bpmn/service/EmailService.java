@@ -43,15 +43,15 @@ public class EmailService {
         new Thread(() -> {
             try {
                 String[] recipients = filterRecipients(mail.getTo());
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true);
+                var message = mailSender.createMimeMessage();
+                var helper = new MimeMessageHelper(message, true);
                 helper.setTo(recipients);
                 helper.setSubject(mail.getSubject());
                 helper.setFrom(host);
                 message.setContent(getHtmlTemplate(mail.getTemplateName(), mail.getParameters()),
                         MimeTypeUtils.TEXT_HTML_VALUE);
                 addAttachment(mail, helper);
-                if (!StringUtils.isEmpty(Arrays.asList(recipients))) {
+                if (!Arrays.asList(recipients).isEmpty()) {
                     mailSender.send(message);
                 }
             } catch (MessagingException | MailException e) {
@@ -82,7 +82,7 @@ public class EmailService {
     }
 
     private String getHtmlTemplate(String templateName, Map<String, Object> parameters) {
-        final Context context = new Context();
+        final var context = new Context();
         context.setVariables(parameters);
         return springTemplateEngine.process(templateName, context);
     }

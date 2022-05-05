@@ -6,7 +6,6 @@
         <groupId>com.umss.siiu</groupId>
         <artifactId>siiu-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
     </parent>
     <artifactId>bpmn</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -76,14 +75,4 @@
         </dependency>
 
     </dependencies>
-
-    <build>
-        <!--<plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>-->
-    </build>
-
 </project>

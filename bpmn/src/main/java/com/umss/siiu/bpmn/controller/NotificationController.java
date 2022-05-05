@@ -31,7 +31,7 @@ public class NotificationController extends GenericController<Notification, Noti
     }
 
     @MessageMapping("/notification/{jobId}")
-    public void processMessageFromClient(@Payload String message, @DestinationVariable String jobId) throws Exception {
+    public void processMessageFromClient(@Payload String message, @DestinationVariable String jobId) {
         messagingTemplate.convertAndSend("/notifications/" + jobId, message);
     }
 
@@ -47,7 +47,7 @@ public class NotificationController extends GenericController<Notification, Noti
     }
 
     @PutMapping("/checkAllAsRead")
-    public ResponseEntity<?> checkAllAsRead(@RequestParam("email") String email) {
+    public ResponseEntity<Object> checkAllAsRead(@RequestParam("email") String email) {
         notificationService.markAllAsRead(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }

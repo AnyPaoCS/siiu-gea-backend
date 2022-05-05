@@ -65,7 +65,7 @@ public class ProcessInstanceDto extends DtoBase<ProcessInstance> {
         super.toDto(process, mapper);
         setTasks(new TaskInstanceDto().toListDto(process.getTaskInstances(), mapper));
         setUser((UserDto) new UserDto().toDto(process.getUser(), mapper));
-        setProcess((ProcessDto) new ProcessDto().toDto(process.getProcess(), mapper));
+        setProcess(new ProcessDto().toDto(process.getProcess(), mapper));
         return this;
     }
 

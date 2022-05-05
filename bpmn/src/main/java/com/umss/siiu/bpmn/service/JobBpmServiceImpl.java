@@ -28,7 +28,6 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     private static final String HIGH = "high";
     private static final String NORMAL = "normal";
     private static final String COMPLETE_ACTION_NAME = "DONE";
-    private static final String PATH_SEPARATOR = "/";
     private static final String REQUEST_PROCESS = "req_pro";
 
     private JobBpmRepository repository;
@@ -112,12 +111,12 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     private void processTaskAssignation(List<Employee> unassignedEmployees, Map<Long, List<Employee>> taskEmployeeMap,
             TaskInstance unallocatedTaskInstance,
             Map<Long, Map<String, List<TaskInstance>>> groupingByProcessId) {
-        Task task = unallocatedTaskInstance.getTask();
+        var task = unallocatedTaskInstance.getTask();
         Long taskId = task.getId();
-        ProcessInstance processInstance = unallocatedTaskInstance.getProcessInstance();
+        var processInstance = unallocatedTaskInstance.getProcessInstance();
 
         Employee groupingEmployee = null;
-        boolean isGroupingEmployeeQualified = false;
+        var isGroupingEmployeeQualified = false;
         String parallelGroupingCode = task.getParallelGroupingCode();
         if (null != parallelGroupingCode) {
             if (groupingByProcessId.containsKey(processInstance.getId())) {
@@ -190,10 +189,10 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
         } else {
             ArrayList<Employee> systemUserList = new ArrayList<>();
             systemUserList.add(employeeService.findSystemEmployee());
-            boolean skipSystemReallocationAllocation = false;
+            var skipSystemReallocationAllocation = false;
             if (!CollectionUtils.isEmpty(unallocatedTaskInstance.getResourceInstances())) {
                 for (ResourceInstance resourceInstance : unallocatedTaskInstance.getResourceInstances()) {
-                    if (resourceInstance.isActive() && resourceInstance.getEmployee().getUser().getSystemUser()) {
+                    if (resourceInstance.isActive() && Boolean.TRUE.equals(resourceInstance.getEmployee().getUser().getSystemUser())) {
                         skipSystemReallocationAllocation = true;
                     }
                 }
@@ -208,11 +207,11 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     private void assignTask(List<Employee> unassignedEmployees, Map<Long, List<Employee>> taskEmployeeMap,
             TaskInstance taskInstance, List<Employee> employeesForTask,
             Map<Long, Map<String, List<TaskInstance>>> groupingByProcessId) {
-        Task task = taskInstance.getTask();
-        ProcessInstance processInstance = taskInstance.getProcessInstance();
+        var task = taskInstance.getTask();
+        var processInstance = taskInstance.getProcessInstance();
         for (Resource resource : task.getResourceList()) {
             if (resource.getResourceType().equals(ResourceType.EMPLOYEE)) {
-                Employee employee = employeesForTask.get(0);
+                var employee = employeesForTask.get(0);
                 boolean getSystem = employee.getUser().getSystemUser();
                 if (!getSystem) {
                     employeesForTask.remove(0);
@@ -222,7 +221,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
                     }
                     setJobBpmInProgress(processInstance.getJobBpm());
                 }
-                ResourceInstance resourceInstance = taskInstanceService.allocateResource(taskInstance, resource, null,
+                var resourceInstance = taskInstanceService.allocateResource(taskInstance, resource, null,
                         employee);
                 String parallelGroupingCode = taskInstance.getTask().getParallelGroupingCode();
                 if (parallelGroupingCode != null) {
@@ -238,8 +237,8 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
                     taskInstanceService.complete(taskInstance, Collections.singletonList(COMPLETE_ACTION_NAME));
                 }
             } else {
-                Employee employee = processInstance.getUser().getEmployee();
-                ResourceInstance resourceInstance = taskInstanceService.allocateResource(taskInstance, resource, null,
+                var employee = processInstance.getUser().getEmployee();
+                var resourceInstance = taskInstanceService.allocateResource(taskInstance, resource, null,
                         employee);
                 String parallelGroupingCode = taskInstance.getTask().getParallelGroupingCode();
                 if (parallelGroupingCode != null) {
@@ -265,8 +264,8 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     }
 
     private JobBpm createJobBpm(Job job) {
-        ProcessInstance processInstance = processInstanceService.createProcessInstance();
-        JobBpm jobBpm = new JobBpm();
+        var processInstance = processInstanceService.createProcessInstance();
+        var jobBpm = new JobBpm();
         jobBpm.setProcessInstance(processInstance);
         jobBpm.setStatus(JobStatus.QUEUED.toString());
         jobBpm.setPriority(NORMAL);
@@ -278,9 +277,9 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
 
     @Override
     public JobBpm createJobBpm(ProcessInstance process) {
-        Job job = new Job();
+        var job = new Job();
         job = jobService.save(job);
-        JobBpm job1Bpm = new JobBpm();
+        var job1Bpm = new JobBpm();
         job1Bpm.setProcessInstance(process);
         job1Bpm.setStatus(JobStatus.PREPARED.toString());
         job1Bpm.setPriority(NORMAL);
@@ -305,7 +304,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     @Override
     @Transactional
     public TaskInstance changeStatus(TaskInstanceDto task, Boolean exceptionTrigger) {
-        if (exceptionTrigger) {
+        if (Boolean.TRUE.equals(exceptionTrigger)) {
             return exceptionFlow(taskInstanceService.findById(task.getId()));
         }
         return flow(task);
@@ -327,7 +326,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
     }
 
     private TaskInstance flow(TaskInstanceDto task) {
-        TaskInstance currentTask = taskInstanceService.findById(task.getId());
+        var currentTask = taskInstanceService.findById(task.getId());
         taskInstanceService.validateChangeStatus(currentTask.getTaskStatus(), task.getTaskStatus());
         if (task.getTaskStatus().equals(TaskStatus.DONE)) {
             finishWith(currentTask, task.getActionNames());
@@ -348,7 +347,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
         Map<TaskStatus, List<TaskInstance>> statusListMap = taskInstanceService
                 .findByProcessInstance(taskInstance.getProcessInstance()).stream()
                 .collect(Collectors.groupingBy(TaskInstance::getTaskStatus));
-        JobBpm jobBpm = taskInstance.getProcessInstance().getJobBpm();
+        var jobBpm = taskInstance.getProcessInstance().getJobBpm();
         if (statusListMap.containsKey(TaskStatus.ON_HOLD)) {
             jobBpm.setStatus(TaskStatus.ON_HOLD.toString());
         } else if (statusListMap.containsKey(TaskStatus.IN_PROGRESS) || statusListMap.containsKey(TaskStatus.PENDING)
@@ -368,8 +367,7 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
 
     @Override
     public List<String> getAssigneesByProcessInstanceId(Long id) {
-        // return assigneesFrom(processInstanceService.tasksOf(id));
-        ProcessInstance processInstance = new ProcessInstance();
+        var processInstance = new ProcessInstance();
         processInstance.setId(id);
         return assigneesFrom(taskInstanceService.findByProcessInstance(processInstance));
     }
@@ -389,15 +387,13 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
 
     @Override
     public List<JobBpm> findByUserEmail(String email) {
-        Employee employee = employeeService.findByEmail(email);
+        var employee = employeeService.findByEmail(email);
         if (employee != null) {
             List<ProcessInstance> processInstances = processInstanceService
                     .findByUserEmail(employee.getUser().getEmail());
-            return processInstances.parallelStream().map(processInstance -> {
-                return this.findByProcessInstance(processInstance);
-            }).collect(Collectors.toList());
+            return processInstances.parallelStream().map(this::findByProcessInstance).collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -407,18 +403,15 @@ public class JobBpmServiceImpl extends GenericServiceImpl<JobBpm> implements Job
 
     @Override
     public List<JobBpm> findByTaskAssigned(String email) {
-        Employee employee = employeeService.findByEmail(email);
-        List<JobBpm> result = new ArrayList<JobBpm>();
+        var employee = employeeService.findByEmail(email);
+        List<JobBpm> result = new ArrayList<>();
         if (!email.isEmpty()) {
             List<JobBpm> jobBpms = this.findAll();
             for (JobBpm jobBpm : jobBpms) {
                 Long jobId = jobBpm.getJob().getId();
-                try {
-                    TaskInstance taskInstance = taskInstanceService.findByJobIdAndEmployeeId(jobId, employee.getId());
-                    if (taskInstance != null) {
-                        result.add(jobBpm);
-                    }
-                } catch (Exception e) {
+                var taskInstance = taskInstanceService.findByJobIdAndEmployeeId(jobId, employee.getId());
+                if (taskInstance != null) {
+                    result.add(jobBpm);
                 }
             }
         }

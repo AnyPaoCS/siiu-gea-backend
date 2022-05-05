@@ -27,9 +27,9 @@ public class EmployeeTaskController extends GenericController<EmployeeTask, Empl
 
   @GetMapping("findByEmployee/{employeeId}")
   public List<EmployeeTaskDto> findUserTaskByUSer(@PathVariable String employeeId) {
-    Employee employee = employeeService.findById(Long.parseLong(employeeId));
+    var employee = employeeService.findById(Long.parseLong(employeeId));
     Set<EmployeeTask> employeeTasks = employeeTaskService.findByEmployee(employee);
-    return (List<EmployeeTaskDto>) super.toDto(employeeTasks);
+    return new EmployeeTaskDto().toListDto(employeeTasks, modelMapper);
   }
 
 
@@ -39,7 +39,7 @@ public class EmployeeTaskController extends GenericController<EmployeeTask, Empl
   }
 
   @PostMapping(value="saveAllByCode")
-  protected void saveAll(@RequestBody EmployeeTaskDto element) {
+  public void saveAll(@RequestBody EmployeeTaskDto element) {
     employeeTaskService.saveAllTask(toModel(element));
   }
 

@@ -47,12 +47,12 @@ public class JobBpmController extends GenericController<JobBpm, JobBpmDto> {
 
     @PostMapping(value = "/byUser")
     public List<JobBpmDto> findProcessByJobId(@RequestBody UserDto userDto) {
-        return (List<JobBpmDto>) super.toDto(service.findByUserEmail(userDto.getEmail()));
+        return new JobBpmDto().toListDto(service.findByUserEmail(userDto.getEmail()), modelMapper);
     }
 
     @PostMapping(value = "/byAssignedEmployee")
     public List<JobBpmDto> findProcessByAssignedTasks(@RequestBody UserDto userDto) {
-        return (List<JobBpmDto>) super.toDto(service.findByTaskAssigned(userDto.getEmail()));
+        return new JobBpmDto().toListDto(service.findByTaskAssigned(userDto.getEmail()), modelMapper);
     }
 
     @PostMapping("/createProcessInstances/{idProcess}")
@@ -60,10 +60,10 @@ public class JobBpmController extends GenericController<JobBpm, JobBpmDto> {
             @RequestBody UserDto userDto) {
         ResponseEntity<Object> responseEntity = null;
         try {
-            User user = userService.findByEmail(userDto.getEmail());
-            Process processUser = processService.findById(Long.parseLong(idProcess));
-            ProcessInstance instance = processInstanceService.createProcessInstance(processUser, user);
-            JobBpm processCreated = service.createJobBpm(instance);
+            var user = userService.findByEmail(userDto.getEmail());
+            var processUser = processService.findById(Long.parseLong(idProcess));
+            var instance = processInstanceService.createProcessInstance(processUser, user);
+            var processCreated = service.createJobBpm(instance);
             service.allocateResources();
             responseEntity = new ResponseEntity<>(toDto(processCreated),
                     HttpStatus.OK);

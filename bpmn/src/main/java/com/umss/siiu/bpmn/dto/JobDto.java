@@ -15,7 +15,6 @@ public class JobDto extends DtoBase<Job> {
     private String name;
     private LocalDateTime dateEntered;
     private String priority;
-    private JobBpmDto jobBpm;
     private String generalNotes;
     private String type;
 

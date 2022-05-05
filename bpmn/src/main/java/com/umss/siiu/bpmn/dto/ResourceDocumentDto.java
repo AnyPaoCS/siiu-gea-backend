@@ -41,7 +41,7 @@ public class  ResourceDocumentDto extends DtoBase<ResourceDocument> {
 
     @Override
     public int hashCode() {
-        int result = 15;
+        var result = 15;
         result = 31 * result + Objects.hashCode(this.getId());
         return result;
     }

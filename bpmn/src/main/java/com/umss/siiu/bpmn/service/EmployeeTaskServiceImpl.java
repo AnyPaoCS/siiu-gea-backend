@@ -4,6 +4,7 @@
 
 package com.umss.siiu.bpmn.service;
 
+import com.umss.siiu.bpmn.model.EmployeeRoleType;
 import com.umss.siiu.bpmn.model.EmployeeTask;
 import com.umss.siiu.bpmn.model.processes.Task;
 import com.umss.siiu.bpmn.model.processes.TaskType;
@@ -21,8 +22,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class EmployeeTaskServiceImpl extends GenericServiceImpl<EmployeeTask> implements EmployeeTaskService {
-
-    private final String TYPE_APPLICANT = "APPLICANT";
 
     private TaskService taskService;
 
@@ -46,9 +45,9 @@ public class EmployeeTaskServiceImpl extends GenericServiceImpl<EmployeeTask> im
     @Override
     public void setEmployeeTaskForUser(Employee employee, String typeUser) {
         // Solo asignar estas tareas al usuario solicitante
-        if (typeUser.equals(TYPE_APPLICANT)) {
+        if (typeUser.equals(EmployeeRoleType.APPLICANT)) {
             for (Task task : getUserTask()) {
-                EmployeeTask employeeTask = new EmployeeTask();
+                var employeeTask = new EmployeeTask();
                 employeeTask.setTask(task);
                 employeeTask.setEmployee(employee);
                 save(employeeTask);
@@ -71,7 +70,7 @@ public class EmployeeTaskServiceImpl extends GenericServiceImpl<EmployeeTask> im
         List<Task> taskWithTaskCode = taskService.findAllTaskWithCode(model.getTask().getCode());
         if (!taskWithTaskCode.isEmpty()) {
             for (Task taskR : taskWithTaskCode) {
-                EmployeeTask employeeTask = new EmployeeTask();
+                var employeeTask = new EmployeeTask();
                 employeeTask.setTask(taskR);
                 employeeTask.setEmployee(model.getEmployee());
                 repository.save(employeeTask);

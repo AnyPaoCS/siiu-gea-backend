@@ -23,7 +23,7 @@ public class CommentServiceImpl extends GenericServiceImpl<Comment> implements C
 
     @Override
     public Comment save(String author, String commentAuthor, Long rating, Long idProcess) {
-        Comment comment = new Comment();
+        var comment = new Comment();
         comment.setAuthor(author);
         comment.setComment(commentAuthor);
         comment.setRating(rating);
