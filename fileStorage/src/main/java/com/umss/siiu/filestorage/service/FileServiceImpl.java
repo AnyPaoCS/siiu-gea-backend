@@ -5,7 +5,6 @@ import com.umss.siiu.core.exceptions.BlockedFileException;
 import com.umss.siiu.core.exceptions.NotFoundException;
 import com.umss.siiu.core.exceptions.RepositoryException;
 import com.umss.siiu.core.model.Employee;
-import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.core.service.EmployeeService;
 import com.umss.siiu.core.util.ApplicationConstants;
@@ -44,11 +43,8 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class FileServiceImpl implements FileService {
 
-    private static final String DOC = ".doc";
-    private static final String FILE_NOT_FOUND_ERROR = "Could not read the file";
     private static final String BRACKET = "[";
     private static final String SLASH_SEPARATOR = "/";
-    private static final String NONE_ABBREVIATION = "None";
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private JackRabbitService jackRabbitService;
@@ -234,23 +230,6 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private void clearFileType(Long modelBaseId, Long currentFileTypeId, JackRabbitNode protectedNode,
-                               FileTypeCategory targetFileType) {
-        FileType fileType = null != currentFileTypeId ? fileTypeService.findById(currentFileTypeId) : null;
-        Long protectedId = null != protectedNode ? protectedNode.getId() : 0L;
-        if (null != fileType && null != fileType.getFileTypeCategory()
-                && fileType.getFileTypeCategory().equals(targetFileType)) {
-            List<JackRabbitNode> filesByJobAndCategoryType = getFilesByJobAndCategoryType(modelBaseId,
-                    targetFileType.name());
-            filesByJobAndCategoryType.forEach(jackRabbitNode -> {
-                if (!protectedId.equals(jackRabbitNode.getId())) {
-                    jackRabbitNode.setFileType(fileTypeService.findByAbbreviation(NONE_ABBREVIATION));
-                    jackRabbitNodeService.save(jackRabbitNode);
-                }
-            });
-        }
-    }
-
     @Override
     @Transactional
     public void saveFile(String fileName, long fileTypeCode, String description, InputStream stream,
@@ -276,11 +255,8 @@ public class FileServiceImpl implements FileService {
                     (!StringUtils.isEmpty(nodePath) ? ("/" + nodePath) : "") + "/" + fileName);
             if (hasNode && jackRabbitNode != null) {
                 jackRabbitNode.setNodeId(node.getIdentifier());
-                //jackRabbitNode.setPath(node.getPath());
-                System.out.println("jackrabbitnode no es nulo");
                 jackRabbitNodeService.save(jackRabbitNode);
             } else {
-                System.out.println("jackrabbitnode SI es nulo");
                 jackRabbitNodeService.createJackRabbitNode(modelBase, fileTypeCode, false, fileName, description.trim(),
                         modelBase.getId(), node, nodePath, flush);
             }
@@ -319,8 +295,6 @@ public class FileServiceImpl implements FileService {
             jackRabbitService.save();
             if (jackRabbitService.getRootNode().hasNode(nodePath)) {
                 logger.error("File structure for job %s already exists\", job.getId()");
-                // throw new RepositoryException(String.format("File structure
-                // for job %s already exists", job.getId()));
             } else {
                 node = jackRabbitService.createFolderNode(job.getId().toString(), parentNodePath);
                 jackRabbitNodeService.createJackRabbitNode(owner, 1, false, node.getName(),
@@ -401,16 +375,16 @@ public class FileServiceImpl implements FileService {
                     jackRabbitService.save();
                 } catch (javax.jcr.RepositoryException ignored) {
                 }
+                // Saving the new file
+                Node node = jackRabbitService.createBinaryNodeFromStream(jackRabbitNodeDto.getFile().getOriginalFilename(),
+                        jackRabbitNode.getParentPath(), jackRabbitNodeDto.getFile().getInputStream(),
+                        MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
+                // Updating the previous JackRabbitNode
+                jackRabbitNode.setNodeId(node.getIdentifier());
+                jackRabbitNode.setPath(node.getPath());
+                jackRabbitNode.setFileName(jackRabbitNodeDto.getFile().getOriginalFilename());
+                jackRabbitNode.setDescription(jackRabbitNodeDto.getFile().getOriginalFilename());
             }
-            // Saving the new file
-            Node node = jackRabbitService.createBinaryNodeFromStream(jackRabbitNodeDto.getFile().getOriginalFilename(),
-                    jackRabbitNode.getParentPath(), jackRabbitNodeDto.getFile().getInputStream(),
-                    MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
-            // Updating the previous JackRabbitNode
-            jackRabbitNode.setNodeId(node.getIdentifier());
-            jackRabbitNode.setPath(node.getPath());
-            jackRabbitNode.setFileName(jackRabbitNodeDto.getFile().getOriginalFilename());
-            jackRabbitNode.setDescription(jackRabbitNodeDto.getFile().getOriginalFilename());
             return jackRabbitNodeService.save(jackRabbitNode);
         } catch (javax.jcr.RepositoryException e) {
             throw new RepositoryException("Error updating the file", e);

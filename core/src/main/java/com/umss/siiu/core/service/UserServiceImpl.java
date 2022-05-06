@@ -27,7 +27,7 @@ public class UserServiceImpl extends GenericServiceImpl<User> implements UserSer
     private UserRepository userRepository;
     private EmployeeService employeeService;
 
-    private final String TYPE_APPLICANT = "APPLICANT";
+    private static final String TYPE_APPLICANT = "APPLICANT";
 
     public UserServiceImpl(UserRepository userSystemRepository, EmployeeService employeeService) {
         this.userRepository = userSystemRepository;
@@ -42,10 +42,10 @@ public class UserServiceImpl extends GenericServiceImpl<User> implements UserSer
     @Override
     @Transactional
     public User save(String firstName, String lastName, String email, String password, String typeUser) {
-        Role role = new Role();
+        var role = new Role();
         Set<Role> roles = new HashSet<>();
-        Employee employee = new Employee();
-        User user = new User();
+        var employee = new Employee();
+        var user = new User();
 
         employee.setFirstName(firstName);
         employee.setLastName(lastName);
@@ -103,14 +103,14 @@ public class UserServiceImpl extends GenericServiceImpl<User> implements UserSer
 
     @Override
     public UserDetails findUserDetails(String email) {
-        User user = findOnlyEnabledByEmailWithRoles(email);
+        var user = findOnlyEnabledByEmailWithRoles(email);
         user.setPassword("");
         return convertUserToUserDetails(user);
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        User user = findOnlyEnabledByEmailWithRoles(email);
+        var user = findOnlyEnabledByEmailWithRoles(email);
 
         if (user == null) {
             throw new UsernameNotFoundException(email);
@@ -135,15 +135,11 @@ public class UserServiceImpl extends GenericServiceImpl<User> implements UserSer
     @Override
     @Transactional
     public User update(User model) {
-        User user = findById(model.getId());
-        Employee employee = user.getEmployee();
+        var user = findById(model.getId());
+        var employee = user.getEmployee();
         // Setting employee values
         employee.setFirstName(model.getEmployee().getFirstName());
         employee.setLastName(model.getEmployee().getLastName());
-        /*employee.getTasks().clear();
-        for (Task task : model.getEmployee().getTasks()) {
-            employee.getTasks().add(task);
-        }*/
         employeeService.save(employee);
         // Setting user values
         user.getRoles().clear();

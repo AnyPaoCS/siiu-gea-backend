@@ -159,8 +159,6 @@ public class FileStorageServiceImpl implements FileStorageService {
                     if (node.getFileType().equals(fileType)) {
                         FileSimpleInfoDto dto = new FileSimpleInfoDto(node);
                         list.add(dto);
-                    } else {
-                        System.out.println("id node: " + node.getFileType().getId() + "  id fileType: " + fileType.getId());
                     }
                 }
             }

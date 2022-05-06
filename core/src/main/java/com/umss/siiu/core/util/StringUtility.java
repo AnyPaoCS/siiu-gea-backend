@@ -7,7 +7,6 @@ import java.util.*;
 
 
 public class StringUtility {
-    // TODO add unit test to the this methods
 
     private static final String NO_ALPHANUMBERIC_PATTERN = "[^\\d-A-Za-z ]";
     public static final String BLANK_SPACE_SEPARATOR = " ";
@@ -25,7 +24,7 @@ public class StringUtility {
     }
 
     public static String listAsString(List<String> list) {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         for (String text : list) {
             builder.append(text);
         }
@@ -33,7 +32,7 @@ public class StringUtility {
     }
 
     public static String listAsStringSpaced(List<String> list) {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         for (String text : list) {
             builder.append(text);
             builder.append(' ');
@@ -60,7 +59,7 @@ public class StringUtility {
     }
 
     public static String removeQuotes(String json) {
-        String text = sanitizeString(json);
+        var text = sanitizeString(json);
         if (text.startsWith("\"")) {
             return text.substring(1, text.length() - 1);
         }
@@ -86,7 +85,7 @@ public class StringUtility {
     public static boolean textMatchesPhrase(String text, String phrase) {
         List<String> list = tokenizerToList(new StringTokenizer(text, BLANK_SPACE_SEPARATOR, true));
         int phraseSize = new StringTokenizer(phrase, BLANK_SPACE_SEPARATOR, true).countTokens();
-        for (int i = 0; i < list.size(); i++) {
+        for (var i = 0; i < list.size(); i++) {
             if (textMatchesWord(sublistAsString(list, i, i + phraseSize), phrase)) {
                 return true;
             }
@@ -112,7 +111,7 @@ public class StringUtility {
             String[] separetedItem = item.split(token, 2);
             if (filteredValues.containsKey(separetedItem[0].toUpperCase().trim())) {
                 String originalValue = filteredValues.get(separetedItem[0].toUpperCase().trim());
-                String newValue = new StringBuilder().append(originalValue).append(textSeparator)
+                var newValue = new StringBuilder().append(originalValue).append(textSeparator)
                         .append(separetedItem[1].trim()).toString();
                 filteredValues.replace(separetedItem[0].toUpperCase().trim(), newValue);
             } else if (separetedItem.length == 2) {

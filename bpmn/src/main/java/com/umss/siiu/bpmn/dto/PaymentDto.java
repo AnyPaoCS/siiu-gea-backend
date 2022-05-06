@@ -6,8 +6,6 @@ import com.umss.siiu.bpmn.model.PaymentType;
 import com.umss.siiu.bpmn.model.processes.ProcessInstance;
 import com.umss.siiu.core.dto.DtoBase;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import java.math.BigDecimal;
 
 public class PaymentDto extends DtoBase<Payment> {

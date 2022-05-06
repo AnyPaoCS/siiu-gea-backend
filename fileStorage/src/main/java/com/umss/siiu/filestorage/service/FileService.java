@@ -33,10 +33,6 @@ public interface FileService {
     void saveFile(String fileName, long fileTypeCode, String description, InputStream stream,
                   ModelBase<?> modelBase, String nodePath, boolean flush);
 
-    /*void deleteOutdatedFiles(JobCrm jobCrm, JackRabbitNode jackRabbitNode);
-
-    boolean isUpToDate(JobCrm jobCrm, JackRabbitNode jackRabbitNode);*/
-
     void createJobStructure(Object owner, List<String> entries);
 
     void createAdditionalJobStructure(Object owner, List<String> entries);

@@ -7,7 +7,6 @@ package com.umss.siiu.bpmn.schedulers;
 import com.umss.siiu.bpmn.model.Job;
 import com.umss.siiu.bpmn.service.ConfigurationService;
 import com.umss.siiu.bpmn.service.JobBpmService;
-import com.umss.siiu.bpmn.service.JobService;
 import com.umss.siiu.core.model.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,13 +31,13 @@ public class JobScheduler {
     private ReentrantLock lock = new ReentrantLock();
     private volatile AtomicBoolean runningDaemon = new AtomicBoolean(false);
     private Condition noRunningCondition = lock.newCondition();
-    private JobService jobService;
     private ConfigurationService configurationService;
     private JobBpmService jobBpmService;
 
-    public JobScheduler(JobService jobService, ConfigurationService configurationService
+    private static final String CURRENT_THREAD_TEXT = "Current Thread :%s";
+
+    public JobScheduler(ConfigurationService configurationService
             , JobBpmService jobBpmService) {
-        this.jobService = jobService;
         this.configurationService = configurationService;
         this.jobBpmService = jobBpmService;
     }
@@ -53,7 +52,7 @@ public class JobScheduler {
             runningDaemon.set(true);
             logger.info("FetchJobs ini");
             logger.info(lock.toString());
-            logger.info(String.format("Current Thread :%s", Thread.currentThread().getName()));
+            logger.info(String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName()));
             List<Job> jobs = new ArrayList<>();
             //todo here fetch jobs
             if (!jobs.isEmpty()) {
@@ -72,7 +71,7 @@ public class JobScheduler {
     // por el momento se ejecuta en 2min para ver el funcionamiento
     @Scheduled(cron = "0 */2 * * * *")
     public synchronized void execAllocation() throws InterruptedException {
-        System.out.println("Se esta ejecutando la asignacion de tareas a empleados disponibles");
+        logger.info("Se esta ejecutando la asignacion de tareas a empleados disponibles");
         try {
             lock.lock();
             while (runningDaemon.get()) {
@@ -81,7 +80,7 @@ public class JobScheduler {
             runningDaemon.set(true);
             allocationInProgress = true;
             logger.info("assign ini");
-            logger.info(String.format("Current Thread :%s", Thread.currentThread().getName()));
+            logger.info(String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName()));
             jobBpmService.allocateResources();
             logger.info("assign end");
         } finally {
@@ -101,7 +100,7 @@ public class JobScheduler {
             }
             runningDaemon.set(true);
             logger.info("download ini");
-            logger.info(String.format("Current Thread :%s", Thread.currentThread().getName()));
+            logger.info(String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName()));
             downloadJobsFiles();
             logger.info("download end");
         } finally {
