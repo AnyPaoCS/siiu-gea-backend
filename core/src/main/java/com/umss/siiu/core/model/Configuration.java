@@ -12,12 +12,12 @@ public class Configuration extends ModelBase<ConfigurationDto> {
 
     private boolean active;
 
-    public String getType() {
-        return type;
+    public String getValue() {
+        return value;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String getEntryKey() {
@@ -28,19 +28,19 @@ public class Configuration extends ModelBase<ConfigurationDto> {
         this.entryKey = entryKey;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public boolean isActive() {
         return active;
     }
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

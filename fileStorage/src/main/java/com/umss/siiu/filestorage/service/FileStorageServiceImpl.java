@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -76,7 +77,7 @@ public class FileStorageServiceImpl implements FileStorageService {
     public byte[] getDocumentFileContent(long fileId) {
         JackRabbitNode node = fileService.findByFileId(fileId);
         if (node == null) {
-            return null;
+            return new byte[0];
         }
         InputStream is = fileService.getInputStreamFromNode(node.getPath());
         byte[] documentContent = null;
@@ -149,7 +150,7 @@ public class FileStorageServiceImpl implements FileStorageService {
     public List<FileSimpleInfoDto> getFilesByUserIdAndFileTypeCategory(long userId, String category) {
         List<FileType> fileTypes = fileTypeService.findByFileTypeCategory(FileTypeCategory.valueOf(category));
         if (fileTypes == null || fileTypes.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
         List<JackRabbitNode> nodeList = fileService.getFilesByUserId(userId);
         List<FileSimpleInfoDto> list = new ArrayList<>();
@@ -198,7 +199,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         FileType fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
         if (node == null) {
-            return null;
+            return new byte[0];
         }
         InputStream is = fileService.getInputStreamFromNode(node.getPath());
         byte[] signatureImage = null;

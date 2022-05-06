@@ -2,11 +2,11 @@ package com.umss.siiu.bpmn.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.umss.siiu.bpmn.dto.MailDto;
-import com.umss.siiu.bpmn.dto.OperationResultDto;
 import com.umss.siiu.bpmn.dto.TokenDto;
 import com.umss.siiu.bpmn.service.*;
 import com.umss.siiu.core.controller.GenericController;
 import com.umss.siiu.core.dto.EmployeeDto;
+import com.umss.siiu.core.dto.OperationResultDto;
 import com.umss.siiu.core.dto.UserDto;
 import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.service.GenericService;

@@ -1,7 +1,7 @@
 package com.umss.siiu.filestorage.service;
 
-
 import com.umss.siiu.bpmn.model.Job;
+import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.filestorage.dto.JackRabbitNodeDto;
 import com.umss.siiu.filestorage.model.JackRabbitNode;
@@ -19,7 +19,7 @@ public interface FileService {
     void downloadFilesByJobIdAndCategory(HttpServletResponse response, long jobId, String category);
 
     void lockAndDownloadFilesByJobIdAndCategory(HttpServletResponse response, long jobId, String category,
-                                                String employeeEmail);
+            String employeeEmail);
 
     InputStream getInputStreamFromNode(String file);
 
@@ -29,9 +29,8 @@ public interface FileService {
 
     void saveFile(JackRabbitNodeDto jackRabbitNodeDto, String fileName);
 
-
     void saveFile(String fileName, long fileTypeCode, String description, InputStream stream,
-                  ModelBase<?> modelBase, String nodePath, boolean flush);
+            ModelBase<?> modelBase, String nodePath, boolean flush);
 
     void createJobStructure(Object owner, List<String> entries);
 
@@ -50,16 +49,17 @@ public interface FileService {
     List<String> getFilePathsByJobAndCategoryType(long jobId, String category);
 
     public void saveWordDocument(long jobId, long fileTypeId, JackRabbitNode jackRabbitNode, XWPFDocument xwpfDocument,
-                                 String removedWordFromFile);
+            String removedWordFromFile) throws MyException;
 
-    void saveTemplate(Job job, JackRabbitNode jackRabbitNode, ByteArrayOutputStream baos, String removedWordFromFile);
+    void saveTemplate(Job job, JackRabbitNode jackRabbitNode, ByteArrayOutputStream baos, String removedWordFromFile)
+            throws MyException;
 
     void unlockAndSaveFile(JackRabbitNodeDto jackRabbitNodeDto, String fileName, String employeeEmail, String category);
 
     void createFolderEntry(ModelBase<?> owner, String rootNode, String description, String path);
 
     List<String> getFilePathsByOwnerAndFileTypeIdsAndOwnerIds(String ownerName, List<Long> ownerIds,
-                                                              List<Long> fileTypeIds);
+            List<Long> fileTypeIds);
 
     List<String> getFilePathsByJobIdsAndCategoryType(List<Long> jobIds, String category);
 
@@ -69,15 +69,15 @@ public interface FileService {
 
     List<JackRabbitNode> getFilesByJobAndCategoryType(long jobId, String category);
 
-    JackRabbitNode findByFileId (long fileId);
+    JackRabbitNode findByFileId(long fileId);
 
-    JackRabbitNode findByPath (String path);
+    JackRabbitNode findByPath(String path);
 
     List<JackRabbitNode> getFilesByUserId(long userId);
 
     JackRabbitNode getNodeByUserIdAndFileTypeId(long userId, long fileTypeId);
 
-    JackRabbitNode updateFileVerified (long fileId, boolean isVerified, String physicCode);
+    JackRabbitNode updateFileVerified(long fileId, boolean isVerified, String physicCode);
 
-    JackRabbitNode updateFileIsPermanent (long fileId, boolean isPermanent);
+    JackRabbitNode updateFileIsPermanent(long fileId, boolean isPermanent);
 }

@@ -4,6 +4,7 @@
 
 package com.umss.siiu.filestorage.service;
 
+import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.filestorage.model.JackRabbitNode;
 
@@ -49,7 +50,7 @@ public interface JackRabbitService {
 
 //    Node updateFileNode(ModelBase<?> model, String args, JackRabbitNode jackRabbitNode);
 
-    Binary getRabbitBinary(OutputStream outputStream);
+    Binary getRabbitBinary(OutputStream outputStream) throws MyException ;
 
     Node getFileNode(String fileNodeName);
 
