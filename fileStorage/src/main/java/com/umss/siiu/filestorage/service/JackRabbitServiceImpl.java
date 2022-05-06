@@ -151,7 +151,7 @@ public class JackRabbitServiceImpl implements JackRabbitService {
      */
     @Override
     public Node getNode(String path) {
-        if (StringUtils.hasText(path)) {
+        if (!StringUtils.hasText(path)) {
             return getRootNode();
         }
         try {

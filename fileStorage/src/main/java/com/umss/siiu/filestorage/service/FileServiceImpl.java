@@ -221,7 +221,7 @@ public class FileServiceImpl implements FileService {
                     jackRabbitNodeDto.getOwnerId());
             String parentPath = jackRabbitNodeDto.getParentPath();
             JackRabbitNode jackRabbitNode = jackRabbitNodeService
-                    .findByFilePath((!StringUtils.hasText(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
+                    .findByFilePath((StringUtils.hasText(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
 
             saveFile(fileName, jackRabbitNodeDto.getFileTypeId(), jackRabbitNodeDto.getDescription(),
                     jackRabbitNodeDto.getFile().getInputStream(), modelBase, parentPath, true);
@@ -253,7 +253,7 @@ public class FileServiceImpl implements FileService {
                     MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
             JackRabbitNode jackRabbitNode;
             jackRabbitNode = jackRabbitNodeService.findByFilePath(
-                    (!StringUtils.hasText(nodePath) ? ("/" + nodePath) : "") + "/" + fileName);
+                    (StringUtils.hasText(nodePath) ? ("/" + nodePath) : "") + "/" + fileName);
             if (hasNode && jackRabbitNode != null) {
                 jackRabbitNode.setNodeId(node.getIdentifier());
                 jackRabbitNodeService.save(jackRabbitNode);
