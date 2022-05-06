@@ -2,7 +2,6 @@ package com.umss.siiu.filestorage.service;
 
 import com.umss.siiu.bpmn.model.Job;
 import com.umss.siiu.core.exceptions.BlockedFileException;
-import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.exceptions.NotFoundException;
 import com.umss.siiu.core.exceptions.RepositoryException;
 import com.umss.siiu.core.model.Employee;
@@ -34,8 +33,8 @@ import javax.jcr.Node;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -241,11 +240,7 @@ public class FileServiceImpl implements FileService {
             }
             Node targetNode = jackRabbitService.getNode(nodePath);
             boolean hasNode = false;
-            try {
-                hasNode = targetNode.hasNode(fileName);
-            } catch (Exception ignored) {
-
-            }
+            hasNode = targetNode.hasNode(fileName);
             if (hasNode) {
                 jackRabbitService.deleteNode(fileName, nodePath);
             }
@@ -262,7 +257,8 @@ public class FileServiceImpl implements FileService {
                         modelBase.getId(), node, nodePath, flush);
             }
         } catch (Exception e) {
-            throw new RepositoryException(String.format("Error while storing file %s", fileName), e);
+            String errorMessage = String.format("Error while storing file %s", fileName);
+            logger.error(errorMessage);
         }
     }
 
@@ -273,8 +269,10 @@ public class FileServiceImpl implements FileService {
         Node node;
 
         try {
-            String yearNode = Integer.toString(job.getCreatedAt().getYear());
-            String monthNode = Integer.toString(job.getCreatedAt().getMonth());
+            Calendar date = Calendar.getInstance();
+            date.setTime(job.getCreatedAt());
+            String yearNode = Integer.toString(date.get(Calendar.YEAR) - 1900);
+            String monthNode = Integer.toString(date.get(Calendar.MONTH));
             String nodePath = String.format("%s/%s/%s", yearNode, monthNode, job.getId());
             String parentNodePath = String.format("%s/%s", yearNode, monthNode);
             if (!jackRabbitService.getRootNode().hasNode(yearNode)) {
@@ -313,8 +311,10 @@ public class FileServiceImpl implements FileService {
     public void createAdditionalJobStructure(Object owner, List<String> entries) {
         Job job = (Job) owner;
         try {
-            String yearNode = Integer.toString(job.getCreatedAt().getYear());
-            String monthNode = Integer.toString(job.getCreatedAt().getMonth());
+            Calendar date = Calendar.getInstance();
+            date.setTime(job.getCreatedAt());
+            String yearNode = Integer.toString(date.get(Calendar.YEAR) - 1900);
+            String monthNode = Integer.toString(date.get(Calendar.MONTH));
             String nodePath = String.format("%s/%s/%s", yearNode, monthNode, job.getId());
             if (!jackRabbitService.getRootNode().hasNode(nodePath)) {
                 logger.error("File structure for job %s already exists\", job.getId()");
@@ -366,16 +366,14 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public JackRabbitNode replaceFile(JackRabbitNodeDto jackRabbitNodeDto, JackRabbitNode jackRabbitNode) {
+    public void replaceFile(JackRabbitNodeDto jackRabbitNodeDto, JackRabbitNode jackRabbitNode) {
         try {
             if (jackRabbitNode != null) {
-                try {
-                    // Deleting the old node
-                    jackRabbitService.getRootNode().getNode(jackRabbitNode.getPath().replaceFirst(SLASH_SEPARATOR, ""))
-                            .remove();
-                    jackRabbitService.save();
-                } catch (javax.jcr.RepositoryException ignored) {
-                }
+                // Deleting the old node
+                jackRabbitService.getRootNode().getNode(jackRabbitNode.getPath().replaceFirst(SLASH_SEPARATOR, ""))
+                        .remove();
+                jackRabbitService.save();
+
                 // Saving the new file
                 Node node = jackRabbitService.createBinaryNodeFromStream(
                         jackRabbitNodeDto.getFile().getOriginalFilename(),
@@ -387,13 +385,16 @@ public class FileServiceImpl implements FileService {
                 jackRabbitNode.setFileName(jackRabbitNodeDto.getFile().getOriginalFilename());
                 jackRabbitNode.setDescription(jackRabbitNodeDto.getFile().getOriginalFilename());
             }
-            return jackRabbitNodeService.save(jackRabbitNode);
+            jackRabbitNodeService.save(jackRabbitNode);
         } catch (javax.jcr.RepositoryException e) {
             throw new RepositoryException("Error updating the file", e);
         } catch (IOException e) {
             throw new RepositoryException(
                     String.format("Error while updating file %s", jackRabbitNodeDto.getFile().getOriginalFilename()),
                     e);
+        } catch (Exception e) {
+            String errorMessage = "Error when replacing file";
+            logger.error(errorMessage);
         }
     }
 
@@ -536,7 +537,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void saveWordDocument(long jobId, long fileTypeId, JackRabbitNode jackRabbitNode, XWPFDocument xwpfDocument,
-            String removedWordFromFile) throws MyException {
+            String removedWordFromFile) {
         try {
             Job job = new Job();
             job.setId(jobId);
@@ -557,7 +558,8 @@ public class FileServiceImpl implements FileService {
             InputStream inputStreamConverted = StreamUtils.toInputStream(byteArrayOutputStream);
             saveFile("Formatted - " + fileName, fileTypeId, "", inputStreamConverted, job, parentPath, false);
         } catch (Exception e) {
-            throw new MyException("Error writing the document");
+            String errorMessage = "Error writing the document";
+            logger.error(errorMessage);
         }
     }
 
@@ -598,7 +600,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void saveTemplate(Job job, JackRabbitNode jackRabbitNode, ByteArrayOutputStream baos,
-            String removedWordFromFile) throws MyException {
+            String removedWordFromFile) {
         try {
             // Getting the name of the file
             String fileName = removedWordFromFile != null
@@ -614,7 +616,8 @@ public class FileServiceImpl implements FileService {
             InputStream inputStreamConverted = StreamUtils.toInputStream(baos);
             saveFile("Formatted - " + fileName, 1, "", inputStreamConverted, job, parentPath, false);
         } catch (Exception e) {
-            throw new MyException("Error writing the document");
+            String errorMessage = "Error writing the document";
+            logger.error(errorMessage);
         }
     }
 

@@ -8,7 +8,6 @@ import com.umss.siiu.bpmn.model.EmployeeTask;
 import com.umss.siiu.bpmn.model.processes.Process;
 import com.umss.siiu.bpmn.model.processes.*;
 import com.umss.siiu.bpmn.repository.TaskInstanceRepository;
-import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.model.Employee;
 import com.umss.siiu.core.repository.GenericRepository;
 import com.umss.siiu.core.service.EmployeeService;
@@ -63,7 +62,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
 
     @Override
     @Transactional
-    public TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation) throws MyException {
+    public TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation) {
         var taskInstance = findById(taskInstanceId);
         taskInstance.setTaskStatus(TaskStatus.PENDING);
         taskInstance.setObservations(setObservationsTaskInstance(taskInstance, observation));
@@ -78,8 +77,9 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
                 allocateResource(taskInstance, taskInstance.getResourceInstances().iterator().next().getResource(),
                         taskInstance.getResourceInstances().iterator().next(), employeeService.findById(employeeId));
             } else {
-                throw new MyException(String.format("The employee %s does not have the skill to %s1",
-                        employee.getFullName(false), taskInstance.getTask().getName()));
+                String errorMessage = String.format("The employee %s does not have the skill to %s1",
+                        employee.getFullName(false), taskInstance.getTask().getName());
+                logger.error(errorMessage);
             }
         }
         return taskInstance;

@@ -6,7 +6,6 @@ package com.umss.siiu.bpmn.service;
 
 import com.umss.siiu.bpmn.model.processes.Process;
 import com.umss.siiu.bpmn.model.processes.*;
-import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.model.Employee;
 import com.umss.siiu.core.service.GenericService;
 
@@ -25,7 +24,7 @@ public interface TaskInstanceService extends GenericService<TaskInstance> {
 
     List<TaskInstance> findByCodeNotAndJobIdAndTaskStatusNot(String taskCode, Long jobId, String taskStatus);
 
-    TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation) throws MyException;
+    TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation);
 
     TaskInstance createTaskInstance(Process defaultJobProcess, ProcessInstance processInstance);
 
