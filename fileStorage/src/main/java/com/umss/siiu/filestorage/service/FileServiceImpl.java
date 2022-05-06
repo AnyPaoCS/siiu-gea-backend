@@ -5,7 +5,6 @@ import com.umss.siiu.core.exceptions.BlockedFileException;
 import com.umss.siiu.core.exceptions.NotFoundException;
 import com.umss.siiu.core.exceptions.RepositoryException;
 import com.umss.siiu.core.model.Employee;
-import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.core.service.EmployeeService;
 import com.umss.siiu.core.util.ApplicationConstants;
@@ -46,7 +45,6 @@ public class FileServiceImpl implements FileService {
 
     private static final String BRACKET = "[";
     private static final String SLASH_SEPARATOR = "/";
-    private static final String NONE_ABBREVIATION = "None";
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private JackRabbitService jackRabbitService;
@@ -377,16 +375,16 @@ public class FileServiceImpl implements FileService {
                     jackRabbitService.save();
                 } catch (javax.jcr.RepositoryException ignored) {
                 }
+                // Saving the new file
+                Node node = jackRabbitService.createBinaryNodeFromStream(jackRabbitNodeDto.getFile().getOriginalFilename(),
+                        jackRabbitNode.getParentPath(), jackRabbitNodeDto.getFile().getInputStream(),
+                        MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
+                // Updating the previous JackRabbitNode
+                jackRabbitNode.setNodeId(node.getIdentifier());
+                jackRabbitNode.setPath(node.getPath());
+                jackRabbitNode.setFileName(jackRabbitNodeDto.getFile().getOriginalFilename());
+                jackRabbitNode.setDescription(jackRabbitNodeDto.getFile().getOriginalFilename());
             }
-            // Saving the new file
-            Node node = jackRabbitService.createBinaryNodeFromStream(jackRabbitNodeDto.getFile().getOriginalFilename(),
-                    jackRabbitNode.getParentPath(), jackRabbitNodeDto.getFile().getInputStream(),
-                    MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
-            // Updating the previous JackRabbitNode
-            jackRabbitNode.setNodeId(node.getIdentifier());
-            jackRabbitNode.setPath(node.getPath());
-            jackRabbitNode.setFileName(jackRabbitNodeDto.getFile().getOriginalFilename());
-            jackRabbitNode.setDescription(jackRabbitNodeDto.getFile().getOriginalFilename());
             return jackRabbitNodeService.save(jackRabbitNode);
         } catch (javax.jcr.RepositoryException e) {
             throw new RepositoryException("Error updating the file", e);

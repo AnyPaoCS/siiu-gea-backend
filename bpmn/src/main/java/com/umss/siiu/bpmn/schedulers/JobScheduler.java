@@ -7,7 +7,6 @@ package com.umss.siiu.bpmn.schedulers;
 import com.umss.siiu.bpmn.model.Job;
 import com.umss.siiu.bpmn.service.ConfigurationService;
 import com.umss.siiu.bpmn.service.JobBpmService;
-import com.umss.siiu.bpmn.service.JobService;
 import com.umss.siiu.core.model.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
