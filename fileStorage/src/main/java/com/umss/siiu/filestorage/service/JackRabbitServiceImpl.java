@@ -4,7 +4,6 @@
 
 package com.umss.siiu.filestorage.service;
 
-import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.filestorage.model.JackRabbitNode;
 import com.umss.siiu.filestorage.util.StreamUtils;
@@ -53,7 +52,6 @@ public class JackRabbitServiceImpl implements JackRabbitService {
 
     @Value("${jackrabbit.standAlone.port}")
     private String port;
-
 
     private Session session;
 
@@ -268,15 +266,14 @@ public class JackRabbitServiceImpl implements JackRabbitService {
     }
 
     @Override
-    public Binary getRabbitBinary(OutputStream outputStream) throws MyException {
+    public Binary getRabbitBinary(OutputStream outputStream) {
         try {
             return session.getValueFactory().createBinary(StreamUtils
                     .toInputStream(outputStream));
         } catch (RepositoryException e) {
             logger.error("Error creating binary from outputStream");
-            e.printStackTrace();
-            throw new MyException("Error creating binary from outputStream");
         }
+        return null;
     }
 
     private InputStream obtainFileFromNode(JackRabbitNode jackRabbitNode) {

@@ -1,7 +1,6 @@
 package com.umss.siiu.filestorage.service;
 
 import com.umss.siiu.bpmn.model.Job;
-import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.filestorage.dto.JackRabbitNodeDto;
 import com.umss.siiu.filestorage.model.JackRabbitNode;
@@ -40,7 +39,7 @@ public interface FileService {
 
     void replaceFile(JackRabbitNodeDto jackRabbitNodeDto);
 
-    JackRabbitNode replaceFile(JackRabbitNodeDto jackRabbitNodeDto, JackRabbitNode jackRabbitNode);
+    void replaceFile(JackRabbitNodeDto jackRabbitNodeDto, JackRabbitNode jackRabbitNode);
 
     void visualizeFile(HttpServletResponse response, String filename);
 
@@ -49,10 +48,9 @@ public interface FileService {
     List<String> getFilePathsByJobAndCategoryType(long jobId, String category);
 
     public void saveWordDocument(long jobId, long fileTypeId, JackRabbitNode jackRabbitNode, XWPFDocument xwpfDocument,
-            String removedWordFromFile) throws MyException;
+            String removedWordFromFile);
 
-    void saveTemplate(Job job, JackRabbitNode jackRabbitNode, ByteArrayOutputStream baos, String removedWordFromFile)
-            throws MyException;
+    void saveTemplate(Job job, JackRabbitNode jackRabbitNode, ByteArrayOutputStream baos, String removedWordFromFile);
 
     void unlockAndSaveFile(JackRabbitNodeDto jackRabbitNodeDto, String fileName, String employeeEmail, String category);
 

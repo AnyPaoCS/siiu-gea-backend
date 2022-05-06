@@ -5,9 +5,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import com.umss.siiu.core.exceptions.MyException;
-
-
 public class StringUtility {
 
     private static final String NO_ALPHANUMBERIC_PATTERN = "[^\\d-A-Za-z ]";
