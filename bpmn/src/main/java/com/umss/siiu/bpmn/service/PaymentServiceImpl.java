@@ -20,7 +20,7 @@ public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements P
 
     private final PaymentRepository paymentRepository;
     private final ProcessInstanceService processInstanceService;
-    private final static long TIME_DIFFERENCE = 1000L * 60L * 30L;
+    private static final long TIME_DIFFERENCE = 1000L * 60L * 30L;
 
     public PaymentServiceImpl(PaymentRepository paymentRepository, ProcessInstanceService processInstanceService) {
         this.paymentRepository = paymentRepository;
@@ -29,8 +29,8 @@ public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements P
 
     @Override
     public long savePayment(PaymentInfoDto paymentInfoDto) {
-        Payment p = new Payment();
-        ProcessInstance pI = processInstanceService.findById(paymentInfoDto.getProcessId());
+        var p = new Payment();
+        var pI = processInstanceService.findById(paymentInfoDto.getProcessId());
         p.setAmount(new BigDecimal(paymentInfoDto.getAmount()));
         p.setDescription(paymentInfoDto.getDescription());
         p.setPaymentCode("PT" + pI.getId());
@@ -52,7 +52,7 @@ public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements P
 
     @Override
     public PaymentInfoDto realizePaymentByProcessInstanceId(Long processInstanceId) {
-        Payment p = paymentRepository.findByProcessInstanceId(processInstanceId);
+        var p = paymentRepository.findByProcessInstanceId(processInstanceId);
         if (p == null) {
             return null;
         }
@@ -76,7 +76,7 @@ public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements P
 
     @Override
     public boolean verifyPaymentInformationIsCorrect(Long processInstanceId, BigDecimal amount) {
-        Payment payment = paymentRepository.findByProcessInstanceId(processInstanceId);
+        var payment = paymentRepository.findByProcessInstanceId(processInstanceId);
         if (payment == null) {
             return false;
         }
@@ -85,8 +85,8 @@ public class PaymentServiceImpl extends GenericServiceImpl<Payment> implements P
 
     @Override
     public List<Payment> getPTPaymentsForScheduledTask() {
-        Date now = new Date();
-        Date datePast = new Date((now.getTime()-TIME_DIFFERENCE));
+        var now = new Date();
+        var datePast = new Date((now.getTime()-TIME_DIFFERENCE));
         List<Payment> paymentList = paymentRepository.findPaymentsBetweenDates(datePast, now);
         List<Payment> res = new ArrayList<>();
         paymentList.forEach(p -> {

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ public class FileController {
     private UserService userService;
     private final Gson gson;
 
+    private static final String FILE_ID_NOT_EXISTS = "El archivo con el id solicitado no existe.";
+    private static final String USER_HAS_NO_FILES = "El usuario no tiene archivos registrados.";
+
     public FileController(FileService fileService, FileTypeService fileTypeService, Gson gson, UserService userService) {
         this.fileService = fileService;
         this.fileTypeService = fileTypeService;
@@ -42,22 +46,21 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<Object> uploadFile (@RequestParam("file")MultipartFile file, @RequestParam("fileInfoDto")String fileUpload) {
-        FileUploadDto fileUploadDto = gson.fromJson(fileUpload, FileUploadDto.class);
-        User user = userService.findByEmail(fileUploadDto.getEmail());
-        JackRabbitNodeDto dto = new JackRabbitNodeDto();
+        var fileUploadDto = gson.fromJson(fileUpload, FileUploadDto.class);
+        var user = userService.findByEmail(fileUploadDto.getEmail());
+        var dto = new JackRabbitNodeDto();
         dto.setFile(file);
         dto.setDescription(fileUploadDto.getDescription());
         dto.setOwnerId(user.getId());
         dto.setOwnerClass("user");
-        FileType fileType = fileTypeService.findByAbbreviation(fileUploadDto.getFileTypeAbbreviation());
+        var fileType = fileTypeService.findByAbbreviation(fileUploadDto.getFileTypeAbbreviation());
         dto.setFileTypeId(fileType.getId());
-        String folderPath = user.getId() + "/" + fileType.getFileTypeCategory().name();
+        String folderPath = user.getId() + File.separator + fileType.getFileTypeCategory().name();
         dto.setParentPath(folderPath);
-        JackRabbitNode jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
+        var jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
         if (jackRabbitNode != null) {
             if (jackRabbitNode.isVerified()) {
                 return new ResponseEntity<>("El tipo de archivo que desea subir ya se encuentra verificado.", HttpStatus.BAD_REQUEST);
-                //TODO preguntar si se borra o no, si se puede subir o no
             } else {
                 dto.setId(jackRabbitNode.getId());
                 fileService.replaceFile(dto);
@@ -84,9 +87,9 @@ public class FileController {
     public ResponseEntity<Object> getDocumentFileContent(@RequestParam("fileId") long fileId) {
         JackRabbitNode node = fileService.findByFileId(fileId);
         if (node == null) {
-            return new ResponseEntity<>("El archivo con el id solicitado no existe.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(FILE_ID_NOT_EXISTS, HttpStatus.BAD_REQUEST);
         }
-        InputStream is = fileService.getInputStreamFromNode(node.getPath());
+        var is = fileService.getInputStreamFromNode(node.getPath());
         byte[] documentContent = null;
         try {
             documentContent = IOUtils.toByteArray(is);
@@ -140,27 +143,27 @@ public class FileController {
         List<FileSimpleInfoDto> list = new ArrayList<>();
         if (nodeList != null && !nodeList.isEmpty()) {
             for (JackRabbitNode node : nodeList) {
-                FileSimpleInfoDto dto = new FileSimpleInfoDto(node);
+                var dto = new FileSimpleInfoDto(node);
                 list.add(dto);
             }
         } else {
-            return new ResponseEntity<>("El usuario no tiene archivos registrados.", HttpStatus.OK);
+            return new ResponseEntity<>(USER_HAS_NO_FILES, HttpStatus.OK);
         }
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/userId/{userId}/abbreviation/{fileTypeAbbreviation}")
     public ResponseEntity<Object> getFileByUserIdAndFileTypeAbbreviation (@PathVariable("userId")long userId, @PathVariable("fileTypeAbbreviation")String abbreviation) {
-        FileType fileType = fileTypeService.findByAbbreviation(abbreviation);
+        var fileType = fileTypeService.findByAbbreviation(abbreviation);
         if (fileType == null) {
             return new ResponseEntity<>("La abreviación ingresada no existe.", HttpStatus.BAD_REQUEST);
         }
         JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
         if (node != null) {
-            FileSimpleInfoDto dto = new FileSimpleInfoDto(node);
+            var dto = new FileSimpleInfoDto(node);
             return new ResponseEntity<>(dto, HttpStatus.OK);
         }
-        return new ResponseEntity<>("El usuario no tiene archivos registrados.", HttpStatus.OK);
+        return new ResponseEntity<>(USER_HAS_NO_FILES, HttpStatus.OK);
     }
 
     @GetMapping("/list/userId/{userId}/fileTypeCategory/{fileTypeCategory}")
@@ -171,16 +174,14 @@ public class FileController {
         }
         List<JackRabbitNode> nodeList = fileService.getFilesByUserId(userId);
         if (nodeList == null || nodeList.isEmpty()) {
-            return new ResponseEntity<>("El usuario no tiene archivos registrados.", HttpStatus.OK);
+            return new ResponseEntity<>(USER_HAS_NO_FILES, HttpStatus.OK);
         }
         List<FileSimpleInfoDto> list = new ArrayList<>();
         for (FileType fileType: fileTypes) {
             for (JackRabbitNode node : nodeList) {
                 if (node.getFileType().equals(fileType)) {
-                    FileSimpleInfoDto dto = new FileSimpleInfoDto(node);
+                    var dto = new FileSimpleInfoDto(node);
                     list.add(dto);
-                } else {
-                    System.out.println("id node: " + node.getFileType().getId() + "  id fileType: " + fileType.getId());
                 }
             }
         }
@@ -191,7 +192,7 @@ public class FileController {
     public ResponseEntity<Object> verifyQRLegalizedDocument(@RequestParam("fileId") long fileId, @RequestParam("qrValue") String qrValue) {
         JackRabbitNode node = fileService.findByFileId(fileId);
         if (node == null) {
-            return new ResponseEntity<>("El archivo con el id solicitado no existe.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(FILE_ID_NOT_EXISTS, HttpStatus.BAD_REQUEST);
         }
         boolean res = node.getNodeId().equals(qrValue);
         return new ResponseEntity<>(res, HttpStatus.OK);
@@ -199,18 +200,18 @@ public class FileController {
 
     @PostMapping("/upload/image")
     public ResponseEntity<Object> uploadSignatureImage(@RequestParam("userId") long userId, @RequestParam("image") MultipartFile file) {
-        JackRabbitNodeDto dto = new JackRabbitNodeDto();
+        var dto = new JackRabbitNodeDto();
         dto.setFile(file);
         dto.setOwnerId(userId);
         dto.setDescription("imagen subida");
         dto.setOwnerClass("user");
 
 
-        FileType fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
+        var fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         dto.setFileTypeId(fileType.getId());
-        String folderPath = userId + "/" + fileType.getFileTypeCategory().name();
+        String folderPath = userId + File.separator + fileType.getFileTypeCategory().name();
         dto.setParentPath(folderPath);
-        JackRabbitNode jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
+        var jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
         if (jackRabbitNode != null) {
             dto.setId(jackRabbitNode.getId());
             fileService.replaceFile(dto);
@@ -224,12 +225,12 @@ public class FileController {
 
     @GetMapping("/signature/{userId}")
     public ResponseEntity<Object> getSignatureImage(@PathVariable("userId") long userId) {
-        FileType fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
+        var fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
         if (node == null) {
-            return new ResponseEntity<>("El archivo con el id solicitado no existe.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(FILE_ID_NOT_EXISTS, HttpStatus.BAD_REQUEST);
         }
-        InputStream is = fileService.getInputStreamFromNode(node.getPath());
+        var is = fileService.getInputStreamFromNode(node.getPath());
         byte[] signatureImage = null;
         try {
             signatureImage = IOUtils.toByteArray(is);

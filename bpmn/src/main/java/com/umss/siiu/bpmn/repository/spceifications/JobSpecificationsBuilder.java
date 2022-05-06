@@ -14,7 +14,6 @@ public class JobSpecificationsBuilder extends GenericSpecificationsBuilder<Job> 
 
     private static final String FIRSTNAME_FILTER = "firstName";
     private static final String LASTNAME_FILTER = "lastName";
-    private static final String NAME_FILTER = "name";
     private static final String STATUS_FILTER = "status";
     private static final String PRIORITY_FILTER = "priority";
 

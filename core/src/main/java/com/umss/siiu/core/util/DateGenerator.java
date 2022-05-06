@@ -10,7 +10,7 @@ public class DateGenerator {
     }
 
     public static Date addDaysToDate(int numberOfDays) {
-        Calendar calendar = Calendar.getInstance();
+        var calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, numberOfDays);
         return calendar.getTime();
     }

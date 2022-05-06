@@ -44,8 +44,6 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class FileServiceImpl implements FileService {
 
-    private static final String DOC = ".doc";
-    private static final String FILE_NOT_FOUND_ERROR = "Could not read the file";
     private static final String BRACKET = "[";
     private static final String SLASH_SEPARATOR = "/";
     private static final String NONE_ABBREVIATION = "None";
@@ -234,23 +232,6 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private void clearFileType(Long modelBaseId, Long currentFileTypeId, JackRabbitNode protectedNode,
-                               FileTypeCategory targetFileType) {
-        FileType fileType = null != currentFileTypeId ? fileTypeService.findById(currentFileTypeId) : null;
-        Long protectedId = null != protectedNode ? protectedNode.getId() : 0L;
-        if (null != fileType && null != fileType.getFileTypeCategory()
-                && fileType.getFileTypeCategory().equals(targetFileType)) {
-            List<JackRabbitNode> filesByJobAndCategoryType = getFilesByJobAndCategoryType(modelBaseId,
-                    targetFileType.name());
-            filesByJobAndCategoryType.forEach(jackRabbitNode -> {
-                if (!protectedId.equals(jackRabbitNode.getId())) {
-                    jackRabbitNode.setFileType(fileTypeService.findByAbbreviation(NONE_ABBREVIATION));
-                    jackRabbitNodeService.save(jackRabbitNode);
-                }
-            });
-        }
-    }
-
     @Override
     @Transactional
     public void saveFile(String fileName, long fileTypeCode, String description, InputStream stream,
@@ -276,11 +257,8 @@ public class FileServiceImpl implements FileService {
                     (!StringUtils.isEmpty(nodePath) ? ("/" + nodePath) : "") + "/" + fileName);
             if (hasNode && jackRabbitNode != null) {
                 jackRabbitNode.setNodeId(node.getIdentifier());
-                //jackRabbitNode.setPath(node.getPath());
-                System.out.println("jackrabbitnode no es nulo");
                 jackRabbitNodeService.save(jackRabbitNode);
             } else {
-                System.out.println("jackrabbitnode SI es nulo");
                 jackRabbitNodeService.createJackRabbitNode(modelBase, fileTypeCode, false, fileName, description.trim(),
                         modelBase.getId(), node, nodePath, flush);
             }
@@ -319,8 +297,6 @@ public class FileServiceImpl implements FileService {
             jackRabbitService.save();
             if (jackRabbitService.getRootNode().hasNode(nodePath)) {
                 logger.error("File structure for job %s already exists\", job.getId()");
-                // throw new RepositoryException(String.format("File structure
-                // for job %s already exists", job.getId()));
             } else {
                 node = jackRabbitService.createFolderNode(job.getId().toString(), parentNodePath);
                 jackRabbitNodeService.createJackRabbitNode(owner, 1, false, node.getName(),

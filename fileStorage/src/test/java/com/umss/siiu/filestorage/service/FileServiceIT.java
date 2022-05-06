@@ -1,6 +1,7 @@
 package com.umss.siiu.filestorage.service;
 
 import com.umss.siiu.filestorage.dto.JackRabbitNodeDto;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,6 @@ public class FileServiceIT {
         File targetFile = new File("./targetFile.txt");
         targetFile.createNewFile();
         org.apache.commons.io.FileUtils.copyInputStreamToFile(jackRabbitStream, targetFile);
-
+        Assert.assertNotNull(jackRabbitNodeDto);
     }
 }

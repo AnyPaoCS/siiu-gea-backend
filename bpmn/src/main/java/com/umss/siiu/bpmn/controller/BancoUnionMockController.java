@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/payment")
 public class BancoUnionMockController {
 
-    public BancoUnionMockController() {}
-
     @PostMapping("/mock")
     public ResponseEntity<PaymentList> mockPayment (@RequestBody PaymentList list) {
-        System.out.println("controller called");
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }

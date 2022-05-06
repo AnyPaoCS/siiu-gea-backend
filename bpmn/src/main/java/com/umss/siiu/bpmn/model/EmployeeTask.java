@@ -1,5 +1,6 @@
 package com.umss.siiu.bpmn.model;
 
+import com.umss.siiu.bpmn.dto.EmployeeTaskDto;
 import com.umss.siiu.bpmn.model.processes.Task;
 import com.umss.siiu.core.model.Employee;
 import com.umss.siiu.core.model.ModelBase;
@@ -8,7 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class EmployeeTask extends ModelBase {
+public class EmployeeTask extends ModelBase<EmployeeTaskDto> {
     @ManyToOne
     private Employee employee;
     @ManyToOne
