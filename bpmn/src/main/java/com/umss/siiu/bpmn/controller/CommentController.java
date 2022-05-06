@@ -1,10 +1,10 @@
 package com.umss.siiu.bpmn.controller;
 
 import com.umss.siiu.bpmn.dto.CommentDto;
-import com.umss.siiu.bpmn.dto.OperationResultDto;
 import com.umss.siiu.bpmn.model.processes.Comment;
 import com.umss.siiu.bpmn.service.CommentService;
 import com.umss.siiu.core.controller.GenericController;
+import com.umss.siiu.core.dto.OperationResultDto;
 import com.umss.siiu.core.service.GenericService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

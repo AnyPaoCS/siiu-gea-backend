@@ -4,6 +4,7 @@
 
 package com.umss.siiu.filestorage.service;
 
+import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.filestorage.model.JackRabbitNode;
 import com.umss.siiu.filestorage.util.StreamUtils;
@@ -150,7 +151,7 @@ public class JackRabbitServiceImpl implements JackRabbitService {
      */
     @Override
     public Node getNode(String path) {
-        if (StringUtils.isEmpty(path)) {
+        if (StringUtils.hasText(path)) {
             return getRootNode();
         }
         try {
@@ -185,7 +186,6 @@ public class JackRabbitServiceImpl implements JackRabbitService {
         try (InputStream stream = new FileInputStream(file)) {
             return createBinaryNodeFromStream(nodeName, parentPath, stream, mimeType);
         } catch (IOException e) {
-            logger.error(ERROR_CREATING_NODE, e);
             throw new IllegalStateException(ERROR_CREATING_NODE, e);
         }
     }
@@ -208,7 +208,6 @@ public class JackRabbitServiceImpl implements JackRabbitService {
             checkin(fileNode);
             return fileNode;
         } catch (RepositoryException e) {
-            logger.error(ERROR_CREATING_NODE, e);
             throw new IllegalStateException(ERROR_CREATING_NODE, e);
         }
     }
@@ -221,7 +220,6 @@ public class JackRabbitServiceImpl implements JackRabbitService {
             fileNode.remove();
             session.save();
         } catch (RepositoryException e) {
-            logger.error(ERROR_DELETING_NODE, e);
             throw new IllegalStateException(ERROR_DELETING_NODE, e);
         }
     }
@@ -237,7 +235,6 @@ public class JackRabbitServiceImpl implements JackRabbitService {
             session.save();
             return node;
         } catch (RepositoryException e) {
-            logger.error(ERROR_CREATING_NODE, e);
             throw new IllegalStateException(ERROR_CREATING_NODE, e);
         }
     }
@@ -247,7 +244,6 @@ public class JackRabbitServiceImpl implements JackRabbitService {
         try (InputStream stream = new FileInputStream(file)) {
             return updateFileNodeFromStream(nodeName, parentPath, stream, mimeType);
         } catch (IOException e) {
-            logger.error(ERROR_UPDATING_NODE, e);
             throw new IllegalStateException(ERROR_UPDATING_NODE, e);
         }
     }
@@ -267,20 +263,19 @@ public class JackRabbitServiceImpl implements JackRabbitService {
             checkin(fileNode);
             return fileNode;
         } catch (RepositoryException e) {
-            logger.error(ERROR_UPDATING_NODE, e);
             throw new IllegalStateException(ERROR_UPDATING_NODE, e);
         }
     }
 
     @Override
-    public Binary getRabbitBinary(OutputStream outputStream) {
+    public Binary getRabbitBinary(OutputStream outputStream) throws MyException {
         try {
             return session.getValueFactory().createBinary(StreamUtils
                     .toInputStream(outputStream));
         } catch (RepositoryException e) {
             logger.error("Error creating binary from outputStream");
             e.printStackTrace();
-            throw new RuntimeException("Error creating binary from outputStream");
+            throw new MyException("Error creating binary from outputStream");
         }
     }
 

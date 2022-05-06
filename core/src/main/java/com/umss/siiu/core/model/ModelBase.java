@@ -44,22 +44,6 @@ public class ModelBase<D extends DtoBase> {
         return id;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Date getUpdatedAt() {
         return updatedAt;
     }
@@ -68,12 +52,28 @@ public class ModelBase<D extends DtoBase> {
         this.updatedAt = updatedAt;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public long getVersion() {
         return version;
     }
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     protected void beforeConversion(D element, ModelMapper mapper) {
@@ -118,7 +118,8 @@ public class ModelBase<D extends DtoBase> {
         return (List<E>) elements.stream().map(element -> {
             try {
                 return this.getClass().getDeclaredConstructor().newInstance().toDomain(element, mapper);
-            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException
+                    | InvocationTargetException e) {
                 return new ModelBase<>();
             }
         }).sorted(Comparator.comparing(ModelBase::getIndexedId)).collect(Collectors.toList());

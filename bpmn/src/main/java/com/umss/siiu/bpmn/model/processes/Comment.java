@@ -28,14 +28,6 @@ public class Comment extends ModelBase<CommentDto> {
         this.author = author;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     public Long getRating() {
         return rating;
     }
@@ -50,5 +42,13 @@ public class Comment extends ModelBase<CommentDto> {
 
     public void setProcess(Process process) {
         this.process = process;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

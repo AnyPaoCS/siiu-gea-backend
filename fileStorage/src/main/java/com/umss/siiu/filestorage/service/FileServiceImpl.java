@@ -2,6 +2,7 @@ package com.umss.siiu.filestorage.service;
 
 import com.umss.siiu.bpmn.model.Job;
 import com.umss.siiu.core.exceptions.BlockedFileException;
+import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.exceptions.NotFoundException;
 import com.umss.siiu.core.exceptions.RepositoryException;
 import com.umss.siiu.core.model.Employee;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,6 +47,7 @@ public class FileServiceImpl implements FileService {
 
     private static final String BRACKET = "[";
     private static final String SLASH_SEPARATOR = "/";
+    private static final String NOT_FOUND_FILE = "Could not find file %s";
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private JackRabbitService jackRabbitService;
@@ -53,10 +56,9 @@ public class FileServiceImpl implements FileService {
     private FileTypeService fileTypeService;
     private EmployeeService employeeService;
 
-
     public FileServiceImpl(JackRabbitService jackRabbitService, JackRabbitNodeService jackRabbitNodeService,
-                           JobFileTypeLockService jobFileTypeLockService,
-                           FileTypeService fileTypeService, EmployeeService employeeService) {
+            JobFileTypeLockService jobFileTypeLockService,
+            FileTypeService fileTypeService, EmployeeService employeeService) {
         this.jackRabbitService = jackRabbitService;
         this.jackRabbitNodeService = jackRabbitNodeService;
         this.jobFileTypeLockService = jobFileTypeLockService;
@@ -74,9 +76,8 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-
     private void exportByteArrayOutputStream(HttpServletResponse response, ByteArrayOutputStream document,
-                                             String filename) {
+            String filename) {
         try {
             response.setHeader("Expires", "0");
             response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
@@ -84,7 +85,7 @@ public class FileServiceImpl implements FileService {
             response.setContentType(URLConnection.guessContentTypeFromName(filename));
             response.addHeader(ApplicationConstants.CONTENT_DISPOSITION, "attachment; filename=\"" + filename);
             response.setContentLength(document.size());
-            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(response.getOutputStream());
+            var bufferedOutputStream = new BufferedOutputStream(response.getOutputStream());
             document.writeTo(bufferedOutputStream);
             bufferedOutputStream.flush();
             bufferedOutputStream.close();
@@ -96,7 +97,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void downloadFile(HttpServletResponse response, String filename) {
         String slashFilename = filename.charAt(0) != '/' ? SLASH_SEPARATOR + filename : filename;
-        JackRabbitNode jackRabbitNode = jackRabbitNodeService.findByFilePath(slashFilename);
+        var jackRabbitNode = jackRabbitNodeService.findByFilePath(slashFilename);
         ByteArrayOutputStream file = getFile(filename);
         exportByteArrayOutputStream(response, file, jackRabbitNode.getFileName());
     }
@@ -113,18 +114,18 @@ public class FileServiceImpl implements FileService {
     }
 
     private void downloadFilesAsZip(HttpServletResponse response, List<JackRabbitNode> jackRabbitNodes,
-                                    String fileNameOutput) {
+            String fileNameOutput) {
         try {
             response.setContentType("application/zip");
             response.setHeader(ApplicationConstants.CONTENT_DISPOSITION,
                     "attachment; filename=\"" + fileNameOutput + " .zip\"");
-            ZipOutputStream zipOutputStream = new ZipOutputStream(response.getOutputStream());
+            var zipOutputStream = new ZipOutputStream(response.getOutputStream());
             for (JackRabbitNode jackRabbitNode : jackRabbitNodes) {
                 // Getting file from JackRabbit
-                InputStream inputStream = getInputStreamFromNode(jackRabbitNode.getPath());
+                var inputStream = getInputStreamFromNode(jackRabbitNode.getPath());
                 zipOutputStream.putNextEntry(new ZipEntry(jackRabbitNode.getFileName()));
                 // Write the contents of the file
-                int data = 0;
+                var data = 0;
                 while ((data = inputStream.read()) != -1) {
                     zipOutputStream.write(data);
                 }
@@ -146,12 +147,12 @@ public class FileServiceImpl implements FileService {
         } catch (javax.jcr.RepositoryException | IOException e) {
             throw new RepositoryException(String.format("Error while processing %s", noneSlashFilename), e);
         }
-        throw new RepositoryException(String.format("Could not find file %s", noneSlashFilename));
+        throw new RepositoryException(String.format(NOT_FOUND_FILE, noneSlashFilename));
     }
 
     private ByteArrayOutputStream getFileFromNode(String file) throws IOException {
         final byte[] content = IOUtils.toByteArray(getInputStreamFromNode(file));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(content.length);
+        var baos = new ByteArrayOutputStream(content.length);
         baos.write(content);
         return baos;
     }
@@ -163,7 +164,7 @@ public class FileServiceImpl implements FileService {
             return jackRabbitService.getFileNode(noneSlashFilename).getProperty(JcrConstants.JCR_DATA).getBinary()
                     .getStream();
         } catch (javax.jcr.RepositoryException e) {
-            throw new RepositoryException(String.format("Could not find file %s", noneSlashFilename));
+            throw new RepositoryException(String.format(NOT_FOUND_FILE, noneSlashFilename));
         }
 
     }
@@ -181,7 +182,7 @@ public class FileServiceImpl implements FileService {
                 jackRabbitService.save();
                 jackRabbitNodeService.deleteByPath(path);
             } else {
-                throw new RepositoryException(String.format("Could not find file %s", path));
+                throw new RepositoryException(String.format(NOT_FOUND_FILE, path));
             }
         } catch (javax.jcr.RepositoryException e) {
             throw new RepositoryException(String.format("Error while deleting file %s", path), e);
@@ -191,7 +192,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void unlockAndSaveFile(JackRabbitNodeDto jackRabbitNodeDto, String fileName, String employeeEmail,
-                                  String category) {
+            String category) {
         try {
             JobFileTypeLock jobFileTypeLock = null;
             Job job = new Job();
@@ -220,7 +221,7 @@ public class FileServiceImpl implements FileService {
                     jackRabbitNodeDto.getOwnerId());
             String parentPath = jackRabbitNodeDto.getParentPath();
             JackRabbitNode jackRabbitNode = jackRabbitNodeService
-                    .findByFilePath((!StringUtils.isEmpty(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
+                    .findByFilePath((!StringUtils.hasText(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
 
             saveFile(fileName, jackRabbitNodeDto.getFileTypeId(), jackRabbitNodeDto.getDescription(),
                     jackRabbitNodeDto.getFile().getInputStream(), modelBase, parentPath, true);
@@ -233,7 +234,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void saveFile(String fileName, long fileTypeCode, String description, InputStream stream,
-                         ModelBase<?> modelBase, String nodePath, boolean flush) {
+            ModelBase<?> modelBase, String nodePath, boolean flush) {
         try {
             if (nodePath.equals("public") && !jackRabbitService.getRootNode().hasNode(nodePath)) {
                 jackRabbitService.createFolderNode(nodePath, "");
@@ -252,7 +253,7 @@ public class FileServiceImpl implements FileService {
                     MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
             JackRabbitNode jackRabbitNode;
             jackRabbitNode = jackRabbitNodeService.findByFilePath(
-                    (!StringUtils.isEmpty(nodePath) ? ("/" + nodePath) : "") + "/" + fileName);
+                    (!StringUtils.hasText(nodePath) ? ("/" + nodePath) : "") + "/" + fileName);
             if (hasNode && jackRabbitNode != null) {
                 jackRabbitNode.setNodeId(node.getIdentifier());
                 jackRabbitNodeService.save(jackRabbitNode);
@@ -327,7 +328,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private void createFolderEntries(Object owner, List<String> entries, Job job, String yearNode, String monthNode,
-                                     String nodePath) {
+            String nodePath) {
         for (String entry : entries) {
             createFolderEntry((ModelBase<?>) owner, nodePath,
                     String.format("year %s, month %s, job %s, " + "folder %s entry level", yearNode, monthNode,
@@ -376,7 +377,8 @@ public class FileServiceImpl implements FileService {
                 } catch (javax.jcr.RepositoryException ignored) {
                 }
                 // Saving the new file
-                Node node = jackRabbitService.createBinaryNodeFromStream(jackRabbitNodeDto.getFile().getOriginalFilename(),
+                Node node = jackRabbitService.createBinaryNodeFromStream(
+                        jackRabbitNodeDto.getFile().getOriginalFilename(),
                         jackRabbitNode.getParentPath(), jackRabbitNodeDto.getFile().getInputStream(),
                         MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
                 // Updating the previous JackRabbitNode
@@ -421,7 +423,7 @@ public class FileServiceImpl implements FileService {
                     String documentContent = new Tika().parseToString(in);
                     if (documentContent.trim().isEmpty())
                         documentContent = ApplicationConstants.FILE_WITHOUT_PREVIEW;
-                    convertByteArrayToOutputStream(response, documentContent.getBytes(Charset.forName("UTF-8")));
+                    convertByteArrayToOutputStream(response, documentContent.getBytes(StandardCharsets.UTF_8));
                     break;
             }
         } catch (Exception e) {
@@ -438,7 +440,6 @@ public class FileServiceImpl implements FileService {
         document.close();
         out.close();
     }
-
 
     private void convertByteArrayToOutputStream(HttpServletResponse response, byte[] b) throws IOException {
         OutputStream out = new BufferedOutputStream(response.getOutputStream());
@@ -457,7 +458,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<String> getFilePathsByOwnerAndFileTypeIdsAndOwnerIds(String ownerName, List<Long> ownerIds,
-                                                                     List<Long> fileTypeIds) {
+            List<Long> fileTypeIds) {
         return jackRabbitNodeService
                 .findByOwnerClassAndFileTypeIdsAndOwnerIds(ModelBaseFactory.createModelBase(ownerName, 0L), fileTypeIds,
                         ownerIds)
@@ -535,7 +536,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void saveWordDocument(long jobId, long fileTypeId, JackRabbitNode jackRabbitNode, XWPFDocument xwpfDocument,
-                                 String removedWordFromFile) {
+            String removedWordFromFile) throws MyException {
         try {
             Job job = new Job();
             job.setId(jobId);
@@ -556,14 +557,13 @@ public class FileServiceImpl implements FileService {
             InputStream inputStreamConverted = StreamUtils.toInputStream(byteArrayOutputStream);
             saveFile("Formatted - " + fileName, fileTypeId, "", inputStreamConverted, job, parentPath, false);
         } catch (Exception e) {
-            throw new RuntimeException("Error writing the document");
+            throw new MyException("Error writing the document");
         }
     }
 
-
     @Override
     public void lockAndDownloadFilesByJobIdAndCategory(HttpServletResponse response, long jobId, String category,
-                                                       String employeeEmail) {
+            String employeeEmail) {
         // Return file(s) to the user (it doesn't matter if the file is blocked)
         downloadFilesByJobIdAndCategory(response, jobId, category);
         try {
@@ -583,19 +583,22 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-
-/*    private JackRabbitNode obtainNode(Job job) {
-        List<FileType> fileTypes = fileTypeService.findByFileTypeCategory(FileTypeCategory.ROI);
-        List<JackRabbitNode> nodes = jackRabbitNodeService.findByOwnerClassAndOwnerIdAndFileTypeIn(job, fileTypes,
-                job.getId());
-        return nodes.stream().filter(node -> node.getPath().contains("xls")).findFirst().get();
-    }*/
-
+    /*
+     * private JackRabbitNode obtainNode(Job job) {
+     * List<FileType> fileTypes =
+     * fileTypeService.findByFileTypeCategory(FileTypeCategory.ROI);
+     * List<JackRabbitNode> nodes =
+     * jackRabbitNodeService.findByOwnerClassAndOwnerIdAndFileTypeIn(job, fileTypes,
+     * job.getId());
+     * return nodes.stream().filter(node ->
+     * node.getPath().contains("xls")).findFirst().get();
+     * }
+     */
 
     @Override
     @Transactional
     public void saveTemplate(Job job, JackRabbitNode jackRabbitNode, ByteArrayOutputStream baos,
-                             String removedWordFromFile) {
+            String removedWordFromFile) throws MyException {
         try {
             // Getting the name of the file
             String fileName = removedWordFromFile != null
@@ -611,7 +614,7 @@ public class FileServiceImpl implements FileService {
             InputStream inputStreamConverted = StreamUtils.toInputStream(baos);
             saveFile("Formatted - " + fileName, 1, "", inputStreamConverted, job, parentPath, false);
         } catch (Exception e) {
-            throw new RuntimeException("Error writing the document");
+            throw new MyException("Error writing the document");
         }
     }
 

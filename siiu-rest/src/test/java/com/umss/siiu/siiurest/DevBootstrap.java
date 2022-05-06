@@ -21,16 +21,11 @@ import com.umss.siiu.core.repository.EmployeeRepository;
 import com.umss.siiu.core.service.UserService;
 import com.umss.siiu.filestorage.model.FileType;
 import com.umss.siiu.filestorage.model.FileTypeCategory;
-import com.umss.siiu.filestorage.service.FileService;
 import com.umss.siiu.filestorage.service.FileTypeService;
-import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +46,6 @@ public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent
     private RoleService roleService;
     private NotificationTypeRepository notificationTypeRepository;
     private final FileTypeService fileTypeService;
-    private FileService fileService;
     private TaskRepository taskRepository;
 
     private Task requestProcessTask;
@@ -65,7 +59,7 @@ public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent
     public DevBootstrap(EmployeeRepository employeeRepository,
                         EmployeeTaskService employeeTaskService,
                         TaskRepository taskRepository,
-                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository, FileTypeService fileTypeService, FileService fileService) {
+                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository, FileTypeService fileTypeService) {
         this.employeeRepository = employeeRepository;
         this.employeeTaskService = employeeTaskService;
         this.userService = userService;
@@ -73,7 +67,6 @@ public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent
         this.roleService = roleService;
         this.notificationTypeRepository = notificationTypeRepository;
         this.fileTypeService = fileTypeService;
-        this.fileService = fileService;
         this.taskRepository = taskRepository;
     }
 
@@ -310,22 +303,6 @@ public class   DevBootstrap implements ApplicationListener<ContextRefreshedEvent
         Set<TaskAction> taskActions = task.getTaskActions();
         taskActions.add(taskAction);
         return task;
-    }
-
-    private String getResourceAsString(String resourceName) {
-        try (InputStream inputStream = this.getClass().getResourceAsStream(resourceName)) {
-            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    private InputStream getResourceAsStream(String resourceName) {
-        try (InputStream inputStream = this.getClass().getResourceAsStream(resourceName)) {
-            return inputStream;
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
     }
 
     private void createUser(String email, Employee employee, Long roleId) {

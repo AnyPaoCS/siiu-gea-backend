@@ -8,6 +8,7 @@ import com.umss.siiu.bpmn.model.EmployeeTask;
 import com.umss.siiu.bpmn.model.processes.Process;
 import com.umss.siiu.bpmn.model.processes.*;
 import com.umss.siiu.bpmn.repository.TaskInstanceRepository;
+import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.model.Employee;
 import com.umss.siiu.core.repository.GenericRepository;
 import com.umss.siiu.core.service.EmployeeService;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.ValidationException;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,7 +63,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
 
     @Override
     @Transactional
-    public TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation) {
+    public TaskInstance reassignResources(long taskInstanceId, long employeeId, String observation) throws MyException {
         var taskInstance = findById(taskInstanceId);
         taskInstance.setTaskStatus(TaskStatus.PENDING);
         taskInstance.setObservations(setObservationsTaskInstance(taskInstance, observation));
@@ -73,13 +73,12 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
         if (employeeId > 0) {
             Long taskId = taskInstance.getTask().getId();
             var employee = employeeService.findById(employeeId);
-            Set<EmployeeTask> employeeTasks =
-                    employeeTaskService.findByEmployee(employee);
+            Set<EmployeeTask> employeeTasks = employeeTaskService.findByEmployee(employee);
             if (employeeTasks.stream().anyMatch(employeeTask -> employeeTask.getTask().getId().equals(taskId))) {
                 allocateResource(taskInstance, taskInstance.getResourceInstances().iterator().next().getResource(),
                         taskInstance.getResourceInstances().iterator().next(), employeeService.findById(employeeId));
             } else {
-                throw new RuntimeException(String.format("The employee %s does not have the skill to %s1",
+                throw new MyException(String.format("The employee %s does not have the skill to %s1",
                         employee.getFullName(false), taskInstance.getTask().getName()));
             }
         }
@@ -123,7 +122,8 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
         TaskInstance task = findById(id);
         if (task != null && employee != null) {
             ResourceInstance fetched = task.getResourceInstances().stream()
-                    .filter(resource -> resource.getEmployee().getId().equals(employee.getId())).findFirst().orElse(null);
+                    .filter(resource -> resource.getEmployee().getId().equals(employee.getId())).findFirst()
+                    .orElse(null);
             return fetched != null;
         }
         return false;
@@ -231,8 +231,8 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
             save(newTaskInstance);
             List<ResourceInstance> fitNewTaskResources = outputResourceInstances.stream()
                     .filter(resourceInstance -> {
-                        Set<EmployeeTask> employeeTasks =
-                                employeeTaskService.findByEmployee(resourceInstance.getEmployee());
+                        Set<EmployeeTask> employeeTasks = employeeTaskService
+                                .findByEmployee(resourceInstance.getEmployee());
                         return employeeTasks.stream().map((EmployeeTask t) -> t.getTask().getId())
                                 .collect(Collectors.toList()).contains(newTaskInstance.getTask().getId());
                     })
@@ -286,18 +286,18 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
     public ResourceInstance allocateResource(TaskInstance taskInstance, Resource resource,
             ResourceInstance resourceInstance, Employee employee) {
         if (taskInstance.getTask().getCode().equals(TaskType.REQUEST_PROCESS.getCode()) ||
-            taskInstance.getTask().getCode().equals(TaskType.VALIDATION_PAYMENT.getCode())) {
+                taskInstance.getTask().getCode().equals(TaskType.VALIDATION_PAYMENT.getCode())) {
             employee = taskInstance.getProcessInstance().getUser().getEmployee();
         }
         if (resourceInstance == null) {
             resourceInstance = createNewResourceInstance(taskInstance, resource, employee);
             notificationService.sendNotifications(employee.getUser().getEmail(), 1L, "New job assigned",
-                    MessageFormat.format("Job assigned to the task of {1}",
+                    String.format("Job assigned to the task of %s",
                             resourceInstance.getTaskInstance().getTask().getName()));
         } else {
             resourceInstance = updateResourceInstanceEmployee(resourceInstance, employee);
             notificationService.sendNotifications(employee.getUser().getEmail(), 2L, "New job reassigned",
-                    MessageFormat.format("Job reassigned to the task of {1}",
+                    String.format("Job reassigned to the task of %s",
                             resourceInstance.getTaskInstance().getTask().getName()));
         }
         boolean isSystem = employee.getFirstName().equals(SYSTEM_EMPLOYEE_NAME);

@@ -4,12 +4,13 @@
 
 package com.umss.siiu.bpmn.controller;
 
-import com.umss.siiu.bpmn.dto.OperationResultDto;
 import com.umss.siiu.bpmn.dto.TaskInstanceDto;
 import com.umss.siiu.bpmn.model.processes.TaskInstance;
 import com.umss.siiu.bpmn.service.JobBpmService;
 import com.umss.siiu.bpmn.service.JobService;
 import com.umss.siiu.bpmn.service.TaskInstanceService;
+import com.umss.siiu.core.dto.OperationResultDto;
+import com.umss.siiu.core.exceptions.MyException;
 import com.umss.siiu.core.controller.GenericController;
 import com.umss.siiu.core.service.GenericService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,7 +67,7 @@ public class TaskInstanceController extends GenericController<TaskInstance, Task
 
     @PutMapping("/reassignResources")
     @PreAuthorize("hasRole('ROLE_SUPERVISOR')")
-    public OperationResultDto<TaskInstanceDto> reassignResources(@RequestBody TaskInstanceDto taskInstanceDto) {
+    public OperationResultDto<TaskInstanceDto> reassignResources(@RequestBody TaskInstanceDto taskInstanceDto) throws MyException {
         return new OperationResultDto<>("messages.taskInstance.userReassigned",
                 toDto(service.reassignResources(taskInstanceDto.getId(), taskInstanceDto.getEmployeeId(), taskInstanceDto.getObservation())));
 
