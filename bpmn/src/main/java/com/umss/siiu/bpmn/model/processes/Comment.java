@@ -11,7 +11,7 @@ public class Comment extends ModelBase<CommentDto> {
 
     private String author;
 
-    private String comment;
+    private String statement;
 
     private Long rating;
 
@@ -44,11 +44,11 @@ public class Comment extends ModelBase<CommentDto> {
         this.process = process;
     }
 
-    public String getComment() {
-        return comment;
+    public String getStatement() {
+        return statement;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setStatement(String statement) {
+        this.statement = statement;
     }
 }
