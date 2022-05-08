@@ -3,7 +3,7 @@ package com.umss.siiu.bpmn.model;
 public class Message {
     private String senderName;
     private String receiverName;
-    private String content;
+    private String message;
     private String date;
     private Status status;
 
@@ -23,12 +23,12 @@ public class Message {
         this.receiverName = receiverName;
     }
 
-    public String getContent() {
-        return content;
+    public String getMessage() {
+        return message;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getDate() {
