@@ -47,6 +47,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private RoleService roleService;
     private NotificationTypeRepository notificationTypeRepository;
     private final FileTypeService fileTypeService;
+
     private TaskRepository taskRepository;
 
     private Task requestProcessTask;
@@ -60,7 +61,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     public DevBootstrap(EmployeeRepository employeeRepository,
                         EmployeeTaskService employeeTaskService,
                         TaskRepository taskRepository,
-                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository, FileTypeService fileTypeService, FileService fileService) {
+                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository, FileTypeService fileTypeService) {
         this.employeeRepository = employeeRepository;
         this.employeeTaskService = employeeTaskService;
         this.userService = userService;
@@ -68,7 +69,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         this.roleService = roleService;
         this.notificationTypeRepository = notificationTypeRepository;
         this.fileTypeService = fileTypeService;
-        this.fileService = fileService;
+
         this.taskRepository = taskRepository;
     }
 
