@@ -77,7 +77,7 @@ public class TaskInstanceServiceImpl extends GenericServiceImpl<TaskInstance> im
                 allocateResource(taskInstance, taskInstance.getResourceInstances().iterator().next().getResource(),
                         taskInstance.getResourceInstances().iterator().next(), employeeService.findById(employeeId));
             } else {
-                String errorMessage = String.format("The employee %s does not have the skill to %s1",
+                var errorMessage = String.format("The employee %s does not have the skill to %s1",
                         employee.getFullName(false), taskInstance.getTask().getName());
                 logger.error(errorMessage);
             }

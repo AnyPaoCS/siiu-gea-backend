@@ -194,11 +194,11 @@ public class FileServiceImpl implements FileService {
             String category) {
         try {
             JobFileTypeLock jobFileTypeLock = null;
-            Job job = new Job();
+            var job = new Job();
             job.setId(jackRabbitNodeDto.getOwnerId());
             Set<FileType> fileTypes = fileTypeService.getFileTypesByJobIdAndCategory(jackRabbitNodeDto.getOwnerId(),
                     FileTypeCategory.valueOf(category));
-            Employee employee = employeeService.findByEmail(employeeEmail);
+            var employee = employeeService.findByEmail(employeeEmail);
             for (FileType fileType : fileTypes) {
                 jobFileTypeLock = jobFileTypeLockService.findByJobAndFileType(job, fileType);
                 if (jobFileTypeLock != null) {
@@ -219,7 +219,7 @@ public class FileServiceImpl implements FileService {
             ModelBase<?> modelBase = ModelBaseFactory.createModelBase(jackRabbitNodeDto.getOwnerClass().trim(),
                     jackRabbitNodeDto.getOwnerId());
             String parentPath = jackRabbitNodeDto.getParentPath();
-            JackRabbitNode jackRabbitNode = jackRabbitNodeService
+            var jackRabbitNode = jackRabbitNodeService
                     .findByFilePath((StringUtils.hasText(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
 
             saveFile(fileName, jackRabbitNodeDto.getFileTypeId(), jackRabbitNodeDto.getDescription(),
@@ -238,13 +238,13 @@ public class FileServiceImpl implements FileService {
             if (nodePath.equals("public") && !jackRabbitService.getRootNode().hasNode(nodePath)) {
                 jackRabbitService.createFolderNode(nodePath, "");
             }
-            Node targetNode = jackRabbitService.getNode(nodePath);
-            boolean hasNode = false;
+            var targetNode = jackRabbitService.getNode(nodePath);
+            var hasNode = false;
             hasNode = targetNode.hasNode(fileName);
             if (hasNode) {
                 jackRabbitService.deleteNode(fileName, nodePath);
             }
-            Node node = jackRabbitService.createBinaryNodeFromStream(fileName, nodePath, stream,
+            var node = jackRabbitService.createBinaryNodeFromStream(fileName, nodePath, stream,
                     MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
             JackRabbitNode jackRabbitNode;
             jackRabbitNode = jackRabbitNodeService.findByFilePath(
@@ -257,7 +257,7 @@ public class FileServiceImpl implements FileService {
                         modelBase.getId(), node, nodePath, flush);
             }
         } catch (Exception e) {
-            String errorMessage = String.format("Error while storing file %s", fileName);
+            var errorMessage = String.format("Error while storing file %s", fileName);
             logger.error(errorMessage);
         }
     }
@@ -265,16 +265,16 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public void createJobStructure(Object owner, List<String> entries) {
-        Job job = (Job) owner;
+        var job = (Job) owner;
         Node node;
 
         try {
-            Calendar date = Calendar.getInstance();
+            var date = Calendar.getInstance();
             date.setTime(job.getCreatedAt());
-            String yearNode = Integer.toString(date.get(Calendar.YEAR) - 1900);
-            String monthNode = Integer.toString(date.get(Calendar.MONTH));
-            String nodePath = String.format("%s/%s/%s", yearNode, monthNode, job.getId());
-            String parentNodePath = String.format("%s/%s", yearNode, monthNode);
+            var yearNode = Integer.toString(date.get(Calendar.YEAR) - 1900);
+            var monthNode = Integer.toString(date.get(Calendar.MONTH));
+            var nodePath = String.format("%s/%s/%s", yearNode, monthNode, job.getId());
+            var parentNodePath = String.format("%s/%s", yearNode, monthNode);
             if (!jackRabbitService.getRootNode().hasNode(yearNode)) {
                 node = jackRabbitService.createFolderNode(yearNode, "");
                 jackRabbitNodeService.createJackRabbitNode(owner, 1, false, node.getName(),
@@ -287,7 +287,6 @@ public class FileServiceImpl implements FileService {
                         true);
             }
 
-            // todo this should never happens if so something is wrong and see
             if (jackRabbitService.getRootNode().hasNode(nodePath)) {
                 jackRabbitService.getRootNode().getNode(nodePath).remove();
             }
@@ -309,13 +308,13 @@ public class FileServiceImpl implements FileService {
 
     @Transactional
     public void createAdditionalJobStructure(Object owner, List<String> entries) {
-        Job job = (Job) owner;
+        var job = (Job) owner;
         try {
-            Calendar date = Calendar.getInstance();
+            var date = Calendar.getInstance();
             date.setTime(job.getCreatedAt());
-            String yearNode = Integer.toString(date.get(Calendar.YEAR) - 1900);
-            String monthNode = Integer.toString(date.get(Calendar.MONTH));
-            String nodePath = String.format("%s/%s/%s", yearNode, monthNode, job.getId());
+            var yearNode = Integer.toString(date.get(Calendar.YEAR) - 1900);
+            var monthNode = Integer.toString(date.get(Calendar.MONTH));
+            var nodePath = String.format("%s/%s/%s", yearNode, monthNode, job.getId());
             if (!jackRabbitService.getRootNode().hasNode(nodePath)) {
                 logger.error("File structure for job %s already exists\", job.getId()");
                 throw new RepositoryException(String.format("File structure for job %s does not exists", job.getId()));
@@ -341,7 +340,7 @@ public class FileServiceImpl implements FileService {
     public void createFolderEntry(ModelBase<?> owner, String rootNode, String description, String path) {
         try {
             if (!jackRabbitService.getRootNode().getNode(rootNode).hasNode(path)) {
-                Node node = jackRabbitService.createFolderNode(path, rootNode);
+                var node = jackRabbitService.createFolderNode(path, rootNode);
                 jackRabbitNodeService.createJackRabbitNode(owner, 1, true, node.getName(), description, owner.getId(),
                         node, rootNode, false);
             }
@@ -360,7 +359,7 @@ public class FileServiceImpl implements FileService {
     @Transactional
     public void replaceFile(JackRabbitNodeDto jackRabbitNodeDto) {
         // Getting the JackRabbitNode to be updated
-        JackRabbitNode jackRabbitNode = jackRabbitNodeService.findById(jackRabbitNodeDto.getId());
+        var jackRabbitNode = jackRabbitNodeService.findById(jackRabbitNodeDto.getId());
         replaceFile(jackRabbitNodeDto, jackRabbitNode);
     }
 
@@ -375,7 +374,7 @@ public class FileServiceImpl implements FileService {
                 jackRabbitService.save();
 
                 // Saving the new file
-                Node node = jackRabbitService.createBinaryNodeFromStream(
+                var node = jackRabbitService.createBinaryNodeFromStream(
                         jackRabbitNodeDto.getFile().getOriginalFilename(),
                         jackRabbitNode.getParentPath(), jackRabbitNodeDto.getFile().getInputStream(),
                         MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
@@ -393,7 +392,7 @@ public class FileServiceImpl implements FileService {
                     String.format("Error while updating file %s", jackRabbitNodeDto.getFile().getOriginalFilename()),
                     e);
         } catch (Exception e) {
-            String errorMessage = "Error when replacing file";
+            var errorMessage = "Error when replacing file";
             logger.error(errorMessage);
         }
     }
@@ -401,8 +400,8 @@ public class FileServiceImpl implements FileService {
     @Override
     public void visualizeFile(HttpServletResponse response, String filename) {
         try {
-            InputStream in = getInputStreamFromNode(filename);
-            String ext = filename.substring(filename.lastIndexOf('.'));
+            var in = getInputStreamFromNode(filename);
+            var ext = filename.substring(filename.lastIndexOf('.'));
             response.setHeader(ApplicationConstants.CONTENT_DISPOSITION,
                     String.format(ApplicationConstants.VIEW_AND_DOWNLOAD_FILE, filename));
 
@@ -421,7 +420,7 @@ public class FileServiceImpl implements FileService {
                     break;
                 default:
                     response.setContentType(MediaType.TEXT_PLAIN_VALUE);
-                    String documentContent = new Tika().parseToString(in);
+                    var documentContent = new Tika().parseToString(in);
                     if (documentContent.trim().isEmpty())
                         documentContent = ApplicationConstants.FILE_WITHOUT_PREVIEW;
                     convertByteArrayToOutputStream(response, documentContent.getBytes(StandardCharsets.UTF_8));
@@ -434,8 +433,8 @@ public class FileServiceImpl implements FileService {
     }
 
     private void convertDocxToPdfOutputStream(HttpServletResponse response, InputStream in) throws IOException {
-        XWPFDocument document = new XWPFDocument(in);
-        PdfOptions options = PdfOptions.create();
+        var document = new XWPFDocument(in);
+        var options = PdfOptions.create();
         OutputStream out = new BufferedOutputStream(response.getOutputStream());
         PdfConverter.getInstance().convert(document, out, options);
         document.close();
