@@ -218,8 +218,6 @@ public class FileServiceImpl implements FileService {
             ModelBase<?> modelBase = ModelBaseFactory.createModelBase(jackRabbitNodeDto.getOwnerClass().trim(),
                     jackRabbitNodeDto.getOwnerId());
             String parentPath = jackRabbitNodeDto.getParentPath();
-            var jackRabbitNode = jackRabbitNodeService
-                    .findByFilePath((StringUtils.hasText(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
 
             saveFile(fileName, jackRabbitNodeDto.getFileTypeId(), jackRabbitNodeDto.getDescription(),
                     jackRabbitNodeDto.getFile().getInputStream(), modelBase, parentPath, true);
@@ -583,17 +581,6 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    /*
-     * private JackRabbitNode obtainNode(Job job) {
-     * List<FileType> fileTypes =
-     * fileTypeService.findByFileTypeCategory(FileTypeCategory.ROI);
-     * List<JackRabbitNode> nodes =
-     * jackRabbitNodeService.findByOwnerClassAndOwnerIdAndFileTypeIn(job, fileTypes,
-     * job.getId());
-     * return nodes.stream().filter(node ->
-     * node.getPath().contains("xls")).findFirst().get();
-     * }
-     */
 
     @Override
     @Transactional
