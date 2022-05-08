@@ -24,7 +24,6 @@ import javax.jcr.*;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
-import javax.jcr.version.VersionManager;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -36,7 +35,7 @@ public class JackRabbitServiceImpl implements JackRabbitService {
     private static final String ERROR_CREATING_NODE = "Error creating node";
     private static final String ERROR_UPDATING_NODE = "Error updating node";
     private static final String ERROR_DELETING_NODE = "Error deleting node";
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value("${jackrabbit.user}")
     private String user;
