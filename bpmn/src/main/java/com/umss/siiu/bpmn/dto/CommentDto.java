@@ -8,7 +8,7 @@ public class CommentDto extends DtoBase<Comment> {
 
     private String author;
 
-    private String comment;
+    private String statement;
 
     private Long rating;
 
@@ -28,12 +28,11 @@ public class CommentDto extends DtoBase<Comment> {
         this.rating = rating;
     }
 
-    public String getComment() {
-        return comment;
+    public String getStatement() {
+        return statement;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setStatement(String statement) {
+        this.statement = statement;
     }
-
 }
