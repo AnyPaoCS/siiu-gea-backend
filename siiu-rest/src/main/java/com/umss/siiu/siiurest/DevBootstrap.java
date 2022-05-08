@@ -47,7 +47,6 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private RoleService roleService;
     private NotificationTypeRepository notificationTypeRepository;
     private final FileTypeService fileTypeService;
-    private FileService fileService;
     private TaskRepository taskRepository;
 
     private Task requestProcessTask;
@@ -83,9 +82,9 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         initializeEmployees();
     }
     private void initializeNotificationType(){
-        NotificationType n1 = new NotificationType();
+        var n1 = new NotificationType();
         n1.setName("Tipo 1");
-        NotificationType n2 = new NotificationType();
+        var n2 = new NotificationType();
         n2.setName("Tipo 2");
         notificationTypeRepository.save(n1);
         notificationTypeRepository.save(n2);
@@ -99,7 +98,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private Role createRole(long id, String roleName) {
-        Role role = new Role();
+        var role = new Role();
         role.setId(id);
         role.setName(roleName);
         roleService.save(role);
@@ -156,13 +155,13 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private void initializeJobProcess() {
         Process crmJob = processRepository.findByCode(PROC1_CODE);
         if (null == crmJob) {
-            Process process = createDefaultProcess();
+            var process = createDefaultProcess();
             processRepository.save(process);
         }
     }
 
     private Process createDefaultProcess() {
-        Process process = new Process();
+        var process = new Process();
         process.setCode(PROC1_CODE);
         process.setName(PROC1_NAME);
 
@@ -217,7 +216,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void createProcessDos() {
-        Process process2 = new Process();
+        var process2 = new Process();
         process2.setCode(PROC2_CODE);
         process2.setName(PROC2_NAME);
         requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(),false, Area.NONE.getCode());
@@ -278,7 +277,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private Task createProcessTask(String taskName, String code, boolean isOutput, String relatedAreaCode) {
-        Task task = new Task();
+        var task = new Task();
         task.setName(taskName);
         task.setCode(code);
         task.setRelatedAreaCode(relatedAreaCode);
@@ -287,7 +286,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void addResource(Task task, boolean isOutput) {
-        Resource resource = new Resource();
+        var resource = new Resource();
         resource.setResourceType(ResourceType.EMPLOYEE);
         resource.setTask(task);
         resource.setOutput(isOutput);
@@ -295,7 +294,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void addResourceDocument(Task task, boolean isOutput, String code, String name, String processCode) {
-        Resource resource = new Resource();
+        var resource = new Resource();
         resource.setResourceType(ResourceType.DOCUMENT);
         resource.setTask(task);
         resource.setOutput(isOutput);
@@ -304,7 +303,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private Task addTaskAction(Task task, String actionName, Task nextTask, ActionFlowType actionFlowType) {
-        TaskAction taskAction = new TaskAction();
+        var taskAction = new TaskAction();
         taskAction.setName(actionName);
         taskAction.setTask(task);
         taskAction.setNextTask(nextTask);
@@ -316,7 +315,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private String getResourceAsString(String resourceName) {
-        try (InputStream inputStream = this.getClass().getResourceAsStream(resourceName)) {
+        try (var inputStream = this.getClass().getResourceAsStream(resourceName)) {
             return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -324,7 +323,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private InputStream getResourceAsStream(String resourceName) {
-        try (InputStream inputStream = this.getClass().getResourceAsStream(resourceName)) {
+        try (var inputStream = this.getClass().getResourceAsStream(resourceName)) {
             return inputStream;
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -332,8 +331,8 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void createUser(String email, Employee employee, Long roleId) {
-        User user = new User();
-        Role role = new Role();
+        var user = new User();
+        var role = new Role();
         HashSet<Role> roles = new HashSet<>();
 
         user.setEmail(email);
@@ -351,7 +350,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void createEmployee(String firstName, String lastName, Set<Task> tasks, String email, Long roleId) {
-        Employee employee = new Employee();
+        var employee = new Employee();
         employee.setFirstName(firstName);
         employee.setLastName(lastName);
         employeeRepository.save(employee);
@@ -360,7 +359,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
                 List<Task> taskOfTaskCode = taskRepository.findAllByCode(task.getCode());
                 if (!taskOfTaskCode.isEmpty()) {
                     for (Task taskR : taskOfTaskCode) {
-                        EmployeeTask employeeTask = new EmployeeTask();
+                        var employeeTask = new EmployeeTask();
                         employeeTask.setTask(taskR);
                         employeeTask.setEmployee(employee);
                         employeeTaskService.save(employeeTask);
@@ -413,7 +412,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void createFileType(String abbreviation, String name, FileTypeCategory fileTypeCategory) {
-        FileType fileType = new FileType();
+        var fileType = new FileType();
         fileType.setAbbreviation(abbreviation);
         fileType.setName(name);
         fileType.setFileTypeCategory(fileTypeCategory);
