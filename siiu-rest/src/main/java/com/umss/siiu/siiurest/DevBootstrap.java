@@ -272,7 +272,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         processRepository.save(process2);
     }
 
-    private Task createProcessTask(String taskName, String code, boolean lsisOutput, String relatedAreaCode) {
+    private Task createProcessTask(String taskName, String code, boolean isOutput, String relatedAreaCode) {
         var task = new Task();
         task.setName(taskName);
         task.setCode(code);
