@@ -307,18 +307,18 @@ public class JackRabbitServiceImpl implements JackRabbitService {
 
     @Override
     public void downloadBinaryInfo(Node node, String downloadPath) throws RepositoryException, IOException {
-        final Binary bin = node.getProperty(JcrConstants.JCR_DATA).getBinary();
+        final var bin = node.getProperty(JcrConstants.JCR_DATA).getBinary();
         InputStream stream = bin.getStream();
         final byte[] content = IOUtils.toByteArray(stream);
-        File file = new File(downloadPath);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
+        var file = new File(downloadPath);
+        try (var fos = new FileOutputStream(file)) {
             fos.write(content);
         }
     }
 
     @Override
     public VersionHistory getVersionHistory(Node node) throws RepositoryException {
-        VersionManager versionManager = session.getWorkspace().getVersionManager();
+        var versionManager = session.getWorkspace().getVersionManager();
         return versionManager.getVersionHistory(node.getPath());
     }
 
@@ -329,7 +329,7 @@ public class JackRabbitServiceImpl implements JackRabbitService {
 
     @Override
     public void restore(Version version) throws RepositoryException {
-        VersionManager versionManager = session.getWorkspace().getVersionManager();
+        var versionManager = session.getWorkspace().getVersionManager();
         versionManager.restore(version, true);
     }
 
