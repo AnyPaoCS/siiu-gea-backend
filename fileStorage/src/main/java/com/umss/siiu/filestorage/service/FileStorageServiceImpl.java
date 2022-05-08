@@ -1,7 +1,6 @@
 package com.umss.siiu.filestorage.service;
 
 import com.google.gson.Gson;
-import com.umss.siiu.core.model.User;
 import com.umss.siiu.core.service.UserService;
 import com.umss.siiu.filestorage.dto.FileSimpleInfoDto;
 import com.umss.siiu.filestorage.dto.FileUploadDto;
@@ -16,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,18 +35,18 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public FileSimpleInfoDto uploadFile(MultipartFile file, String fileUpload) {
-        FileUploadDto fileUploadDto = gson.fromJson(fileUpload, FileUploadDto.class);
-        User user = userService.findByEmail(fileUploadDto.getEmail());
-        JackRabbitNodeDto dto = new JackRabbitNodeDto();
+        var fileUploadDto = gson.fromJson(fileUpload, FileUploadDto.class);
+        var user = userService.findByEmail(fileUploadDto.getEmail());
+        var dto = new JackRabbitNodeDto();
         dto.setFile(file);
         dto.setDescription(fileUploadDto.getDescription());
         dto.setOwnerId(user.getId());
         dto.setOwnerClass("user");
-        FileType fileType = fileTypeService.findByAbbreviation(fileUploadDto.getFileTypeAbbreviation());
+        var fileType = fileTypeService.findByAbbreviation(fileUploadDto.getFileTypeAbbreviation());
         dto.setFileTypeId(fileType.getId());
         String folderPath = user.getId() + "/" + fileType.getFileTypeCategory().name();
         dto.setParentPath(folderPath);
-        JackRabbitNode jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
+        var jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
         if (jackRabbitNode != null) {
             if (jackRabbitNode.isVerified()) {
                 return null;
@@ -79,7 +77,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         if (node == null) {
             return new byte[0];
         }
-        InputStream is = fileService.getInputStreamFromNode(node.getPath());
+        var is = fileService.getInputStreamFromNode(node.getPath());
         byte[] documentContent = null;
         try {
             documentContent = IOUtils.toByteArray(is);
@@ -125,7 +123,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         List<FileSimpleInfoDto> list = new ArrayList<>();
         if (nodeList != null && !nodeList.isEmpty()) {
             for (JackRabbitNode node : nodeList) {
-                FileSimpleInfoDto dto = new FileSimpleInfoDto(node);
+                var dto = new FileSimpleInfoDto(node);
                 list.add(dto);
             }
         }
@@ -134,7 +132,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public FileSimpleInfoDto getFileByUserIdAndFileTypeAbbreviation(long userId, String abbreviation) {
-        FileType fileType = fileTypeService.findByAbbreviation(abbreviation);
+        var fileType = fileTypeService.findByAbbreviation(abbreviation);
         if (fileType == null) {
             return null;
         }
@@ -158,7 +156,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             for (FileType fileType: fileTypes) {
                 for (JackRabbitNode node : nodeList) {
                     if (node.getFileType().equals(fileType)) {
-                        FileSimpleInfoDto dto = new FileSimpleInfoDto(node);
+                        var dto = new FileSimpleInfoDto(node);
                         list.add(dto);
                     }
                 }
@@ -175,14 +173,14 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public ImageSimpleInfoDto uploadSignatureImage(long userId, MultipartFile file) {
-        JackRabbitNodeDto dto = new JackRabbitNodeDto();
+        var dto = new JackRabbitNodeDto();
         dto.setFile(file);
         dto.setOwnerId(userId);
-        FileType fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
+        var fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         dto.setFileTypeId(fileType.getId());
         String folderPath = userId + "/" + fileType.getFileTypeCategory().name();
         dto.setParentPath(folderPath);
-        JackRabbitNode jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
+        var jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
         if (jackRabbitNode != null) {
             dto.setId(jackRabbitNode.getId());
             fileService.replaceFile(dto);
@@ -196,12 +194,12 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public byte[] getSignatureImage(long userId) {
-        FileType fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
+        var fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         JackRabbitNode node = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
         if (node == null) {
             return new byte[0];
         }
-        InputStream is = fileService.getInputStreamFromNode(node.getPath());
+        var is = fileService.getInputStreamFromNode(node.getPath());
         byte[] signatureImage = null;
         try {
             signatureImage = IOUtils.toByteArray(is);

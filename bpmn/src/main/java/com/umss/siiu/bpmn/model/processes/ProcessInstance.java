@@ -28,8 +28,6 @@ public class ProcessInstance extends ModelBase<ProcessInstanceDto> {
     @JoinColumn(foreignKey = @ForeignKey(name = "FK_PROCESS_INSTANCE_USER"))
     private User user;
 
-    //todo this should be encapsulated in a object representing all the process properties it could be a map if we
-    // need more properties
     private boolean manual = false;
     private boolean paused = false;
 

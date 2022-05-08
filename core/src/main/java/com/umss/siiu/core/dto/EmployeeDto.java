@@ -4,8 +4,6 @@
 
 package com.umss.siiu.core.dto;
 
-import java.util.Arrays;
-
 import com.umss.siiu.core.model.Employee;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.modelmapper.ModelMapper;
@@ -106,7 +104,7 @@ public class EmployeeDto extends DtoBase<Employee> {
 
     private void setImageBase64(Employee employee) {
         if (employee.getImage() != null) {
-            byte[] bytes = new byte[employee.getImage().length];
+            var bytes = new byte[employee.getImage().length];
             for (var i = 0; i < employee.getImage().length; i++) {
                 bytes[i] = employee.getImage()[i];
             }
