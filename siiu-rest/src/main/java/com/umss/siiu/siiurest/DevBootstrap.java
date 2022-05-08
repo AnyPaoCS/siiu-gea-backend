@@ -15,8 +15,8 @@ import com.umss.siiu.bpmn.service.RoleService;
 import com.umss.siiu.core.model.*;
 import com.umss.siiu.core.repository.*;
 import com.umss.siiu.core.service.*;
+import com.umss.siiu.filestorage.model.FileType;
 import com.umss.siiu.filestorage.model.FileTypeCategory;
-import com.umss.siiu.filestorage.service.FileService;
 import com.umss.siiu.filestorage.service.FileTypeService;
 import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
@@ -67,6 +67,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         this.roleService = roleService;
         this.notificationTypeRepository = notificationTypeRepository;
         this.fileTypeService = fileTypeService;
+
         this.taskRepository = taskRepository;
     }
 
