@@ -65,9 +65,9 @@ public class JobFileTypeLockServiceImpl extends GenericServiceImpl<JobFileTypeLo
             // releases the lock
             deleteById(jobLockId);
         } catch (Exception e) {
-            throw new RuntimeException(String.format(
+            logger.error(String.format(
                     "There was an error trying to delete the lock for job: %s file type: %s " + "employee: %s",
-                    job.getId(), fileType.getName(), employee.getFullName(true)));
+                    job.getId(), fileType.getName(), employee.getFullName(true)), e);
         }
     }
 
