@@ -116,7 +116,6 @@ public class JobScheduler {
     public void downloadJobsFiles() {
         List<Configuration> maxRetriesConfigurations = configurationService.findByTypeAndEntryKeyAndActiveTrue(
                 DOWNLOAD_POLICY, MAX_RETRIES);
-        Integer maxRetries = CollectionUtils.isEmpty(maxRetriesConfigurations) ? 3 :
                 Integer.parseInt(maxRetriesConfigurations.get(0).getValue());
     }
 
