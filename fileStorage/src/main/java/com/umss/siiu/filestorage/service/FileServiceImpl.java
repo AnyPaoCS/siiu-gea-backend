@@ -623,10 +623,10 @@ public class FileServiceImpl implements FileService {
     public void createFolderStructure(String path) {
         try {
             String[] splitPath = path.split(SLASH_SEPARATOR);
-            for (int init = 1; init <= splitPath.length; init++) {
-                String parentPath = concatWord(splitPath, init);
+            for (var i = 1; i <= splitPath.length; i++) {
+                String parentPath = concatWord(splitPath, i);
                 if (!jackRabbitService.getRootNode().hasNode(parentPath)) {
-                    jackRabbitService.createFolderNode(splitPath[init - 1], init == 1 ? "" : concatWord(splitPath, init - 1));
+                    jackRabbitService.createFolderNode(splitPath[i - 1], i == 1 ? "" : concatWord(splitPath, i - 1));
                 }
             }
         } catch (javax.jcr.RepositoryException e) {
@@ -636,8 +636,8 @@ public class FileServiceImpl implements FileService {
 
     private String concatWord(String[] splitPath, int limit) {
         var stringBuilder = new StringBuilder().append(splitPath[0]);
-        for (int init = 1; init < limit; init++) {
-            stringBuilder.append(SLASH_SEPARATOR).append(splitPath[init]);
+        for (var i = 1; i < limit; i++) {
+            stringBuilder.append(SLASH_SEPARATOR).append(splitPath[i]);
         }
         return stringBuilder.toString();
     }
