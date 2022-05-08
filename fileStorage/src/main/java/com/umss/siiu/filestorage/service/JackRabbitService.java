@@ -47,7 +47,6 @@ public interface JackRabbitService {
 
     Node updateFileNodeFromStream(String nodeName, String parentPath, InputStream stream, String mimeType);
 
-//    Node updateFileNode(ModelBase<?> model, String args, JackRabbitNode jackRabbitNode);
 
     Binary getRabbitBinary(OutputStream outputStream);
 

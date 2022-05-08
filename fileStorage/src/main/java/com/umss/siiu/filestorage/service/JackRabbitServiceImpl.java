@@ -24,7 +24,6 @@ import javax.jcr.*;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
-import javax.jcr.version.VersionManager;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -36,7 +35,7 @@ public class JackRabbitServiceImpl implements JackRabbitService {
     private static final String ERROR_CREATING_NODE = "Error creating node";
     private static final String ERROR_UPDATING_NODE = "Error updating node";
     private static final String ERROR_DELETING_NODE = "Error deleting node";
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value("${jackrabbit.user}")
     private String user;
@@ -113,13 +112,13 @@ public class JackRabbitServiceImpl implements JackRabbitService {
 
     @Override
     public void checkin(Node node) throws RepositoryException {
-        VersionManager vManager = session.getWorkspace().getVersionManager();
+        var vManager = session.getWorkspace().getVersionManager();
         vManager.checkin(node.getPath());
     }
 
     @Override
     public void checkout(Node node) throws RepositoryException {
-        VersionManager vManager = session.getWorkspace().getVersionManager();
+        var vManager = session.getWorkspace().getVersionManager();
         vManager.checkout(node.getPath());
     }
 
@@ -161,7 +160,7 @@ public class JackRabbitServiceImpl implements JackRabbitService {
 
     @Override
     public Property getProperty(String path, String property) {
-        final Node node = getNode(path);
+        final var node = getNode(path);
         try {
             return node.getProperty(property);
         } catch (RepositoryException e) {
@@ -193,8 +192,8 @@ public class JackRabbitServiceImpl implements JackRabbitService {
         try {
             Node content;
             Binary binary;
-            Node parentNode = getNode(parentPath);
-            Node fileNode = parentNode.addNode(nodeName, NtFilePredicate.NT_FILE);
+            var parentNode = getNode(parentPath);
+            var fileNode = parentNode.addNode(nodeName, NtFilePredicate.NT_FILE);
             fileNode.addMixin(JcrConstants.MIX_VERSIONABLE);
             content = fileNode.addNode(JcrConstants.JCR_CONTENT, NtFilePredicate.NT_RESOURCE);
             content.addMixin(JcrConstants.MIX_REFERENCEABLE);
@@ -213,8 +212,8 @@ public class JackRabbitServiceImpl implements JackRabbitService {
     @Override
     public void deleteNode(String nodeName, String parentPath) {
         try {
-            Node parentNode = getNode(parentPath);
-            Node fileNode = parentNode.getNode(nodeName);
+            var parentNode = getNode(parentPath);
+            var fileNode = parentNode.getNode(nodeName);
             fileNode.remove();
             session.save();
         } catch (RepositoryException e) {
@@ -225,11 +224,11 @@ public class JackRabbitServiceImpl implements JackRabbitService {
     @Override
     public Node createFolderNode(String nodeName, String parentPath) {
         try {
-            Node parentNode = getNode(parentPath);
+            var parentNode = getNode(parentPath);
             if (parentNode.hasNode(nodeName)) {
                 throw new IllegalStateException(String.format("The node: %s already exists", nodeName));
             }
-            Node node = parentNode.addNode(nodeName);
+            var node = parentNode.addNode(nodeName);
             session.save();
             return node;
         } catch (RepositoryException e) {
@@ -251,7 +250,7 @@ public class JackRabbitServiceImpl implements JackRabbitService {
         try {
             Node content;
             Binary binary;
-            Node fileNode = getNode(parentPath).getNode(nodeName);
+            var fileNode = getNode(parentPath).getNode(nodeName);
             checkout(fileNode);
             content = fileNode.getNode(JcrConstants.JCR_CONTENT);
             binary = session.getValueFactory().createBinary(file);
@@ -278,9 +277,9 @@ public class JackRabbitServiceImpl implements JackRabbitService {
 
     private InputStream obtainFileFromNode(JackRabbitNode jackRabbitNode) {
         try {
-            final Node node = getFileNode(jackRabbitNode.getPath());
-            final Property property = node.getProperty(JcrConstants.JCR_DATA);
-            final Binary bin = property.getBinary();
+            final var node = getFileNode(jackRabbitNode.getPath());
+            final var property = node.getProperty(JcrConstants.JCR_DATA);
+            final var bin = property.getBinary();
             return bin.getStream();
         } catch (Exception e) {
             throw new IllegalStateException("The file was not found", e);
@@ -307,18 +306,18 @@ public class JackRabbitServiceImpl implements JackRabbitService {
 
     @Override
     public void downloadBinaryInfo(Node node, String downloadPath) throws RepositoryException, IOException {
-        final Binary bin = node.getProperty(JcrConstants.JCR_DATA).getBinary();
+        final var bin = node.getProperty(JcrConstants.JCR_DATA).getBinary();
         InputStream stream = bin.getStream();
         final byte[] content = IOUtils.toByteArray(stream);
-        File file = new File(downloadPath);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
+        var file = new File(downloadPath);
+        try (var fos = new FileOutputStream(file)) {
             fos.write(content);
         }
     }
 
     @Override
     public VersionHistory getVersionHistory(Node node) throws RepositoryException {
-        VersionManager versionManager = session.getWorkspace().getVersionManager();
+        var versionManager = session.getWorkspace().getVersionManager();
         return versionManager.getVersionHistory(node.getPath());
     }
 
@@ -329,7 +328,7 @@ public class JackRabbitServiceImpl implements JackRabbitService {
 
     @Override
     public void restore(Version version) throws RepositoryException {
-        VersionManager versionManager = session.getWorkspace().getVersionManager();
+        var versionManager = session.getWorkspace().getVersionManager();
         versionManager.restore(version, true);
     }
 

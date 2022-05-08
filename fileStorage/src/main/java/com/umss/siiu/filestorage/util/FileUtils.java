@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileUtils {
@@ -21,11 +20,11 @@ public class FileUtils {
     }
 
     public static MultipartFile toMultipart(String path) {
-        Path pathObject = Paths.get(path);
+        var pathObject = Paths.get(path);
         URL resource = TypeReference.class.getResource(path);
-        File file = new File(resource.getPath());
+        var file = new File(resource.getPath());
         String name = null;
-        String contentType = "application/octet-stream";
+        var contentType = "application/octet-stream";
         byte[] content = null;
         try {
             name = URLDecoder.decode(file.getName(), "UTF-8");
