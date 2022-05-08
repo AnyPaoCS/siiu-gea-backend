@@ -5,14 +5,14 @@ import com.umss.siiu.core.dto.DtoBase;
 
 public class ObservationDto extends DtoBase<Observation> {
 
-    private String observation;
+    private String content;
 
-    public String getObservation() {
-        return observation;
+    public String getContent() {
+        return content;
     }
 
-    public void setObservation(String observation) {
-        this.observation = observation;
+    public void setContent(String observation) {
+        this.content = content;
     }
 
 }

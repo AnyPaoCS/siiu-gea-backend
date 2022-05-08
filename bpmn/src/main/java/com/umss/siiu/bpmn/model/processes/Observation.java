@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 public class Observation extends ModelBase<ObservationDto> {
 
-    private String remark;
+    private String content;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(foreignKey = @ForeignKey(name = "FK_OBSERVATION_TASK_INSTANCE"))
@@ -16,17 +16,17 @@ public class Observation extends ModelBase<ObservationDto> {
 
     public Observation(){}
 
-    public Observation(String remark, TaskInstance taskInstance) {
-        this.remark = remark;
+    public Observation(String content, TaskInstance taskInstance) {
+        this.content = content;
         this.taskInstance = taskInstance;
     }
 
-    public String getRemark() {
-        return remark;
+    public String getContent() {
+        return content;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public TaskInstance getTaskInstance() {
