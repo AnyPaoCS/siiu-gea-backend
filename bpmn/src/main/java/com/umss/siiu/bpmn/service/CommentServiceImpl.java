@@ -25,7 +25,7 @@ public class CommentServiceImpl extends GenericServiceImpl<Comment> implements C
     public Comment save(String author, String commentAuthor, Long rating, Long idProcess) {
         var comment = new Comment();
         comment.setAuthor(author);
-        comment.setComment(commentAuthor);
+        comment.setStatement(commentAuthor);
         comment.setRating(rating);
         comment.setProcess(processService.findById(idProcess));
         return repository.save(comment);

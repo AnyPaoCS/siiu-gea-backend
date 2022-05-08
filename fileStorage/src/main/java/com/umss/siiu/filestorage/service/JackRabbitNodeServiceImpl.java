@@ -39,8 +39,8 @@ public class JackRabbitNodeServiceImpl extends GenericServiceImpl<JackRabbitNode
                                                String description,
                                                Long ownerId, Node node, String parentPath, boolean flush) {
         try {
-            JackRabbitNode jackRabbitNode = new JackRabbitNode();
-            FileType fileType = new FileType();
+            var jackRabbitNode = new JackRabbitNode();
+            var fileType = new FileType();
             fileType.setId(fileTypeCode);
             jackRabbitNode.setFileType(fileType);
             jackRabbitNode.setFolder(isFolder);
@@ -103,7 +103,7 @@ public class JackRabbitNodeServiceImpl extends GenericServiceImpl<JackRabbitNode
     public void updateNode(JackRabbitNodeDto jackRabbitNodeDto) {
         Optional<JackRabbitNode> optional = repository.findById(jackRabbitNodeDto.getId());
         if (optional.isPresent()) {
-            JackRabbitNode jackRabbitNode = optional.get();
+            var jackRabbitNode = optional.get();
             jackRabbitNode.getFileType().setId(jackRabbitNodeDto.getFileTypeId());
             jackRabbitNode.setDescription(jackRabbitNodeDto.getDescription());
             repository.save(jackRabbitNode);

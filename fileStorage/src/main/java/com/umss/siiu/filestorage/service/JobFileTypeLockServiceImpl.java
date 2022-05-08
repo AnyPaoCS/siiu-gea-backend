@@ -64,7 +64,7 @@ public class JobFileTypeLockServiceImpl extends GenericServiceImpl<JobFileTypeLo
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void releaseLock(Long jobLockId, Job job, Employee employee, FileType fileType) {
-        JobFileTypeLock jobFileTypeLock = validateLockExists(jobLockId);
+        var jobFileTypeLock = validateLockExists(jobLockId);
         validateLockEmployee(employee, jobFileTypeLock);
         try {
             // releases the lock
@@ -83,7 +83,7 @@ public class JobFileTypeLockServiceImpl extends GenericServiceImpl<JobFileTypeLo
     }
 
     private JobFileTypeLock validateLockExists(Long jobLockId) {
-        JobFileTypeLock jobFileTypeLock = findById(jobLockId);
+        var jobFileTypeLock = findById(jobLockId);
         if (jobFileTypeLock == null) {
             throw new RuntimeException("Lock id is missing. The lock may have never been persisted or acquired.");
         }
@@ -91,7 +91,7 @@ public class JobFileTypeLockServiceImpl extends GenericServiceImpl<JobFileTypeLo
     }
 
     private void validateLockEmployee(Employee employee, JobFileTypeLock jobFileTypeLock) {
-        Employee lockEmployee = jobFileTypeLock.getEmployee();
+        var lockEmployee = jobFileTypeLock.getEmployee();
         if (lockEmployee != null && !lockEmployee.getId().equals(employee.getId())) {
             throw new BlockedFileException(String.format("The lock is owned by %s", lockEmployee.getFullName(true)));
         }

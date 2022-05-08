@@ -17,16 +17,12 @@ import com.umss.siiu.core.repository.*;
 import com.umss.siiu.core.service.*;
 import com.umss.siiu.filestorage.model.FileType;
 import com.umss.siiu.filestorage.model.FileTypeCategory;
-import com.umss.siiu.filestorage.service.FileService;
+
 import com.umss.siiu.filestorage.service.FileTypeService;
-import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,15 +36,14 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private static final String PROC2_NAME = "LEGALIZACION DIPLOMA DE BACHILLER/TITULO PROFESIONAL/DIPLOMA ACADEMICO/TITULO POSTGRADO/ RR.HOMOLOGACIÓN DIPLOMABACHILLER, POLICÍA O MILITAR";
 
 
-    private EmployeeRepository employeeRepository;
-    private EmployeeTaskService employeeTaskService;
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeTaskService employeeTaskService;
     private final UserService userService;
-    private ProcessRepository processRepository;
-    private RoleService roleService;
-    private NotificationTypeRepository notificationTypeRepository;
+    private final ProcessRepository processRepository;
+    private final RoleService roleService;
+    private final NotificationTypeRepository notificationTypeRepository;
     private final FileTypeService fileTypeService;
-    private FileService fileService;
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
     private Task requestProcessTask;
     private Task reviewRequirementsTask;
@@ -61,7 +56,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     public DevBootstrap(EmployeeRepository employeeRepository,
                         EmployeeTaskService employeeTaskService,
                         TaskRepository taskRepository,
-                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository, FileTypeService fileTypeService, FileService fileService) {
+                        UserService userService, ProcessRepository processRepository, RoleService roleService, NotificationTypeRepository notificationTypeRepository, FileTypeService fileTypeService) {
         this.employeeRepository = employeeRepository;
         this.employeeTaskService = employeeTaskService;
         this.userService = userService;
@@ -69,7 +64,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         this.roleService = roleService;
         this.notificationTypeRepository = notificationTypeRepository;
         this.fileTypeService = fileTypeService;
-        this.fileService = fileService;
+
         this.taskRepository = taskRepository;
     }
 
@@ -83,9 +78,9 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         initializeEmployees();
     }
     private void initializeNotificationType(){
-        NotificationType n1 = new NotificationType();
+        var n1 = new NotificationType();
         n1.setName("Tipo 1");
-        NotificationType n2 = new NotificationType();
+        var n2 = new NotificationType();
         n2.setName("Tipo 2");
         notificationTypeRepository.save(n1);
         notificationTypeRepository.save(n2);
@@ -99,7 +94,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private Role createRole(long id, String roleName) {
-        Role role = new Role();
+        var role = new Role();
         role.setId(id);
         role.setName(roleName);
         roleService.save(role);
@@ -154,21 +149,21 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void initializeJobProcess() {
-        Process crmJob = processRepository.findByCode(PROC1_CODE);
+        var crmJob = processRepository.findByCode(PROC1_CODE);
         if (null == crmJob) {
-            Process process = createDefaultProcess();
+            var process = createDefaultProcess();
             processRepository.save(process);
         }
     }
 
     private Process createDefaultProcess() {
-        Process process = new Process();
+        var process = new Process();
         process.setCode(PROC1_CODE);
         process.setName(PROC1_NAME);
 
         requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(),false, Area.NONE.getCode());
-        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DOCUMENTO_VARIOS_DOCUMENTO_ORIGINAL.getCode(), ResourceDocumentType.DOCUMENTO_VARIOS_DOCUMENTO_ORIGINAL.getName(), PROC1_CODE);
-        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DOCUMENTOS_VARIOS_FOTOCOPIA.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_FOTOCOPIA.getName(), PROC1_CODE);
+        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DOCUMENTO_VARIOS_DOCUMENTO_ORIGINAL.getCode(), ResourceDocumentType.DOCUMENTO_VARIOS_DOCUMENTO_ORIGINAL.getName());
+        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DOCUMENTOS_VARIOS_FOTOCOPIA.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_FOTOCOPIA.getName());
         // La tarea necesita de dos recursos.
 
         reviewRequirementsTask = createProcessTask(TaskType.REVIEW_REQUIREMENTS.getName(), TaskType.REVIEW_REQUIREMENTS.getCode(), false, Area.FILES_AREA.getCode());
@@ -176,12 +171,12 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         enablePaymentTask = createProcessTask(TaskType.ENABLE_PAYMENT.getName(), TaskType.ENABLE_PAYMENT.getCode(), false,Area.FILES_AREA.getCode());
 
         validationPaymentTask = createProcessTask(TaskType.VALIDATION_PAYMENT.getName(), TaskType.VALIDATION_PAYMENT.getCode(), false,Area.CASH_AREA.getCode());
-        addResourceDocument(validationPaymentTask, false, ResourceDocumentType.DOCUMENTOS_VARIOS_VALORADO.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_VALORADO.getName(), PROC1_CODE);
+        addResourceDocument(validationPaymentTask, false, ResourceDocumentType.DOCUMENTOS_VARIOS_VALORADO.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_VALORADO.getName());
 
         signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(),false, Area.FACULTY_AREA.getCode());
 
         concludeProcessTask= createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), false, Area.FILES_AREA.getCode());
-        addResourceDocument(concludeProcessTask, true, ResourceDocumentType.DOCUMENTOS_VARIOS_DOCUMENTO_LEGALIZADO.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_DOCUMENTO_LEGALIZADO.getName(), PROC1_CODE);
+        addResourceDocument(concludeProcessTask, true, ResourceDocumentType.DOCUMENTOS_VARIOS_DOCUMENTO_LEGALIZADO.getCode(), ResourceDocumentType.DOCUMENTOS_VARIOS_DOCUMENTO_LEGALIZADO.getName());
         //Primer nodo
         addTaskAction(requestProcessTask, TaskType.REQUEST_PROCESS.getCode(), reviewRequirementsTask, ActionFlowType.AUTOMATIC);
 
@@ -217,25 +212,25 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void createProcessDos() {
-        Process process2 = new Process();
+        var process2 = new Process();
         process2.setCode(PROC2_CODE);
         process2.setName(PROC2_NAME);
         requestProcessTask = createProcessTask(TaskType.REQUEST_PROCESS.getName(), TaskType.REQUEST_PROCESS.getCode(),false, Area.NONE.getCode());
-        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_ORIGINAL.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_ORIGINAL.getName(), PROC2_CODE);
+        addResourceDocument(requestProcessTask, false, ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_ORIGINAL.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_ORIGINAL.getName());
 
         reviewRequirementsTask = createProcessTask(TaskType.REVIEW_REQUIREMENTS.getName(), TaskType.REVIEW_REQUIREMENTS.getCode(), false, Area.FILES_AREA.getCode());
 
         enablePaymentTask = createProcessTask(TaskType.ENABLE_PAYMENT.getName(), TaskType.ENABLE_PAYMENT.getCode(), false,Area.FILES_AREA.getCode());
 
         validationPaymentTask = createProcessTask(TaskType.VALIDATION_PAYMENT.getName(), TaskType.VALIDATION_PAYMENT.getCode(), false,Area.CASH_AREA.getCode());
-        addResourceDocument(validationPaymentTask, false, ResourceDocumentType.DIPLOMA_BACHILLER_VALORADO.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_VALORADO.getName(), PROC2_CODE);
+        addResourceDocument(validationPaymentTask, false, ResourceDocumentType.DIPLOMA_BACHILLER_VALORADO.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_VALORADO.getName());
 
         validationDocumentsTask = createProcessTask(TaskType.VALIDATION_DOCUMENTS.getName(), TaskType.VALIDATION_DOCUMENTS.getCode(),false, Area.DEPARTMENT_AREA.getCode());
 
         signatureDocumentsTask = createProcessTask(TaskType.SIGNATURE_DOCUMENTS.getName(), TaskType.SIGNATURE_DOCUMENTS.getCode(),false, Area.FACULTY_AREA.getCode());
 
         concludeProcessTask= createProcessTask(TaskType.CONCLUDE_PROCESS.getName(), TaskType.CONCLUDE_PROCESS.getCode(), false, Area.FILES_AREA.getCode());
-        addResourceDocument(concludeProcessTask, true, ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_LEGALIZADO.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_LEGALIZADO.getName(), PROC2_CODE);
+        addResourceDocument(concludeProcessTask, true, ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_LEGALIZADO.getCode(), ResourceDocumentType.DIPLOMA_BACHILLER_DOCUMENTO_LEGALIZADO.getName());
         //Primer nodo
         addTaskAction(requestProcessTask, TaskType.REQUEST_PROCESS.getCode(), reviewRequirementsTask, ActionFlowType.AUTOMATIC);
 
@@ -278,7 +273,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private Task createProcessTask(String taskName, String code, boolean isOutput, String relatedAreaCode) {
-        Task task = new Task();
+        var task = new Task();
         task.setName(taskName);
         task.setCode(code);
         task.setRelatedAreaCode(relatedAreaCode);
@@ -287,15 +282,15 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void addResource(Task task, boolean isOutput) {
-        Resource resource = new Resource();
+        var resource = new Resource();
         resource.setResourceType(ResourceType.EMPLOYEE);
         resource.setTask(task);
         resource.setOutput(isOutput);
         task.getResourceList().add(resource);
     }
 
-    private void addResourceDocument(Task task, boolean isOutput, String code, String name, String processCode) {
-        Resource resource = new Resource();
+    private void addResourceDocument(Task task, boolean isOutput, String code, String name) {
+        var resource = new Resource();
         resource.setResourceType(ResourceType.DOCUMENT);
         resource.setTask(task);
         resource.setOutput(isOutput);
@@ -304,7 +299,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private Task addTaskAction(Task task, String actionName, Task nextTask, ActionFlowType actionFlowType) {
-        TaskAction taskAction = new TaskAction();
+        var taskAction = new TaskAction();
         taskAction.setName(actionName);
         taskAction.setTask(task);
         taskAction.setNextTask(nextTask);
@@ -315,27 +310,12 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         return task;
     }
 
-    private String getResourceAsString(String resourceName) {
-        try (InputStream inputStream = this.getClass().getResourceAsStream(resourceName)) {
-            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
 
-    private InputStream getResourceAsStream(String resourceName) {
-        try (InputStream inputStream = this.getClass().getResourceAsStream(resourceName)) {
-            return inputStream;
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
 
     private void createUser(String email, Employee employee, Long roleId) {
-        User user = new User();
-        Role role = new Role();
+        var user = new User();
+        var role = new Role();
         HashSet<Role> roles = new HashSet<>();
-
         user.setEmail(email);
         user.setEnabled(true);
         user.setPassword("$2a$10$XURPShQNCsLjp1ESc2laoObo9QZDhxz73hJPaEv7/cBha4pk0AgP."); //el password es: password
@@ -351,7 +331,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void createEmployee(String firstName, String lastName, Set<Task> tasks, String email, Long roleId) {
-        Employee employee = new Employee();
+        var employee = new Employee();
         employee.setFirstName(firstName);
         employee.setLastName(lastName);
         employeeRepository.save(employee);
@@ -360,7 +340,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
                 List<Task> taskOfTaskCode = taskRepository.findAllByCode(task.getCode());
                 if (!taskOfTaskCode.isEmpty()) {
                     for (Task taskR : taskOfTaskCode) {
-                        EmployeeTask employeeTask = new EmployeeTask();
+                        var employeeTask = new EmployeeTask();
                         employeeTask.setTask(taskR);
                         employeeTask.setEmployee(employee);
                         employeeTaskService.save(employeeTask);
@@ -413,7 +393,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     private void createFileType(String abbreviation, String name, FileTypeCategory fileTypeCategory) {
-        FileType fileType = new FileType();
+        var fileType = new FileType();
         fileType.setAbbreviation(abbreviation);
         fileType.setName(name);
         fileType.setFileTypeCategory(fileTypeCategory);

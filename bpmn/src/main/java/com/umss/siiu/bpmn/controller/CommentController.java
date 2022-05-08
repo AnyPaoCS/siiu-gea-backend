@@ -28,7 +28,7 @@ public class CommentController extends GenericController<Comment, CommentDto> {
     public ResponseEntity<Object> addCommentToProcess(@RequestBody CommentDto comment, @PathVariable Long idProcess) {
         ResponseEntity<Object> responseEntity = null;
         try {
-            Comment res = service.save(comment.getAuthor(), comment.getComment(), comment.getRating(), idProcess);
+            Comment res = service.save(comment.getAuthor(), comment.getStatement(), comment.getRating(), idProcess);
             responseEntity = new ResponseEntity<>(toDto(res), HttpStatus.OK);
 
         } catch (Exception e) {
