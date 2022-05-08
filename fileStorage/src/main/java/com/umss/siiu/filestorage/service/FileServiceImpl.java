@@ -498,7 +498,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public JackRabbitNode updateFileVerified(long fileId, boolean isVerified, String physicCode) {
-        JackRabbitNode jackRabbitNode = jackRabbitNodeService.findById(fileId);
+        var jackRabbitNode = jackRabbitNodeService.findById(fileId);
         if (jackRabbitNode != null) {
             jackRabbitNode.setVerified(isVerified);
             if (isVerified) {
@@ -514,7 +514,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public JackRabbitNode updateFileIsPermanent(long fileId, boolean isPermanent) {
-        JackRabbitNode jackRabbitNode = jackRabbitNodeService.findById(fileId);
+        var jackRabbitNode = jackRabbitNodeService.findById(fileId);
         if (jackRabbitNode != null) {
             jackRabbitNode.setPermanent(isPermanent);
             return jackRabbitNodeService.save(jackRabbitNode);
@@ -538,7 +538,7 @@ public class FileServiceImpl implements FileService {
     public void saveWordDocument(long jobId, long fileTypeId, JackRabbitNode jackRabbitNode, XWPFDocument xwpfDocument,
             String removedWordFromFile) {
         try {
-            Job job = new Job();
+            var job = new Job();
             job.setId(jobId);
             // Getting the name of the file
             String fileName = removedWordFromFile != null
@@ -549,15 +549,15 @@ public class FileServiceImpl implements FileService {
                     ? jackRabbitNode.getParentPath().substring(1)
                     : jackRabbitNode.getParentPath();
             // Writing the document
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            var byteArrayOutputStream = new ByteArrayOutputStream();
             xwpfDocument.write(byteArrayOutputStream);
             xwpfDocument.close();
             byteArrayOutputStream.close();
             // Saving the file
-            InputStream inputStreamConverted = StreamUtils.toInputStream(byteArrayOutputStream);
+            var inputStreamConverted = StreamUtils.toInputStream(byteArrayOutputStream);
             saveFile("Formatted - " + fileName, fileTypeId, "", inputStreamConverted, job, parentPath, false);
         } catch (Exception e) {
-            String errorMessage = "Error writing the document";
+            var errorMessage = "Error writing the document";
             logger.error(errorMessage);
         }
     }
@@ -568,12 +568,12 @@ public class FileServiceImpl implements FileService {
         // Return file(s) to the user (it doesn't matter if the file is blocked)
         downloadFilesByJobIdAndCategory(response, jobId, category);
         try {
-            Job job = new Job();
+            var job = new Job();
             job.setId(jobId);
 
             Set<FileType> fileTypes = fileTypeService.getFileTypesByJobIdAndCategory(jobId,
                     FileTypeCategory.valueOf(category));
-            Employee employee = employeeService.findByEmail(employeeEmail);
+            var employee = employeeService.findByEmail(employeeEmail);
             for (FileType fileType : fileTypes) {
                 // Blocking ROI file(s)
                 jobFileTypeLockService.acquireLock(job, employee, fileType);
@@ -612,10 +612,10 @@ public class FileServiceImpl implements FileService {
             // Writing the document
             baos.close();
             // Saving the file
-            InputStream inputStreamConverted = StreamUtils.toInputStream(baos);
+            var inputStreamConverted = StreamUtils.toInputStream(baos);
             saveFile("Formatted - " + fileName, 1, "", inputStreamConverted, job, parentPath, false);
         } catch (Exception e) {
-            String errorMessage = "Error writing the document";
+            var errorMessage = "Error writing the document";
             logger.error(errorMessage);
         }
     }
@@ -624,10 +624,10 @@ public class FileServiceImpl implements FileService {
     public void createFolderStructure(String path) {
         try {
             String[] splitPath = path.split(SLASH_SEPARATOR);
-            for (int i = 1; i <= splitPath.length; i++) {
-                String parentPath = concatWord(splitPath, i);
+            for (int var = 1; var <= splitPath.length; var++) {
+                String parentPath = concatWord(splitPath, var);
                 if (!jackRabbitService.getRootNode().hasNode(parentPath)) {
-                    jackRabbitService.createFolderNode(splitPath[i - 1], i == 1 ? "" : concatWord(splitPath, i - 1));
+                    jackRabbitService.createFolderNode(splitPath[var - 1], var == 1 ? "" : concatWord(splitPath, var - 1));
                 }
             }
         } catch (javax.jcr.RepositoryException e) {
@@ -636,9 +636,9 @@ public class FileServiceImpl implements FileService {
     }
 
     private String concatWord(String[] splitPath, int limit) {
-        StringBuilder stringBuilder = new StringBuilder().append(splitPath[0]);
-        for (int i = 1; i < limit; i++) {
-            stringBuilder.append(SLASH_SEPARATOR).append(splitPath[i]);
+        var stringBuilder = new StringBuilder().append(splitPath[0]);
+        for (int var = 1; var < limit; var++) {
+            stringBuilder.append(SLASH_SEPARATOR).append(splitPath[var]);
         }
         return stringBuilder.toString();
     }
