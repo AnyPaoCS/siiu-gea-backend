@@ -218,6 +218,9 @@ public class FileServiceImpl implements FileService {
             ModelBase<?> modelBase = ModelBaseFactory.createModelBase(jackRabbitNodeDto.getOwnerClass().trim(),
                     jackRabbitNodeDto.getOwnerId());
             String parentPath = jackRabbitNodeDto.getParentPath();
+            var jackRabbitNode = jackRabbitNodeService
+                    .findByFilePath((StringUtils.hasText(parentPath) ? ("/" + parentPath) : "") + "/" + fileName);
+
             saveFile(fileName, jackRabbitNodeDto.getFileTypeId(), jackRabbitNodeDto.getDescription(),
                     jackRabbitNodeDto.getFile().getInputStream(), modelBase, parentPath, true);
         } catch (Exception e) {
