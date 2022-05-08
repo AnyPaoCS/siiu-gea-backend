@@ -4,7 +4,6 @@ import com.umss.siiu.bpmn.model.Job;
 import com.umss.siiu.core.exceptions.BlockedFileException;
 import com.umss.siiu.core.exceptions.NotFoundException;
 import com.umss.siiu.core.exceptions.RepositoryException;
-import com.umss.siiu.core.model.Employee;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.core.service.EmployeeService;
 import com.umss.siiu.core.util.ApplicationConstants;
@@ -624,10 +623,10 @@ public class FileServiceImpl implements FileService {
     public void createFolderStructure(String path) {
         try {
             String[] splitPath = path.split(SLASH_SEPARATOR);
-            for (int var = 1; var <= splitPath.length; var++) {
-                String parentPath = concatWord(splitPath, var);
+            for (int init = 1; init <= splitPath.length; init++) {
+                String parentPath = concatWord(splitPath, init);
                 if (!jackRabbitService.getRootNode().hasNode(parentPath)) {
-                    jackRabbitService.createFolderNode(splitPath[var - 1], var == 1 ? "" : concatWord(splitPath, var - 1));
+                    jackRabbitService.createFolderNode(splitPath[init - 1], init == 1 ? "" : concatWord(splitPath, init - 1));
                 }
             }
         } catch (javax.jcr.RepositoryException e) {
@@ -637,8 +636,8 @@ public class FileServiceImpl implements FileService {
 
     private String concatWord(String[] splitPath, int limit) {
         var stringBuilder = new StringBuilder().append(splitPath[0]);
-        for (int var = 1; var < limit; var++) {
-            stringBuilder.append(SLASH_SEPARATOR).append(splitPath[var]);
+        for (int init = 1; init < limit; init++) {
+            stringBuilder.append(SLASH_SEPARATOR).append(splitPath[init]);
         }
         return stringBuilder.toString();
     }
