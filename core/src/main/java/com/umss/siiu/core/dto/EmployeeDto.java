@@ -4,7 +4,6 @@
 
 package com.umss.siiu.core.dto;
 
-import java.util.Arrays;
 
 import com.umss.siiu.core.model.Employee;
 import org.apache.tomcat.util.codec.binary.Base64;
