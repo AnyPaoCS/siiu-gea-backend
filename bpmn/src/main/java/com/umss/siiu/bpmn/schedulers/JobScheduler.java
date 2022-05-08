@@ -51,12 +51,11 @@ public class JobScheduler {
             }
             runningDaemon.set(true);
             logger.info("FetchJobs ini");
-            String lockMessage = lock.toString();
+            var lockMessage = lock.toString();
             logger.info(lockMessage);
-            String threadMessage = String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName());
+            var threadMessage = String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName());
             logger.info(threadMessage);
             List<Job> jobs = new ArrayList<>();
-            //todo here fetch jobs
             if (!jobs.isEmpty()) {
                 jobBpmService.createJobBpms(jobs);
             }
@@ -82,7 +81,7 @@ public class JobScheduler {
             runningDaemon.set(true);
             allocationInProgress = true;
             logger.info("assign ini");
-            String threadMessage = String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName());
+            var threadMessage = String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName());
             logger.info(threadMessage);
             jobBpmService.allocateResources();
             logger.info("assign end");
@@ -103,7 +102,7 @@ public class JobScheduler {
             }
             runningDaemon.set(true);
             logger.info("download ini");
-            String threadMessage = String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName());
+            var threadMessage = String.format(CURRENT_THREAD_TEXT, Thread.currentThread().getName());
             logger.info(threadMessage);
             downloadJobsFiles();
             logger.info("download end");
@@ -119,7 +118,6 @@ public class JobScheduler {
                 DOWNLOAD_POLICY, MAX_RETRIES);
         Integer maxRetries = CollectionUtils.isEmpty(maxRetriesConfigurations) ? 3 :
                 Integer.parseInt(maxRetriesConfigurations.get(0).getValue());
-        //todo here do some execution
     }
 
     public boolean isAllocationInProgress() {
