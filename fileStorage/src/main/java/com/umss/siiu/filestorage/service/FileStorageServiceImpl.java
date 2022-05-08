@@ -22,15 +22,17 @@ import java.util.List;
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
+    public static final String SLASH = "/";
     private final FileService fileService;
     private final FileTypeService fileTypeService;
     private UserService userService;
     private final Gson gson;
 
-    public FileStorageServiceImpl(FileService fileService, FileTypeService fileTypeService, Gson gson) {
+    public FileStorageServiceImpl(FileService fileService, FileTypeService fileTypeService, Gson gson, UserService userService) {
         this.fileService = fileService;
         this.fileTypeService = fileTypeService;
         this.gson = gson;
+        this.userService = userService;
     }
 
     @Override
@@ -44,7 +46,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         dto.setOwnerClass("user");
         var fileType = fileTypeService.findByAbbreviation(fileUploadDto.getFileTypeAbbreviation());
         dto.setFileTypeId(fileType.getId());
-        String folderPath = user.getId() + "/" + fileType.getFileTypeCategory().name();
+        String folderPath = user.getId() + SLASH + fileType.getFileTypeCategory().name();
         dto.setParentPath(folderPath);
         var jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(user.getId(), fileType.getId());
         if (jackRabbitNode != null) {
@@ -178,7 +180,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         dto.setOwnerId(userId);
         var fileType = fileTypeService.findByFileTypeCategory(FileTypeCategory.IMAGEN_FIRMA).get(0);
         dto.setFileTypeId(fileType.getId());
-        String folderPath = userId + "/" + fileType.getFileTypeCategory().name();
+        String folderPath = userId + SLASH + fileType.getFileTypeCategory().name();
         dto.setParentPath(folderPath);
         var jackRabbitNode = fileService.getNodeByUserIdAndFileTypeId(userId, fileType.getId());
         if (jackRabbitNode != null) {

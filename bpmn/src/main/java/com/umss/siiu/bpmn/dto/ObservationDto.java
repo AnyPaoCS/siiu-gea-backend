@@ -11,7 +11,7 @@ public class ObservationDto extends DtoBase<Observation> {
         return content;
     }
 
-    public void setContent(String observation) {
+    public void setContent(String content) {
         this.content = content;
     }
 

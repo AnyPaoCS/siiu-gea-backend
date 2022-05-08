@@ -40,10 +40,9 @@ public class JobFileTypeLockServiceImpl extends GenericServiceImpl<JobFileTypeLo
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public JobFileTypeLock acquireLock(Job job, Employee employee, FileType fileType) {
+    public JobFileTypeLock acquireLock(Job job, Employee employee, FileType fileType) throws RuntimeException {
         JobFileTypeLock jobLock = findByJobAndFileType(job, fileType);
         if (null == jobLock) {
-            try {
                 jobLock = new JobFileTypeLock();
                 jobLock.setJob(job);
                 jobLock.setEmployee(employee);
@@ -51,10 +50,6 @@ public class JobFileTypeLockServiceImpl extends GenericServiceImpl<JobFileTypeLo
                 // lock
                 jobLock = save(jobLock);
                 return jobLock;
-            } catch (Exception e) {
-                throw new RuntimeException(
-                        "The file is already been modified. Please wait refresh and try again " + "later.");
-            }
         } else {
             throw new BlockedFileException(String.format("The file is being modified by %s",
                     jobLock.getEmployee().getFullName(true)));
@@ -73,7 +68,6 @@ public class JobFileTypeLockServiceImpl extends GenericServiceImpl<JobFileTypeLo
             logger.error(String.format(
                     "There was an error trying to delete the lock for job: %s file type: %s " + "employee: %s",
                     job.getId(), fileType.getName(), employee.getFullName(true)), e);
-            throw e;
         }
     }
 
