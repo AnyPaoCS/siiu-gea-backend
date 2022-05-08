@@ -29,7 +29,7 @@ public class JobScheduler {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private ReentrantLock lock = new ReentrantLock();
-    private volatile AtomicBoolean runningDaemon = new AtomicBoolean(false);
+    private AtomicBoolean runningDaemon = new AtomicBoolean(false);
     private Condition noRunningCondition = lock.newCondition();
     private ConfigurationService configurationService;
     private JobBpmService jobBpmService;

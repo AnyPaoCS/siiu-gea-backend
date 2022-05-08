@@ -275,17 +275,6 @@ public class JackRabbitServiceImpl implements JackRabbitService {
         return null;
     }
 
-    private InputStream obtainFileFromNode(JackRabbitNode jackRabbitNode) {
-        try {
-            final var node = getFileNode(jackRabbitNode.getPath());
-            final var property = node.getProperty(JcrConstants.JCR_DATA);
-            final var bin = property.getBinary();
-            return bin.getStream();
-        } catch (Exception e) {
-            throw new IllegalStateException("The file was not found", e);
-        }
-    }
-
     @Override
     public Node getFileNode(String fileNodeName) {
         String path = sanitizePath(fileNodeName);
