@@ -120,11 +120,7 @@ public class StringUtility {
         return filteredValues;
     }
 
-    public static String encodeValue(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex.getCause());
-        }
+    public static String encodeValue(String value) throws UnsupportedEncodingException {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
     }
 }
