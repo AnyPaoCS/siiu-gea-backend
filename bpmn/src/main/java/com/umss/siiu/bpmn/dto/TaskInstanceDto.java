@@ -31,6 +31,8 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
     private List<ObservationDto> observations;
 
     private Long userProcessId;
+    private String processCode;
+    private long processInstanceId;
 
     public TaskStatus getTaskStatus() {
         return taskStatus;
@@ -136,6 +138,22 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
         this.userProcessId = userProcessId;
     }
 
+    public String getProcessCode() {
+        return processCode;
+    }
+
+    public void setProcessCode(String processCode) {
+        this.processCode = processCode;
+    }
+
+    public long getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(long processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
     @Override
     protected void afterConversion(TaskInstance taskInstance, ModelMapper mapper) {
         setName(taskInstance.getTask().getName());
@@ -147,6 +165,8 @@ public class TaskInstanceDto extends DtoBase<TaskInstance> {
         setResourceDocuments(getDocumentsFromResource(taskInstance, mapper));
         setObservations(new ObservationDto().toListDto(taskInstance.getObservations(), mapper));
         setUserProcessId(taskInstance.getProcessInstance().getUser().getId());
+        setProcessCode(taskInstance.getProcessInstance().getProcess().getCode());
+        setProcessInstanceId(taskInstance.getProcessInstance().getId());
     }
 
     private Optional<EmployeeDto> getEmployeeFromResource(TaskInstance taskInstance, ModelMapper mapper) {
