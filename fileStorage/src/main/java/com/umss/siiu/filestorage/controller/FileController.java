@@ -111,6 +111,7 @@ public class FileController {
 
     @PatchMapping("/setPermanent")
     public ResponseEntity<Object> setFileIsPermanent (@RequestParam("fileId")long fileId, @RequestParam("permanent")boolean permanent) {
+        System.out.println("entro");
         ResponseEntity<Object> responseEntity;
         JackRabbitNode node = fileService.updateFileIsPermanent(fileId, permanent);
         if (node != null) {

@@ -10,6 +10,7 @@ import com.umss.siiu.core.exceptions.InternalErrorException;
 import com.umss.siiu.core.model.ModelBase;
 import com.umss.siiu.core.service.GenericService;
 import io.micrometer.core.instrument.util.IOUtils;
+import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,6 @@ public abstract class GenericController<E extends ModelBase, D extends DtoBase<E
     public E findModelById(@PathVariable Long id) {
         return (E) getService().findById(id);
     }
-
     @GetMapping("/{id}")
     protected D getById(@PathVariable("id") @NotNull Long id) {
         return toDto((E) (getService().findById(id)));
